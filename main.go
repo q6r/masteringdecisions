@@ -33,7 +33,7 @@ func main() {
 	/*
 		1. Create a decision
 		2. List all decisions
-		3. TODO : Delete a decision
+		3. Delete a decision
 		4. List decision ballots
 		5. TODO : Change a decision information
 	*/
@@ -48,12 +48,13 @@ func main() {
 		1. Create a ballot
 		2. List all ballots
 		3. Show ballot information
-		4. TODO : Delete a ballot
+		4. Delete a ballot
 		5. TODO : Change a ballot feature
 	*/
 	routes.POST("/ballot", HBallotCreate)
 	routes.GET("/ballots", HBallotList)
 	routes.GET("/ballot/:ballot_id/info", HBallotInfo)
+	routes.DELETE("/ballot/:ballot_id", HBallotDelete)
 
 	routes.Run(":9999")
 }
