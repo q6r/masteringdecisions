@@ -1,13 +1,18 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-gorp/gorp"
+)
 
 // TODO : Write tests
 
-var database *Database
+var dbmap *gorp.DbMap
 
 func main() {
-	database = NewDatabase()
+	dbmap = InitDatabase()
+	defer dbmap.Db.Close()
+
 	routes := gin.Default()
 
 	// Person

@@ -4,20 +4,25 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 )
 
-type Database struct {
-	DB *sql.DB
-}
-
-func NewDatabase() *Database {
-	var err error
-	d := &Database{}
-	d.DB, err = sql.Open("postgres",
+func InitDatabase() *gorp.DbMap {
+	db, err := sql.Open("postgres",
 		"user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return d
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
+
+	dbmap.AddTableWithName(Person{}, "person").SetKeys(true, "person_id")
+	dbmap.AddTableWithName(Decision{}, "decision").SetKeys(true, "decision_id")
+	dbmap.AddTableWithName(Ballot{}, "ballot").SetKeys(true, "ballot_id")
+
+	err = dbmap.CreateTablesIfNotExists()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return dbmap
 }
