@@ -1,13 +1,20 @@
+// TODO : A decision can't be owned by two different users
+// TODO : ^ this restriction is important so one user facilitates one decision
+
+// TODO : Remove decision_id as incremental key, it should be non-incremental
+// or not ???
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Decision struct {
-	Decision_ID            int    `db:"decision_id" json:"decision_id"`
+	Decision_ID            int    `db:"decision_id" json:"decision_id" binding:"required"`
 	Person_ID              int    `db:"person_id" json:"person_id" binding:"required"`
 	Name                   string `db:"name" json:"name" binding:"required"`
 	Description            string `db:"description" json:"description" binding:"required"`
@@ -59,18 +66,9 @@ func HDecisionCreate(c *gin.Context) {
 		return
 	}
 
-	// See if there's a person that this decision belongs to
-	// otherwise we quit
-	var p Person
-	err = dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", decision.Person_ID)
+	err = decision.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "the decision person owner does not exist, create it first"})
-		return
-	}
-
-	err = decision.CreateDecision()
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -78,35 +76,85 @@ func HDecisionCreate(c *gin.Context) {
 }
 
 func HDecisionDelete(c *gin.Context) {
-	id := c.Param("decision_id")
-	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", id)
+	id, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
 
-	// When deleting a decision we should remove anything that belongs
-	// to it such as ballots
-	var ballots []Ballot
-	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", id)
+	d := &Decision{Decision_ID: id}
+	err = d.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
-	}
-
-	for _, b := range ballots {
-		_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err})
-			return
-		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"result": "deleted decision, its ballots"})
 }
 
-func (d *Decision) CreateDecision() error {
-	err := dbmap.Insert(d)
+// Destroy the remove the decision and it's dependencies
+func (d *Decision) Destroy() error {
+	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return err
+	}
+
+	var ballots []Ballot
+	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return err
+	}
+
+	for _, b := range ballots {
+		err := b.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+
+	var cris []Criterion
+	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return err
+	}
+
+	for _, cri := range cris {
+		err := cri.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Save saves decision in the database
+// Restriction : Decision can't be created without an existing owner
+// Restriction : Decision can't be owned by two different people
+func (d *Decision) Save() error {
+
+	// See if there's a person that this decision belongs to
+	// otherwise we quit
+	var p Person
+	err := dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", d.Person_ID)
+	if err != nil {
+		return fmt.Errorf("person %d does not exist, can't create a decision without an owner", d.Person_ID)
+	}
+
+	// If someone else other than us owns the same
+	// decision then abort
+	var ds []Decision
+	_, err = dbmap.Select(&ds, "select * from decision where decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return err
+	}
+	for _, i := range ds {
+		if i.Person_ID != d.Person_ID {
+			return fmt.Errorf("decision %d already owned by person %d", d.Decision_ID, i.Person_ID)
+		}
+	}
+
+	err = dbmap.Insert(d)
 	if err != nil {
 		return err
 	}

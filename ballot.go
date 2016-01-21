@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,23 +30,28 @@ func HBallotCreate(c *gin.Context) {
 		return
 	}
 
-	err = b.CreateBallot()
+	err = b.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, b)
 }
 
 func HBallotDelete(c *gin.Context) {
-	id := c.Param("ballot_id")
-	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", id)
+	id, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+	b := &Ballot{Ballot_ID: id}
+	err = b.Destroy()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted ballot"})
+	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
 func HBallotList(c *gin.Context) {
@@ -71,7 +77,21 @@ func HBallotInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, ballot)
 }
 
-func (b *Ballot) CreateBallot() error {
+func HBallotVote(c *gin.Context) {
+
+}
+
+// Destroy removes a ballot from the database
+func (b *Ballot) Destroy() error {
+	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Save inserts a ballot into the database
+func (b *Ballot) Save() error {
 	if err := dbmap.Insert(b); err != nil {
 		return err
 	}

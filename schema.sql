@@ -27,49 +27,6 @@ CREATE TABLE decision
 	PRIMARY KEY (decision_id)
 );
 
-CREATE TABLE facilitates
-(
-    decision_id INTEGER NOT NULL,
-    person_id INTEGER NOT NULL,
-    
-    FOREIGN KEY (decision_id) REFERENCES decision,
-    FOREIGN KEY (person_id) REFERENCES person,
-    PRIMARY KEY (decision_id, person_id)
-);
-
-CREATE TABLE criterion
-(
-	criterion_id INTEGER NOT NULL,
-	decision_id INTEGER NOT NULL,
-	name TEXT,
-	weight TEXT,
-
-	PRIMARY KEY (criterion_id),
-	FOREIGN KEY (decision_id) REFERENCES decision
-);
-
-CREATE TABLE alternative
-(
-	alternative_id INTEGER NOT NULL,
-	decision_id INTEGER NOT NULL,
-	name TEXT,
-	rating REAL,
-
-	FOREIGN KEY (decision_id) REFERENCES decision,
-	PRIMARY KEY (alternative_id)
-);
-
-CREATE TABLE criterion_alternative
-(
-	criterion_id INTEGER NOT NULL,
-	alternative_id INTEGER NOT NULL,
-	rating REAL,
-
-	PRIMARY KEY (criterion_id, alternative_id),
-	FOREIGN KEY (criterion_id) REFERENCES criterion,
-	FOREIGN KEY (alternative_id) REFERENCES alternative
-);
-
 CREATE TABLE ballot
 (
 	ballot_id INTEGER NOT NULL,
@@ -82,28 +39,29 @@ CREATE TABLE ballot
 	FOREIGN KEY (decision_id) REFERENCES decision
 );
 
+/*
+ A decision has a criterion
+*/
+CREATE TABLE criterion
+(
+	criterion_id INTEGER NOT NULL,
+	decision_id INTEGER NOT NULL,
+	name TEXT,
+	weight TEXT,
+
+	PRIMARY KEY (criterion_id),
+	FOREIGN KEY (decision_id) REFERENCES decision
+);
+
 CREATE TABLE vote_criterion
 (
 	criterion_id INTEGER NOT NULL,
 	ballot_id INTEGER NOT NULL,
 	weight INTEGER NOT NULL,
 
-	PRIMARY KEY (criterion_id, ballot_id),
+	/*PRIMARY KEY (criterion_id, ballot_id),*/
+	/*PRIMARY KEY (criterion_id),*/
 
 	FOREIGN KEY (criterion_id) REFERENCES criterion,
-	FOREIGN KEY (ballot_id) REFERENCES ballot
-);
-
-CREATE TABLE vote_alternative
-(
-	criterion_id INTEGER NOT NULL,
-	alternative_id INTEGER NOT NULL,
-	ballot_id INTEGER NOT NULL,
-	rating INTEGER NOT NULL,
-
-	PRIMARY KEY (criterion_id, alternative_id, ballot_id),
-
-	FOREIGN KEY (criterion_id) REFERENCES criterion,
-	FOREIGN KEY (alternative_id) REFERENCES alternative,
 	FOREIGN KEY (ballot_id) REFERENCES ballot
 );

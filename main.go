@@ -1,3 +1,8 @@
+// TODO : Problem with binding it caches default value as 'unset'
+// eg:sending integer 0 is considered invalid
+// eg:sending an empty string is considered invalid
+
+// TODO : Write more test cover at least 80% of code
 package main
 
 import (
@@ -53,8 +58,22 @@ func main() {
 	*/
 	routes.POST("/ballot", HBallotCreate)
 	routes.GET("/ballots", HBallotList)
-	routes.GET("/ballot/:ballot_id/info", HBallotInfo)
+	routes.GET("/ballot/:ballot_id", HBallotInfo)
+	routes.POST("/ballot/:ballot_id", HBallotVote)
 	routes.DELETE("/ballot/:ballot_id", HBallotDelete)
+
+	// Criterion
+	/*
+		1. Create a criterion
+		2. List all criterions
+		3. Show criterion information
+		4. Delete a criterion
+		5. TODO : Change a criterion information
+	*/
+	routes.POST("/criterion", HCriterionCreate)
+	routes.GET("/criterions", HCriterionList)
+	routes.GET("/criterion/:criterion_id/info", HCriterionInfo)
+	routes.DELETE("/criterion/:criterion_id", HCriterionDelete)
 
 	routes.Run(":9999")
 }

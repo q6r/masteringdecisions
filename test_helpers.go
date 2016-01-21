@@ -2,67 +2,94 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"testing"
+	"net/http/httptest"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-func CheckErr(t *testing.T, err error) {
-	if err != nil {
-		t.Error(err)
+type RequestFunc func(*gin.Context)
+type ResponseFunc func(*httptest.ResponseRecorder)
+
+type RequestConfig struct {
+	Method      string
+	Path        string
+	Body        string
+	Headers     map[string]string
+	Middlewares []gin.HandlerFunc
+	Handler     RequestFunc
+	Finaliser   ResponseFunc
+}
+
+func RunRequest(rc RequestConfig) {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+
+	if rc.Middlewares != nil && len(rc.Middlewares) > 0 {
+		for _, mw := range rc.Middlewares {
+			r.Use(mw)
+		}
+	}
+
+	qs := ""
+	if strings.Contains(rc.Path, "?") {
+		ss := strings.Split(rc.Path, "?")
+		rc.Path = ss[0]
+		qs = ss[1]
+	}
+
+	body := bytes.NewBufferString(rc.Body)
+
+	req, _ := http.NewRequest(rc.Method, rc.Path, body)
+
+	if len(qs) > 0 {
+		req.URL.RawQuery = qs
+	}
+
+	if len(rc.Headers) > 0 {
+		for k, v := range rc.Headers {
+			req.Header.Set(k, v)
+		}
+	} else if rc.Method == "POST" || rc.Method == "PUT" {
+		if strings.HasPrefix(rc.Body, "{") {
+			req.Header.Set("Content-Type", "application/json")
+		} else {
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		}
+	}
+
+	r.Handle(rc.Method, rc.Path, func(c *gin.Context) {
+		//change argument if necessary here
+		rc.Handler(c)
+	})
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if rc.Finaliser != nil {
+		rc.Finaliser(w)
 	}
 }
 
-func SimplePostRequest(url string,
-	data []byte, checker func(resp string, err error)) {
-
-	req, err := http.NewRequest("POST", "http://localhost:9999"+url, bytes.NewBuffer(data))
-	if err != nil {
-		checker("", err)
+func RunSimpleGet(path string, handler RequestFunc, reply ResponseFunc) {
+	rc := RequestConfig{
+		Method:    "GET",
+		Path:      path,
+		Handler:   handler,
+		Finaliser: reply,
 	}
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		checker("", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		checker("", fmt.Errorf("Error status code %v", resp.StatusCode))
-	}
-
-	iob, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		checker("", err)
-	}
-
-	checker(string(iob), nil)
+	RunRequest(rc)
 }
 
-func SimpleGetRequest(url string, checker func(resp string, err error)) {
-
-	req, err := http.NewRequest("GET", "http://localhost:9999"+url, nil)
-	if err != nil {
-		checker("", err)
+func RunSimplePost(path string, body string,
+	handler RequestFunc, reply ResponseFunc) {
+	rc := RequestConfig{
+		Method:    "POST",
+		Path:      path,
+		Body:      body,
+		Handler:   handler,
+		Finaliser: reply,
 	}
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		checker("", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		checker("", fmt.Errorf("Error status code %v", resp.StatusCode))
-	}
-
-	iob, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		checker("", err)
-	}
-
-	checker(string(iob), nil)
+	RunRequest(rc)
 }

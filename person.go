@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,9 +33,9 @@ func HPersonCreate(c *gin.Context) {
 		return
 	}
 
-	err = person.CreatePerson()
+	err = person.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -42,43 +43,17 @@ func HPersonCreate(c *gin.Context) {
 }
 
 func HPersonDelete(c *gin.Context) {
-	id := c.Param("person_id")
-
-	_, err := dbmap.Exec("DELETE FROM person WHERE person_id=$1", id)
+	id, err := strconv.Atoi(c.Param("person_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
 
-	// When removing a person also delete the decision he created
-	// When deleting the decisions he created delete the ballots beloning
-	// to those decisions
-	var decisions []Decision
-	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", id)
+	p := &Person{Person_ID: id}
+	err = p.Destroy()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
-	}
-
-	for _, d := range decisions {
-		var ballots []Ballot
-		_, err := dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err})
-			return
-		}
-		for _, b := range ballots {
-			_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
-			if err != nil {
-				c.JSON(http.StatusNotFound, gin.H{"error": err})
-				return
-			}
-		}
-		_, err = dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.Decision_ID)
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err})
-			return
-		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
@@ -108,7 +83,31 @@ func HPersonDecisions(c *gin.Context) {
 	c.JSON(http.StatusOK, decisions)
 }
 
-func (p *Person) CreatePerson() error {
+// Destroy a person from the database and remove its dependencies
+func (p *Person) Destroy() error {
+	_, err := dbmap.Exec("DELETE FROM person WHERE person_id=$1", p.Person_ID)
+	if err != nil {
+		return err
+	}
+
+	// Remove the person's decisions
+	var decisions []Decision
+	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.Person_ID)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range decisions {
+		err := d.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (p *Person) Save() error {
 	if err := dbmap.Insert(p); err != nil {
 		return err
 	}
