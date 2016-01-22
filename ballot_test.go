@@ -35,6 +35,15 @@ func TestBallotCreateDestroy(t *testing.T) {
 		bs = append(bs, b)
 	}
 
+	// Get info of the ballots
+	for _, b := range bs {
+		res, err := TInfoBallot(d1.Decision_ID, b.Ballot_ID)
+		if err != nil {
+			t.Error(err)
+		}
+		assert.Equal(t, res.Ballot_ID, b.Ballot_ID, "should be equal")
+	}
+
 	// Delete those ballots
 	for _, b := range bs {
 		res, err := TDeleteBallot(d1.Decision_ID, b.Ballot_ID)

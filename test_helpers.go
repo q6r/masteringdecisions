@@ -129,6 +129,31 @@ func TCreatePerson(data string) (Person, error) {
 	return p1, nil
 }
 
+func TCreateCriterion(decision_id int, data string) (Criterion, error) {
+	var c1 Criterion
+	var err error
+
+	RunSimplePost("/decision/:decision_id/criterion", data,
+		func(c *gin.Context) {
+			c.Params = gin.Params{
+				gin.Param{
+					Key:   "decision_id",
+					Value: strconv.Itoa(decision_id),
+				},
+			}
+			HCriterionCreate(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &c1)
+		})
+
+	if err != nil {
+		return Criterion{}, err
+	}
+
+	return c1, nil
+}
+
 func TCreateDecision(data string) (Decision, error) {
 	var d1 Decision
 	var err error
@@ -171,6 +196,34 @@ func TCreateBallot(did int, data string) (Ballot, error) {
 	}
 
 	return b1, nil
+}
+
+func TDeleteCriterion(decision_id int, criterion_id int) (JResult, error) {
+	var res JResult
+	var err error
+
+	RunSimpleDelete("/decision/:decision_id/criterion/:ballot_id",
+		func(c *gin.Context) {
+			c.Params = gin.Params{
+				gin.Param{
+					Key:   "decision_id",
+					Value: strconv.Itoa(decision_id),
+				},
+				gin.Param{
+					Key:   "criterion_id",
+					Value: strconv.Itoa(criterion_id),
+				},
+			}
+			HCriterionDelete(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+	if err != nil {
+		return JResult{}, err
+	}
+
+	return res, nil
 }
 
 func TDeleteBallot(decision_id int, ballot_id int) (JResult, error) {
@@ -257,4 +310,34 @@ func TInfoPerson(person_id int) (Person, error) {
 
 	return res, nil
 
+}
+
+func TInfoBallot(decision_id int, ballot_id int) (Ballot, error) {
+	var res Ballot
+	var err error
+
+	RunSimpleDelete("/decision/:decision_id/ballot/:ballot_id/info",
+		func(c *gin.Context) {
+			c.Params = gin.Params{
+				gin.Param{
+					Key:   "decision_id",
+					Value: strconv.Itoa(decision_id),
+				},
+				gin.Param{
+					Key:   "ballot_id",
+					Value: strconv.Itoa(ballot_id),
+				},
+			}
+
+			HBallotInfo(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+
+	if err != nil {
+		return Ballot{}, err
+	}
+
+	return res, nil
 }
