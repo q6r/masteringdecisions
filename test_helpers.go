@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +13,10 @@ import (
 
 type RequestFunc func(*gin.Context)
 type ResponseFunc func(*httptest.ResponseRecorder)
+
+type JResult struct {
+	Result string `json:"result"`
+}
 
 type RequestConfig struct {
 	Method      string
@@ -102,4 +108,153 @@ func RunSimplePost(path string, body string,
 		Finaliser: reply,
 	}
 	RunRequest(rc)
+}
+
+func TCreatePerson(data string) (Person, error) {
+	var p1 Person
+	var err error
+
+	RunSimplePost("/person", data,
+		func(c *gin.Context) {
+			HPersonCreate(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &p1)
+		})
+
+	if err != nil {
+		return Person{}, err
+	}
+
+	return p1, nil
+}
+
+func TCreateDecision(data string) (Decision, error) {
+	var d1 Decision
+	var err error
+
+	RunSimplePost("/decision", data,
+		func(c *gin.Context) {
+			HDecisionCreate(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &d1)
+		})
+
+	if err != nil {
+		return Decision{}, err
+	}
+
+	return d1, nil
+}
+
+func TCreateBallot(did int, data string) (Ballot, error) {
+	var b1 Ballot
+	var err error
+
+	RunSimplePost("/decision/:did/ballot", data,
+		func(c *gin.Context) {
+			c.Params = gin.Params{
+				gin.Param{
+					Key:   "decision_id",
+					Value: strconv.Itoa(did),
+				},
+			}
+			HBallotCreate(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &b1)
+		})
+
+	if err != nil {
+		return Ballot{}, err
+	}
+
+	return b1, nil
+}
+
+func TDeleteBallot(decision_id int, ballot_id int) (JResult, error) {
+	var res JResult
+	var err error
+
+	RunSimpleDelete("/decision/:decision_id/ballot/:ballot_id",
+		func(c *gin.Context) {
+			c.Params = gin.Params{
+				gin.Param{
+					Key:   "decision_id",
+					Value: strconv.Itoa(decision_id),
+				},
+				gin.Param{
+					Key:   "ballot_id",
+					Value: strconv.Itoa(ballot_id),
+				},
+			}
+			HBallotDelete(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+	if err != nil {
+		return JResult{}, err
+	}
+
+	return res, nil
+}
+
+func TDeleteDecision(decision_id int) (JResult, error) {
+	var res JResult
+	var err error
+
+	RunSimpleDelete("/decision/:decision_id",
+		func(c *gin.Context) {
+			c.Params = gin.Params{gin.Param{Key: "decision_id", Value: strconv.Itoa(decision_id)}}
+			HDecisionDelete(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+	if err != nil {
+		return JResult{}, err
+	}
+
+	return res, nil
+}
+
+func TDeletePerson(person_id int) (JResult, error) {
+	var res JResult
+	var err error
+
+	RunSimpleDelete("/person/:person_id",
+		func(c *gin.Context) {
+			c.Params = gin.Params{gin.Param{Key: "person_id", Value: strconv.Itoa(person_id)}}
+			HPersonDelete(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+	if err != nil {
+		return JResult{}, err
+	}
+
+	return res, nil
+}
+
+func TInfoPerson(person_id int) (Person, error) {
+	var res Person
+	var err error
+
+	RunSimpleDelete("/person/:person_id/info",
+		func(c *gin.Context) {
+			c.Params = gin.Params{gin.Param{Key: "person_id", Value: strconv.Itoa(person_id)}}
+			HPersonInfo(c)
+		},
+		func(r *httptest.ResponseRecorder) {
+			err = json.Unmarshal(r.Body.Bytes(), &res)
+		})
+	if err != nil {
+		return Person{}, err
+	}
+
+	return res, nil
+
 }
