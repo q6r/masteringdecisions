@@ -25,7 +25,7 @@ type Decision struct {
 	Client_Settings        string `db:"client_settings" json:"client_settings" binding:"required"`
 }
 
-func HDecisionBallots(c *gin.Context) {
+func HDecisionBallotsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var ballots []Ballot
 	_, err := dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", did)
@@ -35,6 +35,17 @@ func HDecisionBallots(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, ballots)
+}
+
+func HDecisionCriterionsList(c *gin.Context) {
+	did := c.Param("decision_id")
+	var cris []Criterion
+	_, err := dbmap.Select(&cris, "select * from criterion where decision_id=$1", did)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusOK, cris)
 }
 
 func HDecisionsList(c *gin.Context) {

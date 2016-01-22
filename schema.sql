@@ -1,6 +1,3 @@
-/* TODO : person_id should be autoincrement
- change that and fix Person and the tests
- */
 CREATE TABLE person (
 	person_id INTEGER NOT NULL,
 	email TEXT NOT NULL UNIQUE,
@@ -23,8 +20,8 @@ CREATE TABLE decision
     alternative_vote_style TEXT NOT NULL,
 	client_settings TEXT,
 
-	FOREIGN KEY (person_id) REFERENCES person, /* what should we do */
 	PRIMARY KEY (decision_id)
+	FOREIGN KEY (person_id) REFERENCES person,
 );
 
 CREATE TABLE ballot

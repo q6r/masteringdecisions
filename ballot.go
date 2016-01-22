@@ -77,15 +77,25 @@ func HBallotInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, ballot)
 }
 
-func HBallotVote(c *gin.Context) {
-
-}
-
 // Destroy removes a ballot from the database
 func (b *Ballot) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
 	if err != nil {
 		return err
+	}
+
+	// Remove votes beloning to this ballot
+	var votes []Vote
+	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.Ballot_ID)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range votes {
+		err = v.Destroy()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

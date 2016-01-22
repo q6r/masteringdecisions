@@ -2,7 +2,18 @@
 // eg:sending integer 0 is considered invalid
 // eg:sending an empty string is considered invalid
 
+// TODO : Make sure duplicates are not allowed in Save of all
+
 // TODO : Write more test cover at least 80% of code
+
+// TODO : In all implement Check that checks if one with a primary key
+// exists, good for code refactoring and simplifying
+
+// TODO : Person pwhash should get encrypted
+
+// TODO : Person should not send the hash back <implement after authorization>
+
+// TODO : Review and test Save/Destroy restriction and write tests if possible :)
 package main
 
 import (
@@ -45,7 +56,8 @@ func main() {
 	routes.POST("/decision", HDecisionCreate)
 	routes.GET("/decisions", HDecisionsList)
 	routes.GET("/decision/:decision_id/info", HDecisionInfo)
-	routes.GET("/decision/:decision_id/ballots", HDecisionBallots)
+	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
+	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
 	routes.DELETE("/decision/:decision_id", HDecisionDelete)
 
 	// Ballot
@@ -59,7 +71,7 @@ func main() {
 	routes.POST("/ballot", HBallotCreate)
 	routes.GET("/ballots", HBallotList)
 	routes.GET("/ballot/:ballot_id", HBallotInfo)
-	routes.POST("/ballot/:ballot_id", HBallotVote)
+	//routes.POST("/ballot/:ballot_id", HBallotVote) // TODO
 	routes.DELETE("/ballot/:ballot_id", HBallotDelete)
 
 	// Criterion
@@ -74,6 +86,16 @@ func main() {
 	routes.GET("/criterions", HCriterionList)
 	routes.GET("/criterion/:criterion_id/info", HCriterionInfo)
 	routes.DELETE("/criterion/:criterion_id", HCriterionDelete)
+
+	// Votes
+	/*
+		1. Create a vote
+		2. List all votes
+		3. Delete a vote
+	*/
+	routes.POST("/vote", HVoteCreate)
+	routes.GET("/votes", HVotesList)
+	routes.DELETE("/vote", HVoteDelete)
 
 	routes.Run(":9999")
 }

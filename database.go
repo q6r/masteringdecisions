@@ -26,6 +26,8 @@ func InitDatabase() *gorp.DbMap {
 	// TODO : need to remove criterion autoincr ???
 	dbmap.AddTableWithName(Criterion{}, "criterion").SetKeys(true, "criterion_id")
 
+	dbmap.AddTableWithName(Vote{}, "vote")
+
 	err = dbmap.CreateTablesIfNotExists()
 	if err != nil {
 		log.Fatalln(err)
