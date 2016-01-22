@@ -77,7 +77,7 @@ func main() {
 	routes.POST("/decision", HDecisionCreate)
 	routes.GET("/decisions", HDecisionsList)
 	routes.GET("/decision/:decision_id/info", HDecisionInfo)
-	routes.GET("/decision/:decision_id/stats", HDecisionStats)
+	routes.GET("/decision/:decision_id/stats", HStats)
 	routes.DELETE("/decision/:decision_id", HDecisionDelete)
 
 	// decision's ballots
