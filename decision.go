@@ -1,8 +1,3 @@
-// TODO : A decision can't be owned by two different users
-// TODO : ^ this restriction is important so one user facilitates one decision
-
-// TODO : Remove decision_id as incremental key, it should be non-incremental
-// or not ???
 package main
 
 import (
@@ -13,22 +8,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Decision represent a decision owned by Person_ID
 type Decision struct {
-	Decision_ID            int    `db:"decision_id" json:"decision_id"`
-	Person_ID              int    `db:"person_id" json:"person_id" binding:"required"`
-	Name                   string `db:"name" json:"name" binding:"required"`
-	Description            string `db:"description" json:"description" binding:"required"`
-	Stage                  int    `db:"stage" json:"stage" binding:"required"`
-	Criterion_Vote_Style   string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
+	Decision_ID          int    `db:"decision_id" json:"decision_id"`
+	Person_ID            int    `db:"person_id" json:"person_id" binding:"required"`
+	Name                 string `db:"name" json:"name" binding:"required"`
+	Description          string `db:"description" json:"description" binding:"required"`
+	Stage                int    `db:"stage" json:"stage" binding:"required"`
+	Criterion_Vote_Style string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
+	// TODO : remove alternative?
 	Alternative_Vote_Style string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
 	Client_Settings        string `db:"client_settings" json:"client_settings" binding:"required"`
 }
 
+// HDecisionStats Finds all ballots beloning to a decision
+// find their voes, find the criterion of the decision
+// do the math, return a stats object
+// TODO : implement me / move to stats.go
 func HDecisionStats(c *gin.Context) {
-	//did := c.Param("decision_id")
-
 }
 
+// HDecisionBallotsList returns a list of ballots beloning
+// to a decision
 func HDecisionBallotsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var ballots []Ballot
@@ -41,6 +42,8 @@ func HDecisionBallotsList(c *gin.Context) {
 	c.JSON(http.StatusOK, ballots)
 }
 
+// HDecisionCriterionsList returns a list of criterions beloning
+// to a decision
 func HDecisionCriterionsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var cris []Criterion
@@ -52,6 +55,8 @@ func HDecisionCriterionsList(c *gin.Context) {
 	c.JSON(http.StatusOK, cris)
 }
 
+// HDecisionsList returns a list of all decision defined
+// in the database
 func HDecisionsList(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "SELECT * FROM decision")
@@ -62,6 +67,8 @@ func HDecisionsList(c *gin.Context) {
 	c.JSON(http.StatusOK, decisions)
 }
 
+// HDecisionInfo returns a decision information
+// a decision object not it's stats
 func HDecisionInfo(c *gin.Context) {
 	id := c.Param("decision_id")
 	var decision Decision
@@ -73,6 +80,8 @@ func HDecisionInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, decision)
 }
 
+// HDecisionCreate creates a decision beloning to a specific
+// person
 func HDecisionCreate(c *gin.Context) {
 	var decision Decision
 	err := c.Bind(&decision)
@@ -90,6 +99,7 @@ func HDecisionCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, decision)
 }
 
+// HDecisionDelete deletes a decision from database
 func HDecisionDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
@@ -107,7 +117,9 @@ func HDecisionDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "deleted decision, its ballots"})
 }
 
-// Destroy the remove the decision and it's dependencies
+// Destroy a decision from the database
+// and remove it's dependencies such as ballots
+// when destroying ballots they'll destroy their votes..etc
 func (d *Decision) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.Decision_ID)
 	if err != nil {

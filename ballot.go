@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Ballot represent a ballot that belong
+// in a decision
 type Ballot struct {
 	Ballot_ID   int    `db:"ballot_id" json:"ballot_id"`
 	Decision_ID int    `db:"decision_id" json:"decision_id"`
@@ -15,6 +17,8 @@ type Ballot struct {
 	Email       string `db:"email" json:"email" binding:"required"`
 }
 
+// HBallotCreate create a ballot that belongs
+// to a decision
 func HBallotCreate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
@@ -37,6 +41,7 @@ func HBallotCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, b)
 }
 
+// HBallotDelete deletes a ballot from a decision
 func HBallotDelete(c *gin.Context) {
 
 	did, err := strconv.Atoi(c.Param("decision_id"))
@@ -61,6 +66,9 @@ func HBallotDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
+// HBallotInfo gets the information for a specific
+// ballot in a decision and retusn an json object
+// of the found ballot
 func HBallotInfo(c *gin.Context) {
 	did := c.Param("decision_id")
 	bid := c.Param("ballot_id")
@@ -75,6 +83,8 @@ func HBallotInfo(c *gin.Context) {
 }
 
 // Destroy removes a ballot from the database
+// it also removes the dependencies of a ballots
+// such as votes
 func (b *Ballot) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
 	if err != nil {

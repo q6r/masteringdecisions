@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Criterion represent a criterion for a decision
 type Criterion struct {
 	Criterion_ID int    `db:"criterion_id" json:"criterion_id"`
 	Decision_ID  int    `db:"decision_id" json:"decision_id"` // inherited
@@ -15,6 +16,9 @@ type Criterion struct {
 	Weight       int    `db:"weight" json:"weight" binding:"required"`
 }
 
+// HCriterionInfo get the information of a specific
+// criterion in a decision and return it as a json
+// object
 func HCriterionInfo(c *gin.Context) {
 	did := c.Param("decision_id")
 	cid := c.Param("criterion_id")
@@ -28,6 +32,7 @@ func HCriterionInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, cri)
 }
 
+// HCriterionDelete deletes a criterion from a decision
 func HCriterionDelete(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
@@ -51,6 +56,7 @@ func HCriterionDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
+// HCriterionCreate creates a criterion for a decision
 func HCriterionCreate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
@@ -75,9 +81,10 @@ func HCriterionCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, cri)
 }
 
-// TODO : Let this destroy also destroy vote criterion after we create it
+// Destroy removes a criterion from a decision
 func (cri *Criterion) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM criterion WHERE criterion_id=$1", cri.Criterion_ID)
+	_, err := dbmap.Exec("DELETE FROM criterion WHERE criterion_id=$1 and decision_id=$2",
+		cri.Criterion_ID, cri.Decision_ID)
 	if err != nil {
 		return err
 	}
@@ -85,6 +92,7 @@ func (cri *Criterion) Destroy() error {
 	return nil
 }
 
+// Save saves a criterion in the database
 // Restrictions decision should exist
 func (cri *Criterion) Save() error {
 

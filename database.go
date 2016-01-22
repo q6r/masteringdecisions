@@ -8,6 +8,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// InitDatabase initalizes the postgres database
+// builds the schema of the table
+// forigen key restriction is not handled in here but they're
+// handled in each objects Save and Destroy methods
 func InitDatabase() *gorp.DbMap {
 	db, err := sql.Open("postgres",
 		"user=postgres dbname=postgres sslmode=disable")

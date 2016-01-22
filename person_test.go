@@ -11,6 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestHPersonCreateHPersonInfo
+// a sample test that tests HPersonCreate,
+// and HpersonInfo Handlers
 func TestHPersonCreateHPersonInfo(t *testing.T) {
 	dbmap = InitDatabase()
 	defer dbmap.Db.Close()
@@ -48,7 +51,8 @@ func TestHPersonCreateHPersonInfo(t *testing.T) {
 		})
 }
 
-type ErrorJson struct {
+// ErrorJSON represent an error
+type ErrorJSON struct {
 	Result string `json:"result"`
 }
 
@@ -82,7 +86,7 @@ func TestHPersonCreateHPersonDelete(t *testing.T) {
 		},
 		func(r *httptest.ResponseRecorder) {
 			fmt.Printf(string(r.Body.Bytes()))
-			var jerr ErrorJson
+			var jerr ErrorJSON
 			err := json.Unmarshal(r.Body.Bytes(), &jerr)
 			if err != nil {
 				t.Error(err)

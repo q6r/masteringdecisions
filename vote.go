@@ -8,12 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Vote represent a vote by a ballot for a specific
+// criterion
 type Vote struct {
 	Criterion_ID int `db:"criterion_id" json:"criterion_id" required:"binding"`
 	Ballot_ID    int `db:"ballot_id" json:"ballot_id" required:"binding"`
 	Weight       int `db:"weight" json:"weight" required:"binding"`
 }
 
+// HVoteCreate a ballot votes on a criterion
 // TODO : Force weight checking on criterion
 // the weight in the vote should not be higher than the
 // weight defined in the criterion
@@ -46,7 +49,7 @@ func HVoteCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, v)
 }
 
-// requires ballot_id, vote_id
+// HVoteDelete deletes a vote by a ballot
 func HVoteDelete(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
@@ -70,6 +73,7 @@ func HVoteDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
+// HVotesBallotList list all votes made by a ballot
 func HVotesBallotList(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
@@ -87,8 +91,7 @@ func HVotesBallotList(c *gin.Context) {
 	c.JSON(http.StatusOK, vs)
 }
 
-// Requirements : none ?
-// TODO : should be called inside ballot eg : removing a ballot removes its votes
+// Destroy removes a vote from the database
 func (v *Vote) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM vote WHERE ballot_id=$1 and criterion_id=$2", v.Ballot_ID, v.Criterion_ID)
 	if err != nil {
@@ -97,6 +100,7 @@ func (v *Vote) Destroy() error {
 	return nil
 }
 
+// Save a vote in the database
 // Restriction : Criterion should exists
 // Restriction : Ballot should exists
 // Restriction : Don't allow duplicates on ballot_id, criterion_id
@@ -106,7 +110,7 @@ func (v *Vote) Save() error {
 	// No duplicate votes
 	n, err := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2", v.Ballot_ID, v.Criterion_ID)
 	if n >= 1 {
-		return fmt.Errorf("vote already exists.")
+		return fmt.Errorf("vote already exists")
 	}
 
 	// See if there's a criterion that this vote belongs to

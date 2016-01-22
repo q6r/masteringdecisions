@@ -85,7 +85,8 @@ r1 = {"result": "deleted"}
 # Missing things
 
 - Decision statistics not implemented yet
-- Authentication not implemented (currently everyone can do everything)
+- Update methods for Decisions, Person, Vote, Ballots not implemented yet
+- Authentication not implemented yet (currently everyone can do everything)
 
 # Features
 
