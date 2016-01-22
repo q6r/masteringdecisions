@@ -14,15 +14,19 @@ import (
 )
 
 type Decision struct {
-	Decision_ID            int    `db:"decision_id" json:"decision_id" binding:"required"`
+	Decision_ID            int    `db:"decision_id" json:"decision_id"`
 	Person_ID              int    `db:"person_id" json:"person_id" binding:"required"`
 	Name                   string `db:"name" json:"name" binding:"required"`
 	Description            string `db:"description" json:"description" binding:"required"`
-	Owner_ID               int    `db:"owner_id" json:"owner_id" binding:"required"`
 	Stage                  int    `db:"stage" json:"stage" binding:"required"`
 	Criterion_Vote_Style   string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
 	Alternative_Vote_Style string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
 	Client_Settings        string `db:"client_settings" json:"client_settings" binding:"required"`
+}
+
+func HDecisionStats(c *gin.Context) {
+	//did := c.Param("decision_id")
+
 }
 
 func HDecisionBallotsList(c *gin.Context) {

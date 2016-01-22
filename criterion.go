@@ -10,26 +10,17 @@ import (
 
 type Criterion struct {
 	Criterion_ID int    `db:"criterion_id" json:"criterion_id"`
-	Decision_ID  int    `db:"decision_id" json:"decision_id" binding:"required"`
+	Decision_ID  int    `db:"decision_id" json:"decision_id"` // inherited
 	Name         string `db:"name" json:"name" binding:"required"`
 	Weight       int    `db:"weight" json:"weight" binding:"required"`
 }
 
-func HCriterionList(c *gin.Context) {
-	var cris []Criterion
-	_, err := dbmap.Select(&cris, "SELECT * FROM criterion ORDER BY criterion_id")
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
-		return
-	}
-	c.JSON(http.StatusOK, cris)
-}
-
 func HCriterionInfo(c *gin.Context) {
-	id := c.Param("criterion_id")
+	did := c.Param("decision_id")
+	cid := c.Param("criterion_id")
 
 	var cri Criterion
-	err := dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1", id)
+	err := dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1 and decision_id=$2", cid, did)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
@@ -38,12 +29,19 @@ func HCriterionInfo(c *gin.Context) {
 }
 
 func HCriterionDelete(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("criterion_id"))
+	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-	cri := &Criterion{Criterion_ID: id}
+
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
+	cri := &Criterion{Criterion_ID: cid, Decision_ID: did}
 	err = cri.Destroy()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
@@ -54,12 +52,19 @@ func HCriterionDelete(c *gin.Context) {
 }
 
 func HCriterionCreate(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
 	var cri Criterion
-	err := c.Bind(&cri)
+	err = c.Bind(&cri)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid criterion object"})
 		return
 	}
+	cri.Decision_ID = did // inherited
 
 	err = cri.Save()
 	if err != nil {

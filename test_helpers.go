@@ -82,6 +82,16 @@ func RunSimpleGet(path string, handler RequestFunc, reply ResponseFunc) {
 	RunRequest(rc)
 }
 
+func RunSimpleDelete(path string, handler RequestFunc, reply ResponseFunc) {
+	rc := RequestConfig{
+		Method:    "DELETE",
+		Path:      path,
+		Handler:   handler,
+		Finaliser: reply,
+	}
+	RunRequest(rc)
+}
+
 func RunSimplePost(path string, body string,
 	handler RequestFunc, reply ResponseFunc) {
 	rc := RequestConfig{

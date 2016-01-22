@@ -13,15 +13,20 @@
 
 // TODO : Person should not send the hash back <implement after authorization>
 
+// TODO : Write tests
+
 // TODO : Review and test Save/Destroy restriction and write tests if possible :)
+
 package main
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp"
+	"github.com/itsjamie/gin-cors"
 )
-
-// TODO : Write tests
 
 var dbmap *gorp.DbMap
 
@@ -31,14 +36,34 @@ func main() {
 
 	routes := gin.Default()
 
+	// Middlewares
+	/////////////////
+	// Apply the middleware to the router (works with groups too)
+	routes.Use(cors.Middleware(cors.Config{
+		Origins:         "*",
+		Methods:         "GET, PUT, POST, DELETE",
+		RequestHeaders:  "Origin, Authorization, Content-Type",
+		ExposedHeaders:  "",
+		MaxAge:          50 * time.Second,
+		Credentials:     false,
+		ValidateHeaders: false,
+	}))
+
+	// Debug routes
+	/////////////////
+	if gin.Mode() == "debug" {
+		routes.GET("/clean", func(c *gin.Context) {
+			err := dbmap.TruncateTables()
+			if err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": err})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"result": "cleaned"})
+		})
+	}
+
 	// Person
-	/*
-		1. Create a person
-		2. List all persons
-		3. List all persons decisions
-		4. Delete a person
-		5. TODO : Change a person information (PUT/PATCH)
-	*/
+	////////////////
 	routes.POST("/person", HPersonCreate)
 	routes.GET("/persons", HPersonsList)
 	routes.GET("/person/:person_id/info", HPersonInfo)
@@ -46,56 +71,35 @@ func main() {
 	routes.DELETE("/person/:person_id", HPersonDelete)
 
 	// Decision
-	/*
-		1. Create a decision
-		2. List all decisions
-		3. Delete a decision
-		4. List decision ballots
-		5. TODO : Change a decision information
-	*/
+	////////////////
+
+	// decision homes
 	routes.POST("/decision", HDecisionCreate)
 	routes.GET("/decisions", HDecisionsList)
 	routes.GET("/decision/:decision_id/info", HDecisionInfo)
-	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
-	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
+	routes.GET("/decision/:decision_id/stats", HDecisionStats)
 	routes.DELETE("/decision/:decision_id", HDecisionDelete)
 
-	// Ballot
-	/*
-		1. Create a ballot
-		2. List all ballots
-		3. Show ballot information
-		4. Delete a ballot
-		5. TODO : Change a ballot feature
-	*/
-	routes.POST("/ballot", HBallotCreate)
-	routes.GET("/ballots", HBallotList)
-	routes.GET("/ballot/:ballot_id", HBallotInfo)
-	//routes.POST("/ballot/:ballot_id", HBallotVote) // TODO
-	routes.DELETE("/ballot/:ballot_id", HBallotDelete)
+	// decision's ballots
+	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
+	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
+	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
+	routes.DELETE("/decision/:decision_id/ballot/:ballot_id", HBallotDelete)
 
-	// Criterion
-	/*
-		1. Create a criterion
-		2. List all criterions
-		3. Show criterion information
-		4. Delete a criterion
-		5. TODO : Change a criterion information
-	*/
-	routes.POST("/criterion", HCriterionCreate)
-	routes.GET("/criterions", HCriterionList)
-	routes.GET("/criterion/:criterion_id/info", HCriterionInfo)
-	routes.DELETE("/criterion/:criterion_id", HCriterionDelete)
+	// decision's ballot's votes
+	routes.GET(
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight", HVoteCreate)
+	routes.GET(
+		"/decision/:decision_id/ballot/:ballot_id/votes", HVotesBallotList)
+	routes.DELETE(
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote",
+		HVoteDelete)
 
-	// Votes
-	/*
-		1. Create a vote
-		2. List all votes
-		3. Delete a vote
-	*/
-	routes.POST("/vote", HVoteCreate)
-	routes.GET("/votes", HVotesList)
-	routes.DELETE("/vote", HVoteDelete)
+	// decision's criterions
+	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
+	routes.POST("/decision/:decision_id/criterion", HCriterionCreate)
+	routes.GET("/decision/:decision_id/criterion/:criterion_id/info", HCriterionInfo)
+	routes.DELETE("/decision/:decision_id/criterion/:criterion_id", HCriterionDelete)
 
 	routes.Run(":9999")
 }

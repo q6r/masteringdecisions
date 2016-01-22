@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,12 +18,24 @@ type Vote struct {
 // the weight in the vote should not be higher than the
 // weight defined in the criterion
 func HVoteCreate(c *gin.Context) {
-	var v Vote
-	err := c.Bind(&v)
+
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+	weight, err := strconv.Atoi(c.Param("weight"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
+	v := Vote{Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
 
 	err = v.Save()
 	if err != nil {
@@ -35,33 +48,42 @@ func HVoteCreate(c *gin.Context) {
 
 // requires ballot_id, vote_id
 func HVoteDelete(c *gin.Context) {
-	type DelReq struct {
-		Ballot_ID    int `json:"ballot_id" binding:"required"`
-		Criterion_ID int `json:"criterion_id" binding:"required"`
-	}
-	var delreq DelReq
-
-	err := c.Bind(&delreq)
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-	v := Vote{Ballot_ID: delreq.Ballot_ID, Criterion_ID: delreq.Criterion_ID}
+
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
+	v := Vote{Ballot_ID: bid, Criterion_ID: cid}
 	err = v.Destroy()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
-func HVotesList(c *gin.Context) {
-	var vs []Vote
-	_, err := dbmap.Select(&vs, "select * from vote")
+func HVotesBallotList(c *gin.Context) {
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
+
+	var vs []Vote
+	_, err = dbmap.Select(&vs, "select * from vote WHERE ballot_id=$1", bid)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
 	c.JSON(http.StatusOK, vs)
 }
 

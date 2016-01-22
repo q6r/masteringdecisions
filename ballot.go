@@ -9,26 +9,25 @@ import (
 
 type Ballot struct {
 	Ballot_ID   int    `db:"ballot_id" json:"ballot_id"`
-	Decision_ID int    `db:"decision_id" json:"decision_id" binding:"required"`
+	Decision_ID int    `db:"decision_id" json:"decision_id"`
 	Secret      int    `db:"secret" json:"secret" binding:"required"`
 	Name        string `db:"name" json:"name" binding:"required"`
 	Email       string `db:"email" json:"email" binding:"required"`
 }
 
 func HBallotCreate(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid decision_id"})
+		return
+	}
+
 	var b Ballot
 	if err := c.Bind(&b); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-
-	// Make sure the Ballot's decision exists otherwise we quit
-	var d Decision
-	err := dbmap.SelectOne(&d, "SELECT * from decision WHERE decision_id=$1", b.Decision_ID)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "the decision this ballot belong to does not exist, create it first."})
-		return
-	}
+	b.Decision_ID = did // inherited
 
 	err = b.Save()
 	if err != nil {
@@ -39,12 +38,20 @@ func HBallotCreate(c *gin.Context) {
 }
 
 func HBallotDelete(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("ballot_id"))
+
+	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-	b := &Ballot{Ballot_ID: id}
+
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+
+	b := &Ballot{Ballot_ID: bid, Decision_ID: did}
 	err = b.Destroy()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err})
@@ -54,21 +61,11 @@ func HBallotDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
-func HBallotList(c *gin.Context) {
-	var ballots []Ballot
-	_, err := dbmap.Select(&ballots, "SELECT * FROM ballot")
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
-		return
-	}
-	c.JSON(http.StatusOK, ballots)
-
-}
-
 func HBallotInfo(c *gin.Context) {
+	did := c.Param("decision_id")
 	bid := c.Param("ballot_id")
 	var ballot Ballot
-	err := dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1", bid)
+	err := dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
