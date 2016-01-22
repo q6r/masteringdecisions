@@ -18,6 +18,15 @@ go build
 ./gobackend
 ```
 
+# Code documentation
+
+Run
+```
+godoc -http=localhost:6969
+```
+
+open the link in a browser find gobackend package and read the documentation.
+
 # API
 
 ## person
