@@ -1,4 +1,4 @@
-package gobackend
+package main
 
 // TODO : Problem with binding it caches default value as 'unset'
 // eg:sending integer 0 is considered invalid

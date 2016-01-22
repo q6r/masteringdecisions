@@ -1,4 +1,4 @@
-package gobackend
+package main
 
 import (
 	"encoding/json"
