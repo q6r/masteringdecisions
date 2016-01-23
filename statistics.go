@@ -1,7 +1,26 @@
 package main
 
-// TODO : Finish implementation
 // TODO : Add stats to database
+// This can happen the following way :
+// we can implement a new structure that holds an array of BallotAnalysis for a decision
+// we call it :
+// type DecisionStatistics struct {
+//      DecisionStatistics_ID int
+//      Decision_ID int
+//		BAS []BallotAnalysis
+// }
+// We reimplement HStats to use this
+// We make database.go aware of it and set DecisionStatics autoincr primary
+// We make new routes in main.go for these functions :
+// Destroy() : Destroy a DecisionStatistics given it's DecisionStatistics_ID
+// Save()    : Insert into database (don't allow duplicates) (might have problems with autoincr)
+//
+// Changes to HSTATS:
+// We need to make it aware of the structure in the database
+// If there's data in the database then generate statistics first
+// if all is good then remove the old one and insert the updated one
+// Changes to BallotAnalysis: Remove the Decision_ID since it's already included
+// in the main wrapper structure DecisionStatistics.
 
 import (
 	"fmt"
@@ -11,6 +30,8 @@ import (
 	"github.com/montanaflynn/stats"
 )
 
+// BallotStatistics is an array that holds the vote and
+// criteiron information in the BallotAnalysis structure
 type BallotStatistics struct {
 	Criterion_ID     int     `json:"criterion_id"`
 	Criterion_Name   string  `json:"criterion_name"`
@@ -19,6 +40,10 @@ type BallotStatistics struct {
 	Perc             float64 `json:"perc"`
 }
 
+// BallotAnalysis represent the mathimatical analysis
+// and satistics done on a ballot that belongs to a decision
+// we return an array of BallotAnalysis for the frontend
+// to generate graphs or whatever
 type BallotAnalysis struct {
 	Decision_ID                           int                `json:"decision_id"`
 	Ballot_ID                             int                `json:"ballot_id"`
@@ -29,14 +54,11 @@ type BallotAnalysis struct {
 	AvgVote                               float64            `json:"avg_vote"`
 	MeanVote                              float64            `json:"mean_vote"`
 	MedianVote                            float64            `json:"median_vote"`
-	ModeVote                              float64
-	PopulationVarianceVote                float64
-	SampleVarianceVote                    float64
-	MedianAbsoluteDeviationPopulationVote float64
-	StandardDeviationPopulationVote       float64
-	StandardDeviationSampleVote           float64
-
-	//...etc
+	PopulationVarianceVote                float64            `json:"population_variance_vote"`
+	SampleVarianceVote                    float64            `json:"sample_variance_vote"`
+	MedianAbsoluteDeviationPopulationVote float64            `json:"median_absolute_deviation_population_vote"`
+	StandardDeviationPopulationVote       float64            `json:"standard_deviation_population_vote"`
+	StandardDeviationSampleVote           float64            `json:"standard_deviation_sample_vote"`
 }
 
 // HStats does math analysis/statistics on all ballots beloning to a decision
@@ -93,7 +115,7 @@ func HStats(c *gin.Context) {
 	// 3. Its criterions
 	// 4. Its votes grouped by (by ballots)
 
-	ballots_analysis := make([]*BallotAnalysis, 0)
+	var ballots_analysis []*BallotAnalysis
 
 	for _, ballot := range ballots {
 		ba := &BallotAnalysis{}
@@ -157,11 +179,43 @@ func HStats(c *gin.Context) {
 			return
 		}
 
+		ba.PopulationVarianceVote, err = ApplyFunctionOnVotes(ba, stats.PopulationVariance)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		ba.SampleVarianceVote, err = ApplyFunctionOnVotes(ba, stats.SampleVariance)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		ba.MedianAbsoluteDeviationPopulationVote, err = ApplyFunctionOnVotes(ba, stats.MedianAbsoluteDeviationPopulation)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		ba.StandardDeviationPopulationVote, err = ApplyFunctionOnVotes(ba, stats.StandardDeviationPopulation)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		ba.StandardDeviationSampleVote, err = ApplyFunctionOnVotes(ba, stats.StandardDeviationSample)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
 	}
 
 	c.JSON(http.StatusOK, ballots_analysis)
 }
 
+// ApplyFunctionOnVotes is a helper function
+// to make the code shorter ^^/
 func ApplyFunctionOnVotes(ba *BallotAnalysis, f func(stats.Float64Data) (float64, error)) (float64, error) {
 	var votes []float64
 	var err error
