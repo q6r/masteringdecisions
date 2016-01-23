@@ -26,7 +26,7 @@ func HCriterionInfo(c *gin.Context) {
 	var cri Criterion
 	err := dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1 and decision_id=$2", cid, did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("criterion id %v for decision id %v not found", cid, did)})
 		return
 	}
 	c.JSON(http.StatusOK, cri)
@@ -36,20 +36,20 @@ func HCriterionInfo(c *gin.Context) {
 func HCriterionDelete(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	cri := &Criterion{Criterion_ID: cid, Decision_ID: did}
 	err = cri.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -60,7 +60,7 @@ func HCriterionDelete(c *gin.Context) {
 func HCriterionCreate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -86,7 +86,7 @@ func (cri *Criterion) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM criterion WHERE criterion_id=$1 and decision_id=$2",
 		cri.Criterion_ID, cri.Decision_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to delete criterion %#v from database", cri)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (cri *Criterion) Save() error {
 	}
 
 	if err := dbmap.Insert(cri); err != nil {
-		return err
+		return fmt.Errorf("Unable to insert criterion %#v to database", cri)
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func HBallotCreate(c *gin.Context) {
 
 	var b Ballot
 	if err := c.Bind(&b); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid ballot object"})
 		return
 	}
 	b.Decision_ID = did // inherited
@@ -46,20 +47,20 @@ func HBallotDelete(c *gin.Context) {
 
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	b := &Ballot{Ballot_ID: bid, Decision_ID: did}
 	err = b.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -75,7 +76,7 @@ func HBallotInfo(c *gin.Context) {
 	var ballot Ballot
 	err := dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find ballot %v for decision %v", bid, did)})
 		return
 	}
 
@@ -88,14 +89,14 @@ func HBallotInfo(c *gin.Context) {
 func (b *Ballot) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to delete ballot %#v from database", b)
 	}
 
 	// Remove votes beloning to this ballot
 	var votes []Vote
 	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.Ballot_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to find votes for ballot %#v", b)
 	}
 
 	for _, v := range votes {
@@ -110,7 +111,7 @@ func (b *Ballot) Destroy() error {
 // Save inserts a ballot into the database
 func (b *Ballot) Save() error {
 	if err := dbmap.Insert(b); err != nil {
-		return err
+		return fmt.Errorf("Unable to insert ballot %#v to database", b)
 	}
 	return nil
 }

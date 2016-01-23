@@ -24,17 +24,17 @@ func HVoteCreate(c *gin.Context) {
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 	weight, err := strconv.Atoi(c.Param("weight"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -53,13 +53,13 @@ func HVoteCreate(c *gin.Context) {
 func HVoteDelete(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -77,14 +77,14 @@ func HVoteDelete(c *gin.Context) {
 func HVotesBallotList(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	var vs []Vote
 	_, err = dbmap.Select(&vs, "select * from vote WHERE ballot_id=$1", bid)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -110,7 +110,7 @@ func (v *Vote) Save() error {
 	// No duplicate votes
 	n, err := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2", v.Ballot_ID, v.Criterion_ID)
 	if n >= 1 {
-		return fmt.Errorf("vote already exists")
+		return fmt.Errorf("vote %#v already exists", v)
 	}
 
 	// See if there's a criterion that this vote belongs to
@@ -136,7 +136,7 @@ func (v *Vote) Save() error {
 
 	err = dbmap.Insert(v)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to insert vote %#v to database", v)
 	}
 
 	return nil
@@ -147,7 +147,8 @@ func FindVotesByKeys(criterion_id, ballot_id int) (Vote, error) {
 	var vote Vote
 	err := dbmap.SelectOne(&vote, "select * from vote where criterion_id=$1 and ballot_id=$2", criterion_id, ballot_id)
 	if err != nil {
-		return Vote{}, err
+		return Vote{},
+			fmt.Errorf("Unable to find vote for criterion_id=%v ballot_id=%v", criterion_id, ballot_id)
 	}
 	return vote, nil
 }

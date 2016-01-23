@@ -21,13 +21,6 @@ type Decision struct {
 	Client_Settings        string `db:"client_settings" json:"client_settings" binding:"required"`
 }
 
-// HDecisionStats Finds all ballots beloning to a decision
-// find their voes, find the criterion of the decision
-// do the math, return a stats object
-// TODO : implement me / move to stats.go
-func HDecisionStats(c *gin.Context) {
-}
-
 // HDecisionBallotsList returns a list of ballots beloning
 // to a decision
 func HDecisionBallotsList(c *gin.Context) {
@@ -35,7 +28,7 @@ func HDecisionBallotsList(c *gin.Context) {
 	var ballots []Ballot
 	_, err := dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find ballots for decision id %v", did)})
 		return
 	}
 
@@ -49,7 +42,7 @@ func HDecisionCriterionsList(c *gin.Context) {
 	var cris []Criterion
 	_, err := dbmap.Select(&cris, "select * from criterion where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
 		return
 	}
 	c.JSON(http.StatusOK, cris)
@@ -61,7 +54,7 @@ func HDecisionsList(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "SELECT * FROM decision")
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to find decisions in database"})
 		return
 	}
 	c.JSON(http.StatusOK, decisions)
@@ -70,11 +63,11 @@ func HDecisionsList(c *gin.Context) {
 // HDecisionInfo returns a decision information
 // a decision object not it's stats
 func HDecisionInfo(c *gin.Context) {
-	id := c.Param("decision_id")
+	did := c.Param("decision_id")
 	var decision Decision
-	err := dbmap.SelectOne(&decision, "SELECT * FROM decision where decision_id=$1", id)
+	err := dbmap.SelectOne(&decision, "SELECT * FROM decision where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
 		return
 	}
 	c.JSON(http.StatusOK, decision)
@@ -86,7 +79,7 @@ func HDecisionCreate(c *gin.Context) {
 	var decision Decision
 	err := c.Bind(&decision)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": "invalid decision object"})
 		return
 	}
 
@@ -103,7 +96,7 @@ func HDecisionCreate(c *gin.Context) {
 func HDecisionDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -114,7 +107,7 @@ func HDecisionDelete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted decision, its ballots"})
+	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
 }
 
 // Destroy a decision from the database
@@ -123,13 +116,13 @@ func HDecisionDelete(c *gin.Context) {
 func (d *Decision) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.Decision_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to delete decision %#v from database", d)
 	}
 
 	var ballots []Ballot
 	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to find ballot for decision %#v", d)
 	}
 
 	for _, b := range ballots {
@@ -142,7 +135,7 @@ func (d *Decision) Destroy() error {
 	var cris []Criterion
 	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.Decision_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to find criterion for decision %#v", d)
 	}
 
 	for _, cri := range cris {
@@ -183,7 +176,7 @@ func (d *Decision) Save() error {
 
 	err = dbmap.Insert(d)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to insert decision %#v to database", d)
 	}
 	return nil
 }

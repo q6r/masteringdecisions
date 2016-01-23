@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -21,7 +22,7 @@ func HPersonsList(c *gin.Context) {
 	var persons []Person
 	_, err := dbmap.Select(&persons, "select * from person order by person_id")
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find persons")})
 		return
 	}
 	c.JSON(http.StatusOK, persons)
@@ -49,14 +50,14 @@ func HPersonCreate(c *gin.Context) {
 func HPersonDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("person_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
 	p := &Person{Person_ID: id}
 	err = p.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -82,7 +83,7 @@ func HPersonDecisions(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "select * from decision where person_id=$1", id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -93,14 +94,14 @@ func HPersonDecisions(c *gin.Context) {
 func (p *Person) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM person WHERE person_id=$1", p.Person_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to delete %#v from database : %#v", p, err)
 	}
 
 	// Remove the person's decisions
 	var decisions []Decision
 	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.Person_ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to find decisions for person %#v", p)
 	}
 
 	for _, d := range decisions {
@@ -116,7 +117,8 @@ func (p *Person) Destroy() error {
 // Save a person to database
 func (p *Person) Save() error {
 	if err := dbmap.Insert(p); err != nil {
-		return err
+		return fmt.Errorf("Unable to insert person %d into database:%#v",
+			p.Person_ID, err)
 	}
 	return nil
 }

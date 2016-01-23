@@ -35,6 +35,6 @@ func TestDecisionCreate(t *testing.T) {
 	for _, d := range ds {
 		res, err := TDeleteDecision(d.Decision_ID)
 		assert.Equal(t, err, nil, "Failed while destroying")
-		assert.Equal(t, res.Result, "deleted decision, its ballots")
+		assert.Equal(t, res.Result, "deleted")
 	}
 }
