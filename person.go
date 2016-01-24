@@ -37,6 +37,9 @@ func HPersonCreate(c *gin.Context) {
 		return
 	}
 
+	// Encrypt the plaintext before saving
+	person.PW_hash = HashPassword(person.PW_hash)
+
 	err = person.Save()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
