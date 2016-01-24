@@ -1,5 +1,16 @@
 package main
 
+// TODO : Start appliy the authentication middle ware to the required
+// routes
+
+// TODO : Make a configuration file
+
+// TODO IMPORTANT : database initalization should insure the creation
+// or updating of the admin credentials which is represented as a
+// person with id 0
+
+// TODO : Test AuthAs* middlewares
+
 // TODO : Vote weight should not be more than criterion weight
 
 // TODO : Problem with binding it caches default value as 'unset'
@@ -22,12 +33,14 @@ package main
 // TODO : Review and test Save/Destroy restriction and write tests if possible :)
 
 import (
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp"
 	"github.com/itsjamie/gin-cors"
+	"github.com/rageix/ginAuth"
 )
 
 var dbmap *gorp.DbMap
@@ -102,6 +115,22 @@ func main() {
 	routes.POST("/decision/:decision_id/criterion", HCriterionCreate)
 	routes.GET("/decision/:decision_id/criterion/:criterion_id/info", HCriterionInfo)
 	routes.DELETE("/decision/:decision_id/criterion/:criterion_id", HCriterionDelete)
+
+	// Login/Logout
+	routes.POST("/login", HAuthLogin)
+	routes.GET("/logout", HAuthLogout)
+	// TODO : an example that requires authenticated users only
+	routes.GET("/checklogin", ginAuth.Use, AuthAsAll, HAuthCheck)
+
+	// Setup the authentication
+	ginAuth.ConfigPath = "./auth.conf"
+	ginAuth.Unauthorized = HAuthUnauthenticated
+	ginAuth.Authorized = HAuthAuthenticated
+	err := ginAuth.LoadConfig()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
 
 	routes.Run(":9999")
 }
