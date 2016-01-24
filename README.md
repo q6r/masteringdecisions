@@ -99,11 +99,29 @@ v2 = {"criterion_id":<int>, "ballot_id":<int>, "weight":<int>}
 r1 = {"result": "deleted"}
 ```
 
+# Authentication
+
+Authentication is implemented as middlewares applied to routes, currently they are applied
+to 0 routes to make it easier for the front-end to start writing their code. The login
+you get a cookie and this cookie is checked..etc
+
+| Description        | URL         | Method | Wants   | Gives   |
+|--------------------|-------------|--------|---------|---------|
+| Login              | /login      | POST   | l1      | l2      |
+| Logout             | /logout     | GET    | Nothing | Nothing |
+| Check if logged in | /checklogin | GET    | Nothing | cl1     |
+
+Wants/Gives
+
+```
+l1 = {"email":<str>, "password":<str>}
+l2 = {"error":<str>} or {"status":<str>} // success
+cl1 = {"status":<str>} or {"error": <str>}
+```
+
 # Missing things
 
-- Decision statistics not implemented yet
 - Update methods for Decisions, Person, Vote, Ballots not implemented yet
-- Authentication not implemented yet (currently everyone can do everything)
 
 # Features
 
@@ -112,6 +130,8 @@ r1 = {"result": "deleted"}
 - Very fast
 - Almost done
 - Fully concurrent
+- SecureCookie Authentication
+- Decision Statistics
 
 # Changed things from previous design
 

@@ -46,7 +46,7 @@ func HAuthLogin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "logged in successfuly"})
+	c.JSON(http.StatusOK, gin.H{"status": "logged in"})
 }
 
 // HAuthLogout does a logout and removes

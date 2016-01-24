@@ -1,36 +1,18 @@
 package main
 
-// TODO : Start appliy the authentication middle ware to the required
-// routes
-
+// TODO : Start applying the authentication middlewares to
+// required routes
 // TODO : Make a configuration file
-
 // TODO IMPORTANT : database initalization should insure the creation
 // or updating of the admin credentials which is represented as a
 // person with id 0
-
-// TODO : Test AuthAs* middlewares
-
 // TODO : Vote weight should not be more than criterion weight
-
 // TODO : Problem with binding it caches default value as 'unset'
 // eg:sending integer 0 is considered invalid
 // eg:sending an empty string is considered invalid
-
-// TODO : Make sure duplicates are not allowed in Save of all
-
 // TODO : Write more test cover at least 80% of code
-
-// TODO : In all implement Check that checks if one with a primary key
-// exists, good for code refactoring and simplifying
-
-// TODO : Person pwhash should get encrypted
-
 // TODO : Person should not send the hash back <implement after authorization>
-
 // TODO : Write tests
-
-// TODO : Review and test Save/Destroy restriction and write tests if possible :)
 
 import (
 	"log"
