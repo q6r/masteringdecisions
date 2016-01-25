@@ -119,6 +119,16 @@ func (p *Person) Destroy() error {
 
 // Save a person to database
 func (p *Person) Save() error {
+
+	// disallow duplicate emails
+	n, err := dbmap.SelectInt("select count(*) from person where email=$1", p.Email)
+	if err != nil {
+		return fmt.Errorf("Unable to check person database for duplicate email")
+	}
+	if n != 0 {
+		return fmt.Errorf("Email %s already exists", p.Email)
+	}
+
 	if err := dbmap.Insert(p); err != nil {
 		return fmt.Errorf("Unable to insert person %d into database:%#v",
 			p.Person_ID, err)
