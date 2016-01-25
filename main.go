@@ -6,7 +6,6 @@ package main
 // TODO IMPORTANT : database initalization should insure the creation
 // or updating of the admin credentials which is represented as a
 // person with id 0
-// TODO : Vote weight should not be more than criterion weight
 // TODO : Problem with binding it caches default value as 'unset'
 // eg:sending integer 0 is considered invalid
 // eg:sending an empty string is considered invalid

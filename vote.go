@@ -134,6 +134,11 @@ func (v *Vote) Save() error {
 		return fmt.Errorf("criterion belongs to decision %d while ballot belongs to decision %d", cri.Decision_ID, b.Decision_ID)
 	}
 
+	// Make sure the vote's weight is not more than the criterion weight
+	if v.Weight > cri.Weight {
+		return fmt.Errorf("vote weight is more than criterion weight")
+	}
+
 	err = dbmap.Insert(v)
 	if err != nil {
 		return fmt.Errorf("Unable to insert vote %#v to database", v)
