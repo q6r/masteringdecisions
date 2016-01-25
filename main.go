@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/astaxie/beego/config"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp"
 	"github.com/itsjamie/gin-cors"
@@ -27,7 +28,13 @@ import (
 var dbmap *gorp.DbMap
 
 func main() {
-	dbmap = InitDatabase()
+
+	conf, err := config.NewConfig("ini", "config.conf")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	dbmap = InitDatabase(conf)
 	defer dbmap.Db.Close()
 
 	routes := gin.Default()
@@ -104,10 +111,10 @@ func main() {
 	routes.GET("/checklogin", ginAuth.Use, AuthAsAll, HAuthCheck)
 
 	// Setup the authentication
-	ginAuth.ConfigPath = "./auth.conf"
+	ginAuth.ConfigPath = "config.conf"
 	ginAuth.Unauthorized = HAuthUnauthenticated
 	ginAuth.Authorized = HAuthAuthenticated
-	err := ginAuth.LoadConfig()
+	err = ginAuth.LoadConfig()
 	if err != nil {
 		log.Fatalln(err)
 		return

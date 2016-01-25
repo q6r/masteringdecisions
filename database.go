@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
+	"github.com/astaxie/beego/config"
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 )
@@ -12,11 +14,15 @@ import (
 // builds the schema of the table
 // forigen key restriction is not handled in here but they're
 // handled in each objects Save and Destroy methods
-func InitDatabase() *gorp.DbMap {
-	db, err := sql.Open("postgres",
-		"user=postgres dbname=postgres sslmode=disable")
+func InitDatabase(conf config.Configer) *gorp.DbMap {
+	dbsrc := fmt.Sprintf("user=%s dbname=%s sslmode=%s",
+		conf.String("database::user"),
+		conf.String("database::name"),
+		conf.String("database::sslmode"))
+
+	db, err := sql.Open("postgres", dbsrc)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Unable to connect to postgres : %#v\n", err)
 	}
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 
@@ -30,5 +36,21 @@ func InitDatabase() *gorp.DbMap {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	// Always create an admin account
+	_, err = dbmap.Exec("DELETE FROM person WHERE person_id=0")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	hashed := HashPassword(conf.String("admin::password"))
+	_, err = dbmap.Exec("INSERT INTO person VALUES(0,$1,$2,$3,$4)",
+		conf.String("admin::email"),
+		hashed,
+		conf.String("admin::name_first"),
+		conf.String("admin::name_last"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	return dbmap
 }
