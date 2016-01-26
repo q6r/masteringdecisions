@@ -54,6 +54,53 @@ func HVoteCreate(c *gin.Context) {
 	}
 }
 
+// HVoteUpdate updates a vote
+func HVoteUpdate(c *gin.Context) {
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	weight, err := strconv.Atoi(c.Param("weight"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	var cri Criterion
+	err = dbmap.SelectOne(&cri, "SELECT * FROM criterion WHERE criterion_id=$1", cid)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
+		return
+	}
+	if weight > cri.Weight {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Vote weight can't be more than %d", cri.Weight)})
+		return
+	}
+
+	_, err = dbmap.Exec("UPDATE vote SET weight=$1 WHERE criterion_id=$2 and ballot_id=$3", weight, cid, bid)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
+		return
+	}
+
+	new_vote := Vote{Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "vote_update.js", "body": new_vote})
+	} else {
+		c.JSON(http.StatusOK, new_vote)
+	}
+}
+
 // HVoteDelete deletes a vote by a ballot
 func HVoteDelete(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))

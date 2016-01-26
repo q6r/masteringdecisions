@@ -79,9 +79,9 @@ func main() {
 	routes.POST("/person", HPersonCreate)
 	routes.GET("/persons", HPersonsList)
 	routes.GET("/person/:person_id/info", HPersonInfo)
-	routes.PUT("/person/:person_id", HPersonUpdate)
 	routes.GET("/person/:person_id/decisions", HPersonDecisions)
 	routes.DELETE("/person/:person_id", HPersonDelete)
+	routes.PUT("/person/:person_id", HPersonUpdate)
 
 	// Decision
 	////////////////
@@ -112,6 +112,9 @@ func main() {
 	routes.DELETE(
 		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote",
 		HVoteDelete)
+	routes.PUT(
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight",
+		HVoteUpdate)
 
 	// decision's criterions
 	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
