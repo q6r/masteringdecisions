@@ -38,6 +38,54 @@ func HPersonsList(c *gin.Context) {
 	}
 }
 
+// HPersonUpdate updates a perosn
+func HPersonUpdate(c *gin.Context) {
+	pid, err := strconv.Atoi(c.Param("person_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	var p Person
+	err = dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", pid)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("person %d not found", pid)})
+		return
+	}
+
+	var json Person
+	err = c.Bind(&json)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": "Unable to parse person object"})
+		return
+	}
+
+	new_hash := HashPassword(json.PW_hash)
+	new_person := Person{
+		Person_ID:  pid,
+		Email:      json.Email,
+		PW_hash:    new_hash,
+		Name_First: json.Name_First,
+		Name_Last:  json.Name_Last,
+	}
+	_, err = dbmap.Update(&new_person)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update person %d", pid)})
+		return
+	}
+
+	new_person.PW_hash = "<hidden>"
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_update.js", "body": new_person})
+	} else {
+		c.JSON(http.StatusOK, new_person)
+	}
+}
+
 // HPersonCreate creates a person in the database
 func HPersonCreate(c *gin.Context) {
 	var person Person

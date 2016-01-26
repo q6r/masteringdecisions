@@ -79,6 +79,7 @@ func main() {
 	routes.POST("/person", HPersonCreate)
 	routes.GET("/persons", HPersonsList)
 	routes.GET("/person/:person_id/info", HPersonInfo)
+	routes.PUT("/person/:person_id", HPersonUpdate)
 	routes.GET("/person/:person_id/decisions", HPersonDecisions)
 	routes.DELETE("/person/:person_id", HPersonDelete)
 

@@ -58,6 +58,7 @@ of some of the things we need to send or the things we receive back.
 | Get person info        | /person/:person_id/info      | GET    | nothing | p2                  |
 | Get person's decisions | /person/:person_id/decisions | GET    | nothing | a persons decisions |
 | Delete a person        | /person/:person_id           | DELETE | nothing | s1                  |
+| Update a user          | /person/:person_id           | PUT    | p1      | p2                  |
 
 Wants/Gives
 
