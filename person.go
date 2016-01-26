@@ -25,6 +25,10 @@ func HPersonsList(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find persons")})
 		return
 	}
+
+	for i := range persons {
+		persons[i].PW_hash = "<hidden>"
+	}
 	c.JSON(http.StatusOK, persons)
 }
 
@@ -46,6 +50,7 @@ func HPersonCreate(c *gin.Context) {
 		return
 	}
 
+	person.PW_hash = "<hidden>"
 	c.JSON(http.StatusOK, person)
 }
 
@@ -77,6 +82,8 @@ func HPersonInfo(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
+
+	person.PW_hash = "<hidden>"
 	c.JSON(http.StatusOK, person)
 }
 

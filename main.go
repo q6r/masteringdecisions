@@ -1,10 +1,9 @@
 package main
 
-// TODO : Start applying the authentication middlewares to
-// required routes
 // TODO : Write more test cover at least 80% of code
-// TODO : Person should not send the hash back <implement after authorization>
 // TODO : Write tests
+// TODO : Start applying the authentication middlewares to
+// required routes (When the frontend is a little ready)
 
 import (
 	"log"
