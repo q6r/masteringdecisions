@@ -4,6 +4,12 @@ package main
 // TODO : Write tests
 // TODO : Start applying the authentication middlewares to
 // required routes (When the frontend is a little ready)
+// TODO : Implement an smtp server, send emails to new ballots
+// do this in HBallotCreate
+// TODO : Add route for ballot n to send invite to if GET rcvd
+// TODO : Remove owner_id from decision it's useless ?
+// TODO : Remove alternative_vote_style from decision ?
+// TODO : Remove Client_Settings from decision ?
 
 import (
 	"log"
