@@ -29,7 +29,12 @@ func HPersonsList(c *gin.Context) {
 	for i := range persons {
 		persons[i].PW_hash = "<hidden>"
 	}
-	c.JSON(http.StatusOK, persons)
+
+	if c.Request.Header.Get("Content-Type") == "application/json" {
+		c.JSON(http.StatusOK, persons)
+	} else {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person.js", "body": persons})
+	}
 }
 
 // HPersonCreate creates a person in the database

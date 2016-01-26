@@ -65,6 +65,12 @@ func main() {
 		})
 	}
 
+	// Templates
+	////////////////
+	routes.LoadHTMLGlob("templates/*")
+	//routes.LoadHTMLGlob("static/*")
+	routes.Static("static/", "static/")
+
 	// Person
 	////////////////
 	routes.POST("/person", HPersonCreate)
