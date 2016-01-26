@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +33,11 @@ func HDecisionBallotsList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, ballots)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_ballots.js", "body": ballots})
+	} else {
+		c.JSON(http.StatusOK, ballots)
+	}
 }
 
 // HDecisionCriterionsList returns a list of criterions beloning
@@ -45,7 +50,12 @@ func HDecisionCriterionsList(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
 		return
 	}
-	c.JSON(http.StatusOK, cris)
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_criterions.js", "body": cris})
+	} else {
+		c.JSON(http.StatusOK, cris)
+	}
 }
 
 // HDecisionsList returns a list of all decision defined
@@ -57,7 +67,12 @@ func HDecisionsList(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to find decisions in database"})
 		return
 	}
-	c.JSON(http.StatusOK, decisions)
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": decisions})
+	} else {
+		c.JSON(http.StatusOK, decisions)
+	}
 }
 
 // HDecisionInfo returns a decision information
@@ -70,7 +85,12 @@ func HDecisionInfo(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
 		return
 	}
-	c.JSON(http.StatusOK, decision)
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_info.js", "body": decision})
+	} else {
+		c.JSON(http.StatusOK, decision)
+	}
 }
 
 // HDecisionCreate creates a decision beloning to a specific
@@ -89,7 +109,11 @@ func HDecisionCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, decision)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_create.js", "body": decision})
+	} else {
+		c.JSON(http.StatusOK, decision)
+	}
 }
 
 // HDecisionDelete deletes a decision from database
@@ -107,7 +131,11 @@ func HDecisionDelete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_deleted.js", "body": gin.H{"result": "deleted"}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	}
 }
 
 // Destroy a decision from the database

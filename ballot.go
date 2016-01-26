@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +41,13 @@ func HBallotCreate(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, b)
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": b})
+	} else {
+		c.JSON(http.StatusOK, b)
+	}
+
 }
 
 // HBallotDelete deletes a ballot from a decision
@@ -65,7 +72,11 @@ func HBallotDelete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_deleted.js", "body": gin.H{"result": "deleted"}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	}
 }
 
 // HBallotInfo gets the information for a specific
@@ -81,7 +92,12 @@ func HBallotInfo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, ballot)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_info.js", "body": ballot})
+	} else {
+		c.JSON(http.StatusOK, ballot)
+	}
+
 }
 
 // Destroy removes a ballot from the database
@@ -184,7 +200,13 @@ func HBallotWhoami(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value})
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "ballot_whoami.js", "body": gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value})
+	}
+
 }
 
 // Save inserts a ballot into the database

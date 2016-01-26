@@ -1,5 +1,8 @@
 package main
 
+// TODO : Other Handlers should handle errors in html/json
+// one error page for all ?
+// TODO : HballotLogin implement html/json
 // TODO : Cookie port/host
 // TODO : Ballot cookie!
 // TODO : Write more test cover at least 80% of code

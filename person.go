@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,10 +31,10 @@ func HPersonsList(c *gin.Context) {
 		persons[i].PW_hash = "<hidden>"
 	}
 
-	if c.Request.Header.Get("Content-Type") == "application/json" {
-		c.JSON(http.StatusOK, persons)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "persons_list.js", "body": persons})
 	} else {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person.js", "body": persons})
+		c.JSON(http.StatusOK, persons)
 	}
 }
 
@@ -56,7 +57,12 @@ func HPersonCreate(c *gin.Context) {
 	}
 
 	person.PW_hash = "<hidden>"
-	c.JSON(http.StatusOK, person)
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": person})
+	} else {
+		c.JSON(http.StatusOK, person)
+	}
 }
 
 // HPersonDelete deletes a person from the database
@@ -74,7 +80,11 @@ func HPersonDelete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_deleted.js", "body": gin.H{"result": "deleted"}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	}
 }
 
 // HPersonInfo return information for a person
@@ -102,7 +112,11 @@ func HPersonDecisions(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, decisions)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_decisions.js", "body": decisions})
+	} else {
+		c.JSON(http.StatusOK, decisions)
+	}
 }
 
 // Destroy a person from the database and remove its dependencies

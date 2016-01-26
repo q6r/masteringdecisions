@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +47,11 @@ func HVoteCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, v)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_create.js", "body": v})
+	} else {
+		c.JSON(http.StatusOK, v)
+	}
 }
 
 // HVoteDelete deletes a vote by a ballot
@@ -70,7 +75,11 @@ func HVoteDelete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_deleted.js", "body": gin.H{"result": "deleted"}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+	}
 }
 
 // HVotesBallotList list all votes made by a ballot
@@ -88,7 +97,11 @@ func HVotesBallotList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, vs)
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_ballot_list.js", "body": vs})
+	} else {
+		c.JSON(http.StatusOK, vs)
+	}
 }
 
 // Destroy removes a vote from the database
