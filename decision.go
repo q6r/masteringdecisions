@@ -93,6 +93,55 @@ func HDecisionInfo(c *gin.Context) {
 	}
 }
 
+// HDecisionUpdate updates a decision
+func HDecisionUpdate(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	var d Decision
+	err = dbmap.SelectOne(&d, "SELECT * FROM decision WHERE decision_id=$1", did)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("decision %d not found", did)})
+		return
+	}
+
+	var json Decision
+	err = c.Bind(&json)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": "Unable to parse decision object"})
+		return
+	}
+
+	new_decision := Decision{
+		Decision_ID:            did,
+		Person_ID:              json.Person_ID,
+		Name:                   json.Name,
+		Description:            json.Description,
+		Stage:                  json.Stage,
+		Criterion_Vote_Style:   json.Criterion_Vote_Style,
+		Alternative_Vote_Style: json.Alternative_Vote_Style,
+		Client_Settings:        json.Client_Settings,
+	}
+	_, err = dbmap.Update(&new_decision)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update decision %d", did)})
+		return
+	}
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "decision_update.js", "body": new_decision})
+	} else {
+		c.JSON(http.StatusOK, new_decision)
+	}
+}
+
 // HDecisionCreate creates a decision beloning to a specific
 // person
 func HDecisionCreate(c *gin.Context) {
