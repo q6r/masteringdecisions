@@ -69,6 +69,24 @@ func HAuthAuthenticated(c *gin.Context) {
 
 }
 
+// HAuthWhoAmI decodes the cookie on the backend
+// and sends a json object containing the person_id
+func HAuthWhoAmI(c *gin.Context) {
+	got, exists := c.Get("cookieData")
+	if exists == false {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "not authenticated"})
+		c.Abort()
+		return
+	}
+	cookie := got.(map[string]string)
+	person_id, err := strconv.Atoi(cookie["person_id"])
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to convert number"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"person_id": person_id})
+}
+
 // AuthAsAll is a middleware to be used
 // after ginAuth.Use to assert authenticated users
 // accepts all users
