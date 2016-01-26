@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ import (
 type Ballot struct {
 	Ballot_ID   int    `db:"ballot_id" json:"ballot_id"`
 	Decision_ID int    `db:"decision_id" json:"decision_id"`
-	Secret      int    `db:"secret" json:"secret" binding:"required"`
+	Secret      string `db:"secret" json:"secret"`
 	Name        string `db:"name" json:"name" binding:"required"`
 	Email       string `db:"email" json:"email" binding:"required"`
 }
@@ -108,10 +109,99 @@ func (b *Ballot) Destroy() error {
 	return nil
 }
 
+// HBallotLogin is used to login users to their ballot
+// it only sets the cookie for the user
+// eg : A ballot is created by a facilitator
+// The ballot has a unique secret pkbdf2 hashed
+// A link is sent to the user in the form
+// /decision/123/ballot/222/login/:secret
+// user click on the link and is redirected to .... some url
+func HBallotLogin(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to parse decision id"})
+		return
+	}
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to parse ballot id"})
+		return
+	}
+	secret := c.Param("secret")
+
+	// find the ballot
+	var ballot Ballot
+	err = dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find ballot %v for decision %v", bid, did)})
+		return
+	}
+
+	// TODO : remove this if above todo is done
+	if ballot.Secret != secret {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Secret does not belong to this ballot"})
+		return
+	}
+
+	// set the cookies
+	ballot_id_str := strconv.Itoa(ballot.Ballot_ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to parse ballot_id"})
+		return
+	}
+	decision_id_str := strconv.Itoa(ballot.Decision_ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to parse ballot_id"})
+		return
+	}
+
+	expiration := time.Now().Add(365 * 24 * time.Hour)
+	bcookie := http.Cookie{
+		Name:    "ballot_id",
+		Value:   ballot_id_str,
+		Path:    "/",
+		Expires: expiration}
+	dcookie := http.Cookie{
+		Name:    "decision_id",
+		Value:   decision_id_str,
+		Path:    "/",
+		Expires: expiration}
+	http.SetCookie(c.Writer, &bcookie)
+	http.SetCookie(c.Writer, &dcookie)
+	// TODO : Change url
+	c.Redirect(http.StatusSeeOther, "http://localhost/ballot.html")
+}
+
+func HBallotWhoami(c *gin.Context) {
+	bcookie, err := c.Request.Cookie("ballot_id")
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to find ballot cookie"})
+		return
+	}
+	dcookie, err := c.Request.Cookie("decision_id")
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "unable to find decision cookie"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value})
+}
+
 // Save inserts a ballot into the database
 func (b *Ballot) Save() error {
+
+	b.SetupSecret()
+
 	if err := dbmap.Insert(b); err != nil {
 		return fmt.Errorf("Unable to insert ballot %#v to database", b)
 	}
 	return nil
+}
+
+// SetupSecret sets up the secret for a ballot
+// it's unique :<
+func (b *Ballot) SetupSecret() {
+	b.Secret = HashPassword(fmt.Sprintf("b_%d_d_%d",
+		b.Ballot_ID,
+		b.Decision_ID))
 }

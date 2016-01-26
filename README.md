@@ -90,8 +90,8 @@ Wants/Gives
 d1 = {"person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 s1 = "undecided yet"
-b1 = {"secret":<int>, "name":<str>, "email":<str>}
-b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<int>, "name":<str>, "email":<str>}
+b1 = {"name":<str>, "email":<str>}
+b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<str>, "name":<str>, "email":<str>}
 c1 = {"name":<str>, "weight":<str>}
 c2 = {"criterion_id":<int>, "decision_id":<int>, "name":<str>, "weight":<str>}
 v1 = {"weight":<int>}

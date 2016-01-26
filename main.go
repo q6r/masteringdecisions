@@ -1,5 +1,7 @@
 package main
 
+// TODO : Cookie port/host
+// TODO : Ballot cookie!
 // TODO : Write more test cover at least 80% of code
 // TODO : Write tests
 // TODO : Start applying the authentication middlewares to
@@ -86,6 +88,9 @@ func main() {
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
 	routes.DELETE("/decision/:decision_id/ballot/:ballot_id", HBallotDelete)
+
+	routes.GET("/decision/:decision_id/ballot/:ballot_id/login/:secret", HBallotLogin)
+	routes.GET("/ballot_whoami", HBallotWhoami)
 
 	// decision's ballot's votes
 	routes.GET(
