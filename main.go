@@ -104,7 +104,7 @@ func main() {
 	routes.GET("/checklogin", ginAuth.Use, AuthAsAll, HAuthCheck)
 
 	// Setup the authentication
-	ginAuth.ConfigPath = "config.conf"
+	ginAuth.ConfigPath = "./config.conf"
 	ginAuth.Unauthorized = HAuthUnauthenticated
 	ginAuth.Authorized = HAuthAuthenticated
 	err = ginAuth.LoadConfig()
