@@ -106,8 +106,6 @@ func main() {
 	routes.POST("/login", HAuthLogin)
 	routes.GET("/logout", HAuthLogout)
 	routes.GET("/whoami", ginAuth.Use, AuthAsAll, HAuthWhoAmI)
-	// TODO : an example that requires authenticated users only
-	routes.GET("/checklogin", ginAuth.Use, AuthAsAll, HAuthCheck)
 
 	// Setup the authentication
 	ginAuth.ConfigPath = "./config.conf"

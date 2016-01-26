@@ -55,11 +55,6 @@ func HAuthLogout(c *gin.Context) {
 	ginAuth.Logout(c)
 }
 
-// HAuthCheck returns the status of the current user
-func HAuthCheck(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "authenticated"})
-}
-
 func HAuthUnauthenticated(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"error": "unauthenticated"})
 	c.Abort()
