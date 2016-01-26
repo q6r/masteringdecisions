@@ -99,6 +99,7 @@ func main() {
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
 	routes.DELETE("/decision/:decision_id/ballot/:ballot_id", HBallotDelete)
+	routes.PUT("/decision/:decision_id/ballot/:ballot_id", HBallotUpdate)
 
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/login/:secret", HBallotLogin)
 	routes.GET("/ballot_whoami", HBallotWhoami)

@@ -50,6 +50,57 @@ func HBallotCreate(c *gin.Context) {
 
 }
 
+// HBallotUpdate updates a ballot
+func HBallotUpdate(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	bid, err := strconv.Atoi(c.Param("ballot_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	var b Ballot
+	err = dbmap.SelectOne(&b, "SELECT * FROM ballot WHERE decision_id=$1 and ballot_id=$2", did, bid)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("ballot %d for decision %d not found", bid, did)})
+		return
+	}
+
+	var json Ballot
+	err = c.Bind(&json)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": "Unable to parse decision object"})
+		return
+	}
+
+	new_ballot := Ballot{
+		Ballot_ID:   bid,
+		Decision_ID: did,
+		Secret:      json.Secret,
+		Name:        json.Name,
+		Email:       json.Email,
+	}
+	_, err = dbmap.Update(&new_ballot)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update ballot %d for decision", bid, did)})
+		return
+	}
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "ballot_update.js", "body": new_ballot})
+	} else {
+		c.JSON(http.StatusOK, new_ballot)
+	}
+}
+
 // HBallotDelete deletes a ballot from a decision
 func HBallotDelete(c *gin.Context) {
 
