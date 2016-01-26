@@ -39,6 +39,12 @@ shows the code and what do the tests cover in the code.
 
 # API
 
+For all API below if the header accept json then json objects are sent as mentioned below,
+if the accept header wants html then the same objects are passed to static file that
+runs a javascript file with that name found in `static/` folder.
+eg : Requestion html from `GET /persons` will give an html reply that will run
+the file `static/persons_list.js`
+
 ## person
 
 These are the things we can do with `person`, under this table is description
