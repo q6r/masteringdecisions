@@ -109,7 +109,6 @@ you get a cookie and this cookie is checked..etc
 |-----------------------------------------|-------------|--------|---------|---------|
 | Login                                   | /login      | POST   | l1      | l2      |
 | Logout                                  | /logout     | GET    | Nothing | Nothing |
-| Check if logged in                      | /checklogin | GET    | Nothing | cl1     |
 | Get person_id of current logged in user | /whoami     | GET    | Nothing | g1      |
 
 Wants/Gives
@@ -117,7 +116,6 @@ Wants/Gives
 ```
 l1 = {"email":<str>, "password":<str>}
 l2 = {"error":<str>} or {"status":<str>}
-cl1 = {"status":<str>} or {"error": <str>}
 g1 = {"person_id": <int>} or {"error": <str> }
 ```
 
