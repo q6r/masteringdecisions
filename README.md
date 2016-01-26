@@ -76,6 +76,7 @@ These are the things we can do with `decision`. Things like creating a decision,
 |------------------------------|-------------------------------------------------------------------------------|--------|---------|-------------|
 | Create a decision            | /decision                                                                     | POST   | d1      | d2          |
 | Get all decisions            | /decisions                                                                    | GET    | nothing | array of d2 |
+| Decision update              | /decision/:decision_id                                                        | PUT    | d1      | d2          |
 | Get a decision info          | /decision/:decision_id/info                                                   | GET    | nothing | d2          |
 | Get a decision statistics    | /decision/:decision_id/stats                                                  | GET    | nothing | s1          |
 | Delete a decision            | /decision/:decision_id                                                        | DELETE | nothing | r1          |
@@ -83,11 +84,14 @@ These are the things we can do with `decision`. Things like creating a decision,
 | List ballots in a decision   | /decision/:decision_id/ballots                                                | GET    | nothing | array of b2 |
 | Show a ballot info           | /decision/:decision_id/ballot/:ballot_id/info                                 | GET    | nothing | b2          |
 | Delete a ballot              | /decision/:decision_id/ballot/:ballot_id                                      | DELETE | nothing | r1          |
+| Update a ballot              | /decision/:decision_id/ballot/:ballot_id                                      | PUT    | b1      | b2          |
 | Create a decision criterion  | /decision/:decision_id/criterion                                              | POST   | c1      | c2          |
 | List all criterions          | /decision/:decision_id/criterions                                             | GET    | nothing | array of c2 |
 | Get a criterion info         | /decision/:decision_id/criterion/:criterion_id/info                           | GET    | nothing | c2          |
+| Update a criterion           | /decision/:decision_id/criterion/:criterion_id                                | PUT    | c1      | c2          |
 | Delete a criterion           | /decision/:decision_id/criterion/:criterion_id                                | DELETE | nothing | r1          |
-| Ballot votes in a criterion  | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | GET    | nothing | c2          |
+| Ballot votes in a criterion  | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | GET    | nothing | v2          |
+| Update Ballot vote           | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | PUT    | nothing | v2          |
 | Show ballot votes            | /decision/:decision_id/ballot/:ballot_id/votes                                | GET    | nothing | array of v2 |
 | Delete a vote in ballot      | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote         | DELETE | nothing | r1          |
 
@@ -128,7 +132,14 @@ g1 = {"person_id": <int>} or {"error": <str> }
 
 # Missing things
 
-- Update methods for Decisions, Person, Vote, Ballots not implemented yet
+- Update method does not solve dependencies (eg : chaning ballot weight after
+  votes happened)
+- Handlers errors does not respect html and json replies
+- HballotLogin does not implement html and json replies
+- Applying the permission middlewares to routes
+- SMTP Server for ballots invites
+- Ballot route to send invites to the ballot with secret link
+- Improve testing
 
 # Features
 
@@ -139,6 +150,7 @@ g1 = {"person_id": <int>} or {"error": <str> }
 - Fully concurrent
 - SecureCookie Authentication
 - Decision Statistics
+- Replies html/json
 
 # Changed things from previous design
 

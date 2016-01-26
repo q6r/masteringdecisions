@@ -95,6 +95,56 @@ func HCriterionCreate(c *gin.Context) {
 	}
 }
 
+// HCriterionUpdate updates a criterion
+func HCriterionUpdate(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	var cri Criterion
+	err = dbmap.SelectOne(&cri, "SELECT * FROM criterion WHERE decision_id=$1 and criterion_id=$2", did, cid)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("criterion %d for decision %d not found", cid, did)})
+		return
+	}
+
+	var json Criterion
+	err = c.Bind(&json)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": "Unable to parse decision object"})
+		return
+	}
+
+	new_criterion := Criterion{
+		Criterion_ID: cid,
+		Decision_ID:  did,
+		Name:         json.Name,
+		Weight:       json.Weight,
+	}
+	_, err = dbmap.Update(&new_criterion)
+	if err != nil {
+		c.JSON(http.StatusNotFound,
+			gin.H{"error": fmt.Sprintf("Unable to update criterion %d for decision %d", cid, did)})
+		return
+	}
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "criterion_update.js", "body": new_criterion})
+	} else {
+		c.JSON(http.StatusOK, new_criterion)
+	}
+}
+
 // Destroy removes a criterion from a decision
 func (cri *Criterion) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM criterion WHERE criterion_id=$1 and decision_id=$2",

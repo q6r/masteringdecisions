@@ -1,21 +1,5 @@
 package main
 
-// TODO : Other Handlers should handle errors in html/json
-// one error page for all ?
-// TODO : HballotLogin implement html/json
-// TODO : Cookie port/host
-// TODO : Ballot cookie!
-// TODO : Write more test cover at least 80% of code
-// TODO : Write tests
-// TODO : Start applying the authentication middlewares to
-// required routes (When the frontend is a little ready)
-// TODO : Implement an smtp server, send emails to new ballots
-// do this in HBallotCreate
-// TODO : Add route for ballot n to send invite to if GET rcvd
-// TODO : Remove owner_id from decision it's useless ?
-// TODO : Remove alternative_vote_style from decision ?
-// TODO : Remove Client_Settings from decision ?
-
 import (
 	"log"
 	"net/http"
@@ -121,6 +105,7 @@ func main() {
 	routes.POST("/decision/:decision_id/criterion", HCriterionCreate)
 	routes.GET("/decision/:decision_id/criterion/:criterion_id/info", HCriterionInfo)
 	routes.DELETE("/decision/:decision_id/criterion/:criterion_id", HCriterionDelete)
+	routes.PUT("/decision/:decision_id/criterion/:criterion_id", HCriterionUpdate)
 
 	// Login/Logout
 	routes.POST("/login", HAuthLogin)
