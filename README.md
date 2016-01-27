@@ -30,12 +30,11 @@ open the link in a browser find gobackend package and read the documentation.
 To test the code just run the following 
 
 ```
-go test -coverprofile=coverage.out
-go tool cover -html=coverage.out -o coverage.html
+./run_tests.sh
 ```
 
-These commands will run the *_test.go files and generate an html file that
-shows the code and what do the tests cover in the code.
+This command will run all testing and create a system.html file that can be
+previewed a the browser, to see which code is covered.
 
 # API
 
@@ -67,6 +66,21 @@ p1 = {"email":<str>,"pw_hash":<str>,"name_first":<str>,"name_last":<str>}
 p2 = {"person_id":<int>, "email":<str>,"pw_hash":<str>,"name_first":<str>,"name_last":<str>}
 s1 = {"result": "deleted"}
 ```
+What we actually return is `{"somehting": object}` for example :
+- Get person will return
+
+```
+{"person": p1 object}
+```
+
+- Get persons will return
+
+```
+{"persons": array of p1 object}
+```
+
+and so on..
+
 
 ## decision
 
@@ -110,6 +124,22 @@ v2 = {"criterion_id":<int>, "ballot_id":<int>, "weight":<int>}
 r1 = {"result": "deleted"}
 ```
 
+What we actually return is `{"somehting": object}` for example :
+- Get decision will return
+
+```
+{"decision": d1 object}
+```
+
+- Get decisions will return
+
+```
+{"decisions": array of d1 object}
+```
+
+and so on..
+
+
 # Authentication
 
 Authentication is implemented as middlewares applied to routes, currently they are applied
@@ -132,14 +162,11 @@ g1 = {"person_id": <int>} or {"error": <str> }
 
 # Missing things
 
-- Update method does not solve dependencies (eg : chaning ballot weight after
-  votes happened)
 - Handlers errors does not respect html and json replies
 - HballotLogin does not implement html and json replies
 - Applying the permission middlewares to routes
 - SMTP Server for ballots invites
 - Ballot route to send invites to the ballot with secret link
-- Improve testing
 
 # Features
 
