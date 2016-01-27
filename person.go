@@ -31,10 +31,11 @@ func HPersonsList(c *gin.Context) {
 		persons[i].PW_hash = "<hidden>"
 	}
 
+	result := gin.H{"persons": persons}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "persons_list.js", "body": persons})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "persons_list.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, persons)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -78,11 +79,11 @@ func HPersonUpdate(c *gin.Context) {
 	}
 
 	new_person.PW_hash = "<hidden>"
-
+	result := gin.H{"person": new_person}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_update.js", "body": new_person})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_update.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, new_person)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -105,11 +106,11 @@ func HPersonCreate(c *gin.Context) {
 	}
 
 	person.PW_hash = "<hidden>"
-
+	result := gin.H{"person": person}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": person})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, person)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -128,10 +129,11 @@ func HPersonDelete(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"result": "deleted"}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_deleted.js", "body": gin.H{"result": "deleted"}})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_deleted.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -147,7 +149,9 @@ func HPersonInfo(c *gin.Context) {
 	}
 
 	person.PW_hash = "<hidden>"
-	c.JSON(http.StatusOK, person)
+
+	result := gin.H{"person": person}
+	c.JSON(http.StatusOK, result)
 }
 
 // HPersonDecisions returns the decisions owned by that person
@@ -160,18 +164,22 @@ func HPersonDecisions(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"decisions": decisions}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_decisions.js", "body": decisions})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_decisions.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, decisions)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
 // Destroy a person from the database and remove its dependencies
 func (p *Person) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM person WHERE person_id=$1", p.Person_ID)
+	rd, err := dbmap.Delete(p)
 	if err != nil {
 		return fmt.Errorf("Unable to delete %#v from database : %#v", p, err)
+	}
+	if rd == 0 {
+		return fmt.Errorf("Nothing deleted")
 	}
 
 	// Remove the person's decisions

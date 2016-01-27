@@ -211,7 +211,8 @@ func HStats(c *gin.Context) {
 
 	}
 
-	c.JSON(http.StatusOK, ballots_analysis)
+	result := gin.H{"stats": ballots_analysis}
+	c.JSON(http.StatusOK, result)
 }
 
 // ApplyFunctionOnVotes is a helper function

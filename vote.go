@@ -47,10 +47,12 @@ func HVoteCreate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"vote": v}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_create.js", "body": v})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "vote_create.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, v)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -93,11 +95,12 @@ func HVoteUpdate(c *gin.Context) {
 	}
 
 	new_vote := Vote{Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
+	result := gin.H{"vote": new_vote}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "vote_update.js", "body": new_vote})
+			gin.H{"scriptname": "vote_update.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, new_vote)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -122,10 +125,12 @@ func HVoteDelete(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"result": "deleted"}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_deleted.js", "body": gin.H{"result": "deleted"}})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "vote_deleted.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -144,10 +149,12 @@ func HVotesBallotList(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"votes": vs}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "vote_ballot_list.js", "body": vs})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "vote_ballot_list.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, vs)
+		c.JSON(http.StatusOK, result)
 	}
 }
 

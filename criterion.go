@@ -31,10 +31,12 @@ func HCriterionInfo(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"criterion": cri}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "criterion_info.js", "body": cri})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "criterion_info.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, cri)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -59,10 +61,12 @@ func HCriterionDelete(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"result": "deleted"}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "criterion_deleted.js", "body": gin.H{"result": "deleted"}})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "criterion_deleted.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -88,10 +92,12 @@ func HCriterionCreate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"criterion": cri}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "criterion_create.js", "body": cri})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "criterion_create.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, cri)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -137,11 +143,12 @@ func HCriterionUpdate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"criterion": new_criterion}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "criterion_update.js", "body": new_criterion})
+			gin.H{"scriptname": "criterion_update.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, new_criterion)
+		c.JSON(http.StatusOK, result)
 	}
 }
 

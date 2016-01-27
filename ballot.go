@@ -42,10 +42,11 @@ func HBallotCreate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"ballot": b}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": b})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, b)
+		c.JSON(http.StatusOK, result)
 	}
 
 }
@@ -93,11 +94,12 @@ func HBallotUpdate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"ballot": new_ballot}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_update.js", "body": new_ballot})
+			gin.H{"scriptname": "ballot_update.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, new_ballot)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -123,10 +125,12 @@ func HBallotDelete(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"result": "deleted"}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_deleted.js", "body": gin.H{"result": "deleted"}})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "ballot_deleted.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -143,10 +147,12 @@ func HBallotInfo(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"ballot": ballot}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_info.js", "body": ballot})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "ballot_info.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, ballot)
+		c.JSON(http.StatusOK, result)
 	}
 
 }
@@ -251,11 +257,23 @@ func HBallotWhoami(c *gin.Context) {
 		return
 	}
 
+	dval, err := strconv.Atoi(dcookie.Value)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to parse cookie decision id"})
+		return
+	}
+	bval, err := strconv.Atoi(bcookie.Value)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to parse cookie ballot id"})
+		return
+	}
+
+	result := gin.H{"ballot": Ballot{Ballot_ID: bval, Decision_ID: dval}}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_whoami.js", "body": gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value}})
+			gin.H{"scriptname": "ballot_whoami.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"ballot_id": bcookie.Value, "decision_id": dcookie.Value})
+		c.JSON(http.StatusOK, result)
 	}
 
 }

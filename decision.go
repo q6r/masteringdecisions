@@ -33,10 +33,11 @@ func HDecisionBallotsList(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"ballots": ballots}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_ballots.js", "body": ballots})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_ballots.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, ballots)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -51,10 +52,11 @@ func HDecisionCriterionsList(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"criterions": cris}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_criterions.js", "body": cris})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_criterions.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, cris)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -68,10 +70,11 @@ func HDecisionsList(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"decisions": decisions}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": decisions})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, decisions)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -86,10 +89,11 @@ func HDecisionInfo(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"decision": decision}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_info.js", "body": decision})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_info.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, decision)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -134,11 +138,12 @@ func HDecisionUpdate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"decision": new_decision}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "decision_update.js", "body": new_decision})
+			gin.H{"scriptname": "decision_update.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, new_decision)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -158,10 +163,12 @@ func HDecisionCreate(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"decision": decision}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_create.js", "body": decision})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "decision_create.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, decision)
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -180,10 +187,12 @@ func HDecisionDelete(c *gin.Context) {
 		return
 	}
 
+	result := gin.H{"result": "deleted"}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_deleted.js", "body": gin.H{"result": "deleted"}})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "decision_deleted.js", "body": result})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "deleted"})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
