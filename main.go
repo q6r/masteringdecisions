@@ -45,7 +45,7 @@ func main() {
 		routes.GET("/clean", func(c *gin.Context) {
 			err := dbmap.TruncateTables()
 			if err != nil {
-				c.JSON(http.StatusNotFound, gin.H{"error": err})
+				c.JSON(http.StatusForbidden, gin.H{"error": err})
 				return
 			}
 			c.JSON(http.StatusOK, gin.H{"result": "cleaned"})

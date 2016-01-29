@@ -29,7 +29,7 @@ func HDecisionBallotsList(c *gin.Context) {
 	var ballots []Ballot
 	_, err := dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find ballots for decision id %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find ballots for decision id %v", did)})
 		return
 	}
 
@@ -48,7 +48,7 @@ func HDecisionCriterionsList(c *gin.Context) {
 	var cris []Criterion
 	_, err := dbmap.Select(&cris, "select * from criterion where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
 		return
 	}
 
@@ -66,7 +66,7 @@ func HDecisionsList(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "SELECT * FROM decision")
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to find decisions in database"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unable to find decisions in database"})
 		return
 	}
 
@@ -85,7 +85,7 @@ func HDecisionInfo(c *gin.Context) {
 	var decision Decision
 	err := dbmap.SelectOne(&decision, "SELECT * FROM decision where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
 		return
 	}
 
@@ -101,14 +101,14 @@ func HDecisionInfo(c *gin.Context) {
 func HDecisionUpdate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var d Decision
 	err = dbmap.SelectOne(&d, "SELECT * FROM decision WHERE decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("decision %d not found", did)})
 		return
 	}
@@ -116,7 +116,7 @@ func HDecisionUpdate(c *gin.Context) {
 	var json Decision
 	err = c.Bind(&json)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": "Unable to parse decision object"})
 		return
 	}
@@ -133,7 +133,7 @@ func HDecisionUpdate(c *gin.Context) {
 	}
 	_, err = dbmap.Update(&new_decision)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update decision %d", did)})
 		return
 	}
@@ -153,13 +153,13 @@ func HDecisionCreate(c *gin.Context) {
 	var decision Decision
 	err := c.Bind(&decision)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "invalid decision object"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid decision object"})
 		return
 	}
 
 	err = decision.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -176,14 +176,14 @@ func HDecisionCreate(c *gin.Context) {
 func HDecisionDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	d := &Decision{Decision_ID: id}
 	err = d.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 

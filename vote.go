@@ -25,17 +25,17 @@ func HVoteCreate(c *gin.Context) {
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	weight, err := strconv.Atoi(c.Param("weight"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -43,7 +43,7 @@ func HVoteCreate(c *gin.Context) {
 
 	err = v.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -60,36 +60,36 @@ func HVoteCreate(c *gin.Context) {
 func HVoteUpdate(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	weight, err := strconv.Atoi(c.Param("weight"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cri Criterion
 	err = dbmap.SelectOne(&cri, "SELECT * FROM criterion WHERE criterion_id=$1", cid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
 		return
 	}
 	if weight > cri.Weight {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Vote weight can't be more than %d", cri.Weight)})
 		return
 	}
 
 	_, err = dbmap.Exec("UPDATE vote SET weight=$1 WHERE criterion_id=$2 and ballot_id=$3", weight, cid, bid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
 		return
 	}
@@ -108,20 +108,20 @@ func HVoteUpdate(c *gin.Context) {
 func HVoteDelete(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	v := Vote{Ballot_ID: bid, Criterion_ID: cid}
 	err = v.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -138,14 +138,14 @@ func HVoteDelete(c *gin.Context) {
 func HVotesBallotList(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var vs []Vote
 	_, err = dbmap.Select(&vs, "select * from vote WHERE ballot_id=$1", bid)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 

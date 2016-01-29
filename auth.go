@@ -25,7 +25,7 @@ func HAuthLogin(c *gin.Context) {
 	var ar AuthRequest
 	err := c.Bind(&ar)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid authrequest object"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid authrequest object"})
 		return
 	}
 
@@ -34,7 +34,7 @@ func HAuthLogin(c *gin.Context) {
 	var p Person
 	err = dbmap.SelectOne(&p, "select * from person where email=$1 and pw_hash=$2", ar.Email, hashed)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Wrong email or password"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Wrong email or password"})
 		return
 	}
 
@@ -42,7 +42,7 @@ func HAuthLogin(c *gin.Context) {
 		"person_id": strconv.Itoa(p.Person_ID)}
 	err = ginAuth.Login(c, extra)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to login"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unable to login"})
 		return
 	}
 
@@ -76,7 +76,7 @@ func HAuthWhoAmI(c *gin.Context) {
 	cookie := got.(map[string]string)
 	person_id, err := strconv.Atoi(cookie["person_id"])
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "unable to convert number"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "unable to convert number"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"person_id": person_id})

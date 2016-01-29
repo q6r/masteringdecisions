@@ -73,7 +73,7 @@ func HStats(c *gin.Context) {
 	err := dbmap.SelectOne(&decision,
 		"select * from decision where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -82,7 +82,7 @@ func HStats(c *gin.Context) {
 	_, err = dbmap.Select(&ballots,
 		"select * from ballot where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -91,7 +91,7 @@ func HStats(c *gin.Context) {
 	_, err = dbmap.Select(&criterions,
 		"select * from criterion where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -103,7 +103,7 @@ func HStats(c *gin.Context) {
 			"select * from vote where ballot_id=$1",
 			ballot.Ballot_ID)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		all_votes = append(all_votes, votes)
@@ -131,7 +131,7 @@ func HStats(c *gin.Context) {
 
 			vote, err := FindVotesByKeys(criterion.Criterion_ID, ballot.Ballot_ID)
 			if err != nil {
-				c.JSON(http.StatusNotFound, gin.H{
+				c.JSON(http.StatusForbidden, gin.H{
 					"error": fmt.Errorf("missing vote for criterion id %d ballot id %d",
 						criterion.Criterion_ID, ballot.Ballot_ID).Error(),
 				})
@@ -150,62 +150,62 @@ func HStats(c *gin.Context) {
 
 		ba.MaxVote, err = ApplyFunctionOnVotes(ba, stats.Max)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.MinVote, err = ApplyFunctionOnVotes(ba, stats.Min)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.AvgVote, err = ApplyFunctionOnVotes(ba, stats.Sum)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 		ba.AvgVote /= float64(len(ba.Statistics))
 
 		ba.MeanVote, err = ApplyFunctionOnVotes(ba, stats.Mean)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.MedianVote, err = ApplyFunctionOnVotes(ba, stats.Median)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.PopulationVarianceVote, err = ApplyFunctionOnVotes(ba, stats.PopulationVariance)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.SampleVarianceVote, err = ApplyFunctionOnVotes(ba, stats.SampleVariance)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.MedianAbsoluteDeviationPopulationVote, err = ApplyFunctionOnVotes(ba, stats.MedianAbsoluteDeviationPopulation)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.StandardDeviationPopulationVote, err = ApplyFunctionOnVotes(ba, stats.StandardDeviationPopulation)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
 		ba.StandardDeviationSampleVote, err = ApplyFunctionOnVotes(ba, stats.StandardDeviationSample)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
 		}
 
