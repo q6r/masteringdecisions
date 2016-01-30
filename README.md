@@ -108,10 +108,16 @@ These are the things we can do with `decision`. Things like creating a decision,
 | Update Ballot vote           | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | PUT    | nothing | v2          |
 | Show ballot votes            | /decision/:decision_id/ballot/:ballot_id/votes                                | GET    | nothing | array of v2 |
 | Delete a vote in ballot      | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote         | DELETE | nothing | r1          |
+| Create an alternative        | /decision/:decision_id/alternative                                            | POST   | a1      | a1          |
+| Show all alternatives        | /decision/:decision_id/alternatives                                           | GET    | nothing | array of a1 |
+| Show info of one alternative | /decision/:decision_id/alternative/:alternative_id/info                       | GET    | nothing | a1          |
+| Delete an alternative        | /decision/:decision_id/alternative/:alternative_id                            | DELETE | nothing | r1          |
+| Update an alternative        | /decision/:decision_id/alternative/:alternative_id                            | PUT    | a1      | a1          |
 
 Wants/Gives
 
 ```
+a1 = {"name": <str>, "rating":<int> }
 d1 = {"person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 s1 = "undecided yet"
