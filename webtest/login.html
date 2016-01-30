@@ -116,10 +116,9 @@
 	
 	post_text("/login", JSON.stringify(new_login), function (result) {
 		alert("login: " + JSON.stringify(result));
-	});
-	delay();
-	get_text("/whoami", function (result) {
-		alert("whomi?: " + JSON.stringify(result));
+		get_text("/whoami", function (result) {
+			alert("whomi?: " + JSON.stringify(result));
+		});
 	});
 	
 	return false;
