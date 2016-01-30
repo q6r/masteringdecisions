@@ -59,7 +59,7 @@ func HBallotCreate(c *gin.Context) {
 
 	// Send invitation
 	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
+	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
 		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
 
 	// TODO : Better err handling ?
@@ -82,7 +82,7 @@ func HBallotInvite(c *gin.Context) {
 	}
 
 	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
+	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
 		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
 
 	err = Send(body, title, b.Email)
