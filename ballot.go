@@ -287,6 +287,56 @@ func HBallotWhoami(c *gin.Context) {
 
 }
 
+// HBallotAllInfo show all of the information related to a ballot
+/*
+
+	{"ballot": {
+		"name": ...
+		"id": ...
+	},
+	"criterions": [{
+	}],
+	"votes": [{
+	}],
+	}
+
+*/
+func HBallotAllInfo(c *gin.Context) {
+	did := c.Param("decision_id")
+	bid := c.Param("ballot_id")
+
+	var ballot Ballot
+	err := dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
+	if err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to find ballot %v for decision %v", bid, did)})
+		return
+	}
+
+	type AllInfo struct {
+		Name         string `json:"name"`
+		Email        string `json:"email"`
+		URL_Decision string `json:"url_decision"`
+		Ratings      []Vote `json:"ratings"`
+	}
+
+	// First get the ballot
+	var ai AllInfo
+	ai.Name = ballot.Name
+	ai.Email = ballot.Email
+	ai.URL_Decision = fmt.Sprintf("/decision/%s", did)
+
+	// Get the votes for this decision
+	_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM vote where ballot_id=$1", bid)
+	if err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to find votes %v for ballot %v", bid)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ballot": ai})
+}
+
 // Save inserts a ballot into the database
 func (b *Ballot) Save() error {
 

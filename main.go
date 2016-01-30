@@ -1,6 +1,6 @@
-// TODO : Implement alternative
 // TODO : Location in *Create should return should contain the url
-// TODO : Home route should return urls to everything
+// TODO : on get /decisions show the links to the decisions instead of the objects
+// TODO : on get /decision/1/ballots will show an array of /decision/1/ballot/N
 package main
 
 import (
@@ -89,6 +89,7 @@ func main() {
 	routes.PUT("/decision/:decision_id/alternative/:alternative_id", HAlternativeUpdate)
 
 	// decision's ballots
+	routes.GET("/decision/:decision_id/ballot/:ballot_id", HBallotAllInfo)
 	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
