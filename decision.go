@@ -99,7 +99,7 @@ func HDecisionCriterionsList(c *gin.Context) {
 }
 
 // HDecisionsList returns a list of all decision defined
-// in the database
+// in the database their name and url only
 func HDecisionsList(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "SELECT * FROM decision")
@@ -108,7 +108,18 @@ func HDecisionsList(c *gin.Context) {
 		return
 	}
 
-	result := gin.H{"decisions": decisions}
+	type Link struct {
+		Name string `json:"name"`
+		Url  string `json:"url"`
+	}
+
+	var links []Link
+	for _, d := range decisions {
+		l := Link{Name: d.Name, Url: fmt.Sprintf("/decision/%d", d.Decision_ID)}
+		links = append(links, l)
+	}
+
+	result := gin.H{"decisions": links}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": result})
 	} else {

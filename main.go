@@ -1,8 +1,6 @@
 // TODO : Implement Weight.go, simply same as vote except without criterion
 // it's for voting on alternatives.
 // TODO : Location in *Create should return should contain the url
-// TODO : on get /decisions show the links to the decisions instead of the objects
-// TODO : HBalltAllInfo should also return html
 package main
 
 import (
