@@ -55,7 +55,7 @@ func (alt *Alternative) Save() error {
 }
 
 // HAlternativeUpdate updates an alternative
-func HBallotUpdate(c *gin.Context) {
+func HAlternativeUpdate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
