@@ -115,7 +115,7 @@ ballots, and gather statistics.
 | Show info of one alternative | /decision/:decision_id/alternative/:alternative_id/info                                                   | GET    | nothing | a1          |
 | Delete an alternative        | /decision/:decision_id/alternative/:alternative_id                                                        | DELETE | nothing | r1          |
 | Update an alternative        | /decision/:decision_id/alternative/:alternative_id                                                        | PUT    | a1      | a1          |
-
+| More ballot information      | /decision/:decision_id/ballot/:ballot_id                                                                  | GET    | nothing | b3          |
 Wants/Gives
 
 ```
@@ -125,6 +125,7 @@ d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>,
 s1 = "undecided yet"
 b1 = {"name":<str>, "email":<str>}
 b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<str>, "name":<str>, "email":<str>}
+b3 = {"ballot": b1, "ratings": array of v2}
 c1 = {"name":<str>, "weight":<str>}
 c2 = {"criterion_id":<int>, "decision_id":<int>, "name":<str>, "weight":<str>}
 v1 = {"weight":<int>}
