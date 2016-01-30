@@ -50,6 +50,7 @@ func HBallotCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": b}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.Ballot_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": result})
 	} else {

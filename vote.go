@@ -42,6 +42,13 @@ func HVoteCreate(c *gin.Context) {
 		return
 	}
 
+	var b Ballot
+	err = dbmap.SelectOne(&b, "select * from ballot where ballot_id=$1", bid)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
 	v := Vote{Alternative_ID: aid, Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
 
 	err = v.Save()
@@ -51,6 +58,8 @@ func HVoteCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"vote": v}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/ballot/%d/alternative/%d/criterion/%d/vote/",
+		b.Decision_ID, bid, aid, cid))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "vote_create.js", "body": result})

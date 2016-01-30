@@ -213,6 +213,7 @@ func HDecisionCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"decision": decision}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.Decision_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "decision_create.js", "body": result})

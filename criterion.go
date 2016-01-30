@@ -93,6 +93,8 @@ func HCriterionCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"criterion": cri}
+	c.Writer.Header().Set("Location",
+		fmt.Sprintf("/decision/%d/criterion/%d", did, cri.Criterion_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "criterion_create.js", "body": result})

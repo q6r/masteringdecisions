@@ -39,6 +39,7 @@ func HAlternativeCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"alternative": alt}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/alternative/%d", alt.Decision_ID, alt.Alternative_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "alternative_create.js", "body": result})
 	} else {

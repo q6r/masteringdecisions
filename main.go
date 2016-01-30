@@ -1,6 +1,5 @@
 // TODO : Implement Weight.go, simply same as vote except without criterion
 // it's for voting on alternatives.
-// TODO : Location in *Create should return should contain the url
 package main
 
 import (

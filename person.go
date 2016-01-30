@@ -107,6 +107,7 @@ func HPersonCreate(c *gin.Context) {
 
 	person.PW_hash = "<hidden>"
 	result := gin.H{"person": person}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/person/%d", person.Person_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": result})
 	} else {
