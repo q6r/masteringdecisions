@@ -59,20 +59,39 @@ func HBallotCreate(c *gin.Context) {
 
 	// Send invitation
 	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost/decision/%d/ballot/%d/login/%s",
+	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
 		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
 
 	// TODO : Better err handling ?
 	go Send(body, title, b.Email)
 }
 
-/*
-- Case 1 : Ballot id -> Get the object -> Change it
-- Case 2 : The object -> Change it
+// HBallotInvite invites a specific ballot via email
+// to participate in its decision
+func HBallotInvite(c *gin.Context) {
+	did := c.Param("decision_id")
+	bid := c.Param("ballot_id")
 
+	var b Ballot
+	err := dbmap.SelectOne(&b,
+		"SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
+	if err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to find ballot %v for decision %v", bid, did)})
+		return
+	}
 
+	title := fmt.Sprintf("%s's ballot", b.Name)
+	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
+		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
 
-*/
+	err = Send(body, title, b.Email)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"result": "invited"})
+	}
+}
 
 // HBallotUpdate updates a ballot
 func HBallotUpdate(c *gin.Context) {

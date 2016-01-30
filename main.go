@@ -89,6 +89,7 @@ func main() {
 
 	// decision's ballots
 	routes.GET("/decision/:decision_id/ballot/:ballot_id", HBallotAllInfo)
+	routes.GET("/decision/:decision_id/ballot/:ballot_id/invite", HBallotInvite)
 	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
