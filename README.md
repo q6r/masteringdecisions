@@ -84,35 +84,37 @@ and so on..
 
 ## decision
 
-These are the things we can do with `decision`. Things like creating a decision, configuring it's criterions, creating ballots, doing voting on the ballots, and gather statistics.
+These are the things we can do with `decision`. Things like creating a
+decision, configuring it's criterions, creating ballots, doing voting on the
+ballots, and gather statistics.
 
-| Description                  | URL                                                                           | Method | Wants   | Gives       |
-|------------------------------|-------------------------------------------------------------------------------|--------|---------|-------------|
-| Create a decision            | /decision                                                                     | POST   | d1      | d2          |
-| Get all decisions            | /decisions                                                                    | GET    | nothing | array of d2 |
-| Decision update              | /decision/:decision_id                                                        | PUT    | d1      | d2          |
-| Get a decision info          | /decision/:decision_id/info                                                   | GET    | nothing | d2          |
-| Get a decision statistics    | /decision/:decision_id/stats                                                  | GET    | nothing | s1          |
-| Delete a decision            | /decision/:decision_id                                                        | DELETE | nothing | r1          |
-| Create a ballot for decision | /decision/:decision_id/ballot                                                 | POST   | b1      | b2          |
-| List ballots in a decision   | /decision/:decision_id/ballots                                                | GET    | nothing | array of b2 |
-| Show a ballot info           | /decision/:decision_id/ballot/:ballot_id/info                                 | GET    | nothing | b2          |
-| Delete a ballot              | /decision/:decision_id/ballot/:ballot_id                                      | DELETE | nothing | r1          |
-| Update a ballot              | /decision/:decision_id/ballot/:ballot_id                                      | PUT    | b1      | b2          |
-| Create a decision criterion  | /decision/:decision_id/criterion                                              | POST   | c1      | c2          |
-| List all criterions          | /decision/:decision_id/criterions                                             | GET    | nothing | array of c2 |
-| Get a criterion info         | /decision/:decision_id/criterion/:criterion_id/info                           | GET    | nothing | c2          |
-| Update a criterion           | /decision/:decision_id/criterion/:criterion_id                                | PUT    | c1      | c2          |
-| Delete a criterion           | /decision/:decision_id/criterion/:criterion_id                                | DELETE | nothing | r1          |
-| Ballot votes in a criterion  | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | GET    | nothing | v2          |
-| Update Ballot vote           | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight | PUT    | nothing | v2          |
-| Show ballot votes            | /decision/:decision_id/ballot/:ballot_id/votes                                | GET    | nothing | array of v2 |
-| Delete a vote in ballot      | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote         | DELETE | nothing | r1          |
-| Create an alternative        | /decision/:decision_id/alternative                                            | POST   | a1      | a1          |
-| Show all alternatives        | /decision/:decision_id/alternatives                                           | GET    | nothing | array of a1 |
-| Show info of one alternative | /decision/:decision_id/alternative/:alternative_id/info                       | GET    | nothing | a1          |
-| Delete an alternative        | /decision/:decision_id/alternative/:alternative_id                            | DELETE | nothing | r1          |
-| Update an alternative        | /decision/:decision_id/alternative/:alternative_id                            | PUT    | a1      | a1          |
+| Description                  | URL                                                                                                       | Method | Wants   | Gives       |
+|------------------------------|-----------------------------------------------------------------------------------------------------------|--------|---------|-------------|
+| Create a decision            | /decision                                                                                                 | POST   | d1      | d2          |
+| Get all decisions            | /decisions                                                                                                | GET    | nothing | array of d2 |
+| Decision update              | /decision/:decision_id                                                                                    | PUT    | d1      | d2          |
+| Get a decision info          | /decision/:decision_id/info                                                                               | GET    | nothing | d2          |
+| Get a decision statistics    | /decision/:decision_id/stats                                                                              | GET    | nothing | s1          |
+| Delete a decision            | /decision/:decision_id                                                                                    | DELETE | nothing | r1          |
+| Create a ballot for decision | /decision/:decision_id/ballot                                                                             | POST   | b1      | b2          |
+| List ballots in a decision   | /decision/:decision_id/ballots                                                                            | GET    | nothing | array of b2 |
+| Show a ballot info           | /decision/:decision_id/ballot/:ballot_id/info                                                             | GET    | nothing | b2          |
+| Delete a ballot              | /decision/:decision_id/ballot/:ballot_id                                                                  | DELETE | nothing | r1          |
+| Update a ballot              | /decision/:decision_id/ballot/:ballot_id                                                                  | PUT    | b1      | b2          |
+| Create a decision criterion  | /decision/:decision_id/criterion                                                                          | POST   | c1      | c2          |
+| List all criterions          | /decision/:decision_id/criterions                                                                         | GET    | nothing | array of c2 |
+| Get a criterion info         | /decision/:decision_id/criterion/:criterion_id/info                                                       | GET    | nothing | c2          |
+| Update a criterion           | /decision/:decision_id/criterion/:criterion_id                                                            | PUT    | c1      | c2          |
+| Delete a criterion           | /decision/:decision_id/criterion/:criterion_id                                                            | DELETE | nothing | r1          |
+| Ballot votes in a criterion  | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight | GET    | nothing | v2          |
+| Update Ballot vote           | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight | PUT    | nothing | v2          |
+| Show ballot votes            | /decision/:decision_id/ballot/:ballot_id/votes                                                            | GET    | nothing | array of v2 |
+| Delete a vote in ballot      | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote         | DELETE | nothing | r1          |
+| Create an alternative        | /decision/:decision_id/alternative                                                                        | POST   | a1      | a1          |
+| Show all alternatives        | /decision/:decision_id/alternatives                                                                       | GET    | nothing | array of a1 |
+| Show info of one alternative | /decision/:decision_id/alternative/:alternative_id/info                                                   | GET    | nothing | a1          |
+| Delete an alternative        | /decision/:decision_id/alternative/:alternative_id                                                        | DELETE | nothing | r1          |
+| Update an alternative        | /decision/:decision_id/alternative/:alternative_id                                                        | PUT    | a1      | a1          |
 
 Wants/Gives
 
