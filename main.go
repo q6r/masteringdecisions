@@ -2,7 +2,7 @@
 // it's for voting on alternatives.
 // TODO : Location in *Create should return should contain the url
 // TODO : on get /decisions show the links to the decisions instead of the objects
-// TODO : on get /decision/1/ballots will show an array of /decision/1/ballot/N
+// TODO : HBalltAllInfo should also return html
 package main
 
 import (

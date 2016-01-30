@@ -23,7 +23,8 @@ type Decision struct {
 }
 
 // HDecisionBallotsList returns a list of ballots beloning
-// to a decision
+// to a decision, show all their information Using
+// an array of BallotAllInfo
 func HDecisionBallotsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var ballots []Ballot
@@ -33,9 +34,27 @@ func HDecisionBallotsList(c *gin.Context) {
 		return
 	}
 
-	result := gin.H{"ballots": ballots}
+	var ais []BallotAllInfo
+
+	for _, b := range ballots {
+		var ai BallotAllInfo
+		ai.Name = b.Name
+		ai.Email = b.Email
+		ai.URL_Decision = fmt.Sprintf("/decision/%s", did)
+		// Get the votes for this decision
+		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM vote where ballot_id=$1", b.Ballot_ID)
+		if err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+			return
+		}
+		ais = append(ais, ai)
+	}
+
+	result := gin.H{"ballots": ais}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_ballots.js", "body": result})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "decision_ballots.js", "body": result})
 	} else {
 		c.JSON(http.StatusOK, result)
 	}

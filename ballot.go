@@ -20,6 +20,13 @@ type Ballot struct {
 	Email       string `db:"email" json:"email" binding:"required"`
 }
 
+type BallotAllInfo struct {
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	URL_Decision string `json:"url_decision"`
+	Ratings      []Vote `json:"ratings"`
+}
+
 // HBallotCreate create a ballot that belongs
 // to a decision
 func HBallotCreate(c *gin.Context) {
@@ -287,20 +294,7 @@ func HBallotWhoami(c *gin.Context) {
 
 }
 
-// HBallotAllInfo show all of the information related to a ballot
-/*
-
-	{"ballot": {
-		"name": ...
-		"id": ...
-	},
-	"criterions": [{
-	}],
-	"votes": [{
-	}],
-	}
-
-*/
+// HBallotBallotAllInfo show all of the information related to a ballot
 func HBallotAllInfo(c *gin.Context) {
 	did := c.Param("decision_id")
 	bid := c.Param("ballot_id")
@@ -313,15 +307,8 @@ func HBallotAllInfo(c *gin.Context) {
 		return
 	}
 
-	type AllInfo struct {
-		Name         string `json:"name"`
-		Email        string `json:"email"`
-		URL_Decision string `json:"url_decision"`
-		Ratings      []Vote `json:"ratings"`
-	}
-
 	// First get the ballot
-	var ai AllInfo
+	var ai BallotAllInfo
 	ai.Name = ballot.Name
 	ai.Email = ballot.Email
 	ai.URL_Decision = fmt.Sprintf("/decision/%s", did)
@@ -330,11 +317,18 @@ func HBallotAllInfo(c *gin.Context) {
 	_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM vote where ballot_id=$1", bid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("Unable to find votes %v for ballot %v", bid)})
+			gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", bid)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"ballot": ai})
+	result := gin.H{"ballot": ai}
+
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "ballots_all_info.js", "body": result})
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }
 
 // Save inserts a ballot into the database
