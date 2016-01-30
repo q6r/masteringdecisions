@@ -57,6 +57,13 @@ func HBallotCreate(c *gin.Context) {
 		c.JSON(http.StatusOK, result)
 	}
 
+	// Send invitation
+	title := fmt.Sprintf("%s's ballot", b.Name)
+	body := fmt.Sprintf("Hello %s, you have been invitied to participate in a decision at the following url : http://localhost/decision/%d/ballot/%d/login/%s",
+		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
+
+	// TODO : Better err handling ?
+	go Send(body, title, b.Email)
 }
 
 /*
