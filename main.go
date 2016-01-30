@@ -1,3 +1,6 @@
+// TODO : Implement alternative
+// TODO : Location in *Create should return should contain the url
+// TODO : Home route should return urls to everything
 package main
 
 import (
@@ -78,6 +81,13 @@ func main() {
 	routes.DELETE("/decision/:decision_id", HDecisionDelete)
 	routes.PUT("/decision/:decision_id", HDecisionUpdate)
 
+	// decision's alternatives
+	routes.POST("/decision/:decision_id/alternative", HAlternativeCreate)
+	routes.GET("/decision/:decision_id/alternatives", HDecisionAlternativesList)
+	routes.GET("/decision/:decision_id/alternative/:alternative_id/info", HAlternativeInfo)
+	routes.DELETE("/decision/:decision_id/alternative/:alternative_id", HAlternativeDelete)
+	routes.PUT("/decision/:decision_id/alternative/:alternative_id", HAlternativeUpdate)
+
 	// decision's ballots
 	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
@@ -90,14 +100,14 @@ func main() {
 
 	// decision's ballot's votes
 	routes.GET(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight", HVoteCreate)
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight", HVoteCreate)
 	routes.GET(
 		"/decision/:decision_id/ballot/:ballot_id/votes", HVotesBallotList)
 	routes.DELETE(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote",
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote",
 		HVoteDelete)
 	routes.PUT(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight",
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight",
 		HVoteUpdate)
 
 	// decision's criterions

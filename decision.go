@@ -41,6 +41,25 @@ func HDecisionBallotsList(c *gin.Context) {
 	}
 }
 
+// HDecisionAlternativesList returns a list of alternatives beloning
+// to a decision
+func HDecisionAlternativesList(c *gin.Context) {
+	did := c.Param("decision_id")
+	var alts []Alternative
+	_, err := dbmap.Select(&alts, "SELECT * FROM alternative WHERE decision_id=$1", did)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find alternatives for decision id %v", did)})
+		return
+	}
+
+	result := gin.H{"alternatives": alts}
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_alternatives.js", "body": result})
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
 // HDecisionCriterionsList returns a list of criterions beloning
 // to a decision
 func HDecisionCriterionsList(c *gin.Context) {
@@ -205,12 +224,13 @@ func (d *Decision) Destroy() error {
 		return fmt.Errorf("Unable to delete decision %#v from database", d)
 	}
 
+	// Remove the ballots of this decision
+	// removes the votes
 	var ballots []Ballot
 	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
 	if err != nil {
 		return fmt.Errorf("Unable to find ballot for decision %#v", d)
 	}
-
 	for _, b := range ballots {
 		err := b.Destroy()
 		if err != nil {
@@ -218,14 +238,28 @@ func (d *Decision) Destroy() error {
 		}
 	}
 
+	// Remove criterions
+	// Does not remove anything..
 	var cris []Criterion
 	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.Decision_ID)
 	if err != nil {
 		return fmt.Errorf("Unable to find criterion for decision %#v", d)
 	}
-
 	for _, cri := range cris {
 		err := cri.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Removing the alternatives remove the votes related to it
+	var alts []Alternative
+	_, err = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return fmt.Errorf("Unable to find alternatives for decision %#v", d)
+	}
+	for _, alt := range alts {
+		err := alt.Destroy()
 		if err != nil {
 			return err
 		}

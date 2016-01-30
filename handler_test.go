@@ -1,4 +1,5 @@
 // +build testrunmain
+
 package main
 
 import (
@@ -34,7 +35,7 @@ func TestHPersonCreate(t *testing.T) {
 		SetHeader("Content-Type", "application/json").
 		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
 		Send().
-		ExpectStatus(404)
+		ExpectStatus(403)
 
 	frisby.Global.PrintReport()
 }
@@ -167,7 +168,7 @@ func TestHPersonDelete(t *testing.T) {
 		SetHeader("Content-Type", "application/json").
 		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
 		Send().
-		ExpectStatus(404)
+		ExpectStatus(403)
 
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
@@ -351,7 +352,7 @@ func TestHDecisionCriterionsList(t *testing.T) {
 					Get(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d/info", did, bid)).
 					SetHeader("Content-Type", "application/json").
 					Send().
-					ExpectStatus(404)
+					ExpectStatus(403)
 
 			})
 
@@ -480,7 +481,7 @@ func TestHDecisionBallotsList(t *testing.T) {
 					Get(fmt.Sprintf("http://localhost:9999/decision/%d/criterion/%d/info", did, cid)).
 					SetHeader("Content-Type", "application/json").
 					Send().
-					ExpectStatus(404)
+					ExpectStatus(403)
 
 			})
 

@@ -51,6 +51,14 @@ func HBallotCreate(c *gin.Context) {
 
 }
 
+/*
+- Case 1 : Ballot id -> Get the object -> Change it
+- Case 2 : The object -> Change it
+
+
+
+*/
+
 // HBallotUpdate updates a ballot
 func HBallotUpdate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
@@ -76,7 +84,7 @@ func HBallotUpdate(c *gin.Context) {
 	err = c.Bind(&json)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": "Unable to parse decision object"})
+			gin.H{"error": "Unable to parse ballot object"})
 		return
 	}
 
@@ -90,7 +98,7 @@ func HBallotUpdate(c *gin.Context) {
 	_, err = dbmap.Update(&new_ballot)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("Unable to update ballot %d for decision", bid, did)})
+			gin.H{"error": fmt.Sprintf("Unable to update ballot %d for decision %d", bid, did)})
 		return
 	}
 
@@ -179,6 +187,7 @@ func (b *Ballot) Destroy() error {
 			return err
 		}
 	}
+
 	return nil
 }
 

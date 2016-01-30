@@ -29,6 +29,7 @@ func InitDatabase(conf config.Configer) *gorp.DbMap {
 	dbmap.AddTableWithName(Person{}, "person").SetKeys(true, "person_id")
 	dbmap.AddTableWithName(Decision{}, "decision").SetKeys(true, "decision_id")
 	dbmap.AddTableWithName(Ballot{}, "ballot").SetKeys(true, "ballot_id")
+	dbmap.AddTableWithName(Alternative{}, "alternative").SetKeys(true, "alternative_id")
 	dbmap.AddTableWithName(Criterion{}, "criterion").SetKeys(true, "criterion_id")
 	dbmap.AddTableWithName(Vote{}, "vote")
 
