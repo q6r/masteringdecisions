@@ -13,8 +13,8 @@ import (
 type Alternative struct {
 	Alternative_ID int    `db:"alternative_id" json:"alternative_id"`
 	Decision_ID    int    `db:"decision_id" json:"decision_id"`
-	Name           string `db:"name" json:"name" required:"binding"`
-	Rating         int    `db:"rating" json:"rating" required:"binding"`
+	Name           string `db:"name" json:"name" binding:"required"`
+	Rating         int    `db:"rating" json:"rating" binding:"required"`
 }
 
 // HAlternativeCreate create a ballot that belongs

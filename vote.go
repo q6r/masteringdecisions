@@ -12,10 +12,10 @@ import (
 // Vote represent a vote by a ballot for a specific
 // criterion
 type Vote struct {
-	Alternative_ID int `db:"alternative_id" json:"alternative_id" required:"binding"`
-	Criterion_ID   int `db:"criterion_id" json:"criterion_id" required:"binding"`
-	Ballot_ID      int `db:"ballot_id" json:"ballot_id" required:"binding"`
-	Weight         int `db:"weight" json:"weight" required:"binding"`
+	Alternative_ID int `db:"alternative_id" json:"alternative_id" binding:"required"`
+	Criterion_ID   int `db:"criterion_id" json:"criterion_id" binding:"required"`
+	Ballot_ID      int `db:"ballot_id" json:"ballot_id" binding:"required"`
+	Weight         int `db:"weight" json:"weight" binding:"required"`
 }
 
 // HVoteCreate a ballot votes on a criterion on an alternative
