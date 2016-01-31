@@ -41,8 +41,15 @@ func HDecisionBallotsList(c *gin.Context) {
 		ai.Name = b.Name
 		ai.Email = b.Email
 		ai.URL_Decision = fmt.Sprintf("/decision/%s/ballot/%d", did, b.Ballot_ID)
-		// Get the votes for this decision
-		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM vote where ballot_id=$1", b.Ballot_ID)
+		// Get the votes for this ballot
+		_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", b.Ballot_ID)
+		if err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+			return
+		}
+		// Get the ratings for this ballot
+		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM rating where ballot_id=$1", b.Ballot_ID)
 		if err != nil {
 			c.JSON(http.StatusForbidden,
 				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
