@@ -23,7 +23,7 @@ type Ballot struct {
 type BallotAllInfo struct {
 	Name         string `json:"name"`
 	Email        string `json:"email"`
-	URL_Decision string `json:"url_decision"`
+	URL_Decision string `json:"url"`
 	Ratings      []Vote `json:"ratings"`
 }
 

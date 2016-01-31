@@ -1,5 +1,6 @@
 // TODO : Implement Weight.go, simply same as vote except without criterion
 // it's for voting on alternatives.
+// TODO : Rewrite Destroy to delete in an ORM-ish way
 package main
 
 import (
@@ -110,6 +111,19 @@ func main() {
 	routes.PUT(
 		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight",
 		HVoteUpdate)
+
+	// decision's ballot's rating alternative
+	routes.GET(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating", HRatingCreate)
+	routes.GET(
+		"/decision/:decision_id/alternative/:alternative_id/votes", HRatingBallots)
+	routes.DELETE(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote",
+		HRatingDelete)
+
+	routes.PUT(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating",
+		HRatingUpdate)
 
 	// decision's criterions
 	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
