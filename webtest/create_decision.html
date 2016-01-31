@@ -8,6 +8,8 @@
 
 	</form>
 
+
+		<h1>Decision</h1>
 		
 		<label for="pid">person_id</label>
 		<input type="text" id="pid"></input>
@@ -46,10 +48,87 @@
 		<input type="submit" id="testdec" value="create decision"></input>
 
 	<form>
-		
+		<h1>Criterions</h1>		
+
+		<label for="crit_dec_id">decision id</label>
+		<input type="text" id="crit_dec_id"></input>
+		<br />
+
+		<label for="crit1_name">Crit 1 name</label>
+		<input type="text" id="crit1_name"></input>
+		<br />
+
+		<label for="crit1_wt">Crit 1 weight</label>
+		<input type="text" id="crit1_wt"></input>
+		<br />
+
+		<label for="crit2_name">Crit 2 name</label>
+		<input type="text" id="crit2_name"></input>
+		<br />
+
+		<label for="crit2_wt">Crit 2 weight</label>
+		<input type="text" id="crit2_wt"></input>
+		<br />
+
+
+		<input type="submit" id="crit_add" value="add criterions"></input>
 
 
 	</form>
+
+
+	<form>
+		<h1>Alternatives</h1>
+
+		<label for="alt_dec_id">decision id</label>
+		<input type="text" id="alt_dec_id"></input>
+		<br />
+
+
+		<label for="alt1_name">Alt 1 name</label>
+		<input type="text" id="alt1_name"></input>
+		<br />
+
+		<label for="alt1_rt">Alt 1 rating</label>
+		<input type="text" id="alt1_rt"></input>
+		<br />
+
+
+		<label for="alt2_name">Alt 2 name</label>
+		<input type="text" id="alt2_name"></input>
+		<br />
+
+		<label for="alt2_rt">Alt 2 rating</label>
+		<input type="text" id="alt2_rt"></input>
+		<br />
+
+		<input type="submit" id="alt_add" value="add alternatives"></input>
+	</form>
+
+	<form>
+		<h1>Create a ballot</h1>
+
+		<label for="bal_dec_id">decision id</label>
+		<input type="text" id="bal_dec_id"></input>
+		<br />
+
+		<label for="bal_name">Name</label>
+		<input type="text" id="bal_name"></input>
+		<br />
+
+		<label for="bal_email">Email</label>
+		<input type="text" id="bal_email"></input>
+		<br />
+
+
+		<input type="submit" id="bal_add" value="add ballot"></input>
+
+
+	</form>
+
+
+
+
 
 <script>
 
@@ -131,34 +210,101 @@ document.getElementById("testdec").onclick = function () {
 //	});
 
 	new_decision = {
-		"person_id":document.getElementById("pid").value,
+		"person_id":+document.getElementById("pid").value,
 		"name":document.getElementById("name").value,
 		"description":document.getElementById("desc").value,
-		"owner_id":document.getElementById("oid").value,
-		"stage":document.getElementById("stg").value,
+		"owner_id":+document.getElementById("oid").value,
+		"stage":+document.getElementById("stg").value,
 		"criterion_vote_style":document.getElementById("cstyle").value,
 		"alternative_vote_style":document.getElementById("astyle").value,
 		"client_settings":document.getElementById("settings").value
-
-	}	
+		
+	};	
 
 
 	post_text("/decision", JSON.stringify(new_decision), function(decision) {
 
-		console.log(decision);
+		console.log(decision.decision_id);
 
 	});
+
+
+
+
+}
+
+
+document.getElementById("crit_add").onclick = function() {
+	crit1 = {"name":document.getElementById("crit1_name").value,
+		 "weight":+document.getElementById("crit1_wt").value};	
+
+	crit2 = {"name":document.getElementById("crit2_name").value,
+		"weight":+document.getElementById("crit2_wt").value};
+
+	crits = [crit1, crit2];	
+
+	for(var i in crits) {
+		crit = crits[i];
+
+		post_text("/decision/"+document.getElementById("crit_dec_id").value+"/criterion", JSON.stringify(crit), function(c) {
+
+			console.log(c.criterion_id);
+
+		});
+
+
+	}
+
+}
+
+document.getElementById("alt_add").onclick = function() {
+
+	alt1 = {"name":document.getElementById("alt1_name").value,
+		 "rating":+document.getElementById("alt1_rt").value};	
+
+	alt2 = {"name":document.getElementById("alt2_name").value,
+		"rating":+document.getElementById("alt2_rt").value};
+
+	alts = [alt1, alt2];	
+
+	for(var i in alts) {
+		alt = alts[i];
+
+		post_text("/decision/"+document.getElementById("alt_dec_id").value+"/alternative", JSON.stringify(alt), function(a) {
+
+			console.log(a);
+
+		});
+
+	}
+}
+
+// /decision/decision id/ballot
+// name email
+
+document.getElementById("bal_add").onclick = function() {
+
+
+	new_ballot = {
+		"name":document.getElementById("bal_name").value,
+		"email":document.getElementById("bal_email").value 
+	};
+
+	post_text("/decision/"+document.getElementById("bal_dec_id").value+"/ballot", JSON.stringify(new_ballot), function(b) {
+
+		console.log(b);
+
+	});
+
+
+	
 
 
 }
 
 
 
-
 </script>
-
-
-
 
 </body>
 </html>
