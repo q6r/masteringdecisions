@@ -1,5 +1,3 @@
-// TODO : Implement Weight.go, simply same as vote except without criterion
-// it's for voting on alternatives.
 // TODO : Rewrite Destroy to delete in an ORM-ish way
 package main
 
