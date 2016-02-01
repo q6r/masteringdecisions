@@ -2,8 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Woodentable - Login</title>
+    <title>CHANGE ME!</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	
 	<style>
 		body {
 		  background: #eee !important;
@@ -50,8 +51,10 @@
 		  border-top-left-radius: 0;
 		  border-top-right-radius: 0;
 		}
+		.cbBox{margin-left:20px;}
+		.rememberMeCB{margin:0px 0px 0px 20px !important; padding:0px !important;}
 	</style>
-	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 	<script>
 	var base_url = "http://localhost:9999";
 
@@ -118,28 +121,48 @@
 		alert("login: " + JSON.stringify(result));
 		get_text("/whoami", function (result) {
 			alert("whomi?: " + JSON.stringify(result));
+			callback(result);
 		});
+		callback(result);
 	});
 	
 	return false;
 	}
+	
+	$(function() {
+		$('title').html('Please Login!');
+
+		
+		$('<div>').addClass('wrapper').appendTo('body');
+			//$('<button>').addClass('btn btn-lg btn-block btn-primary').click('create_geoff()').css({ width: "200px" }).text('Create Geoff!').appendTo('.wrapper');
+			var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return login()').appendTo('.wrapper');
+				$('<h2>').addClass('form-signin-heading').text('Please Login').appendTo(form);
+				$('<input type="text" />').addClass('form-control')
+					.attr('name', 'username')
+					.attr('placeholder', 'Email Address')
+					.attr('required', '')
+					.attr('autofocus', '')
+					.attr('id', 'username')
+					.appendTo(form);
+				$('<input type="password" />').addClass('form-control')
+					.attr('name', 'password')
+					.attr('placeholder', 'Password')
+					.attr('required', '')
+					.attr('id', 'password')
+					.appendTo(form);
+				var cbBox = $('<div>').addClass('cbBox');
+					var rememberMe = $('<label class="checkbox">').addClass('rememberMeCB');
+						$('<input type="checkbox">').attr('value', 'remember-me').attr('id', 'rememberMe').attr('name', 'rememberMe').appendTo(rememberMe);
+						rememberMe.append('Remember Me');
+					rememberMe.appendTo(cbBox);
+				cbBox.appendTo(form);
+				var p = $('<p>').appendTo(form);
+					$('<a>').attr('href', '#').text('Forgot Password?').appendTo(cbBox);
+				$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+	});
+	
 	</script>
   </head>
   <body>
-    <div class="wrapper">
-	<button class="btn btn-lg btn-block btn-primary" onClick="create_geoff()" style="width:200px;">Create Geoff!</button>
-    <form class="form-signin" onsubmit="return login();">
-      <h2 class="form-signin-heading">Please login</h2>
-      <input type="text" class="form-control" name="username" placeholder="Email Address" required="" autofocus="" id="username"/>
-      <input type="password" class="form-control" name="password" placeholder="Password" required="" id="password"/>      
-      <div style="margin-left:5px;">
-	  <label class="checkbox" style="margin:0px 0px 0px 20px; padding:0px;">
-        <input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe" /> Remember me
-      </label>
-	  <p><a href="#">Forget Password?</a></p>
-	  </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>   
-    </form>
-  </div>
   </body>
 </html>

@@ -21,10 +21,11 @@ type Ballot struct {
 }
 
 type BallotAllInfo struct {
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	URL_Decision string `json:"url"`
-	Ratings      []Vote `json:"ratings"`
+	Name         string   `json:"name"`
+	Email        string   `json:"email"`
+	URL_Decision string   `json:"url"`
+	Votes        []Vote   `json:"votes"`
+	Ratings      []Rating `json:"rating"`
 }
 
 // HBallotCreate create a ballot that belongs
@@ -340,11 +341,19 @@ func HBallotAllInfo(c *gin.Context) {
 	ai.Email = ballot.Email
 	ai.URL_Decision = fmt.Sprintf("/decision/%s", did)
 
-	// Get the votes for this decision
-	_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM vote where ballot_id=$1", bid)
+	// Get the votes for this ballot
+	_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", bid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", bid)})
+		return
+	}
+
+	// Get the ratings for this ballot
+	_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM rating where ballot_id=$1", bid)
+	if err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to find ratings for ballot %v", bid)})
 		return
 	}
 
