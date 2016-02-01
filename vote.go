@@ -12,42 +12,54 @@ import (
 // Vote represent a vote by a ballot for a specific
 // criterion
 type Vote struct {
-	Criterion_ID int `db:"criterion_id" json:"criterion_id" required:"binding"`
-	Ballot_ID    int `db:"ballot_id" json:"ballot_id" required:"binding"`
-	Weight       int `db:"weight" json:"weight" required:"binding"`
+	Alternative_ID int `db:"alternative_id" json:"alternative_id" binding:"required"`
+	Criterion_ID   int `db:"criterion_id" json:"criterion_id" binding:"required"`
+	Ballot_ID      int `db:"ballot_id" json:"ballot_id" binding:"required"`
+	Weight         int `db:"weight" json:"weight" binding:"required"`
 }
 
-// HVoteCreate a ballot votes on a criterion
-// TODO : Force weight checking on criterion
-// the weight in the vote should not be higher than the
-// weight defined in the criterion
+// HVoteCreate a ballot votes on a criterion on an alternative
 func HVoteCreate(c *gin.Context) {
 
+	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	weight, err := strconv.Atoi(c.Param("weight"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
-	v := Vote{Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
+	var b Ballot
+	err = dbmap.SelectOne(&b, "select * from ballot where ballot_id=$1", bid)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
+	v := Vote{Alternative_ID: aid, Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
 
 	err = v.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	result := gin.H{"vote": v}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/ballot/%d/alternative/%d/criterion/%d/vote/",
+		b.Decision_ID, bid, aid, cid))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "vote_create.js", "body": result})
@@ -56,45 +68,53 @@ func HVoteCreate(c *gin.Context) {
 	}
 }
 
+/*
+	PUT /ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight
+*/
 // HVoteUpdate updates a vote
 func HVoteUpdate(c *gin.Context) {
+	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	weight, err := strconv.Atoi(c.Param("weight"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cri Criterion
 	err = dbmap.SelectOne(&cri, "SELECT * FROM criterion WHERE criterion_id=$1", cid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
 		return
 	}
 	if weight > cri.Weight {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Vote weight can't be more than %d", cri.Weight)})
 		return
 	}
 
-	_, err = dbmap.Exec("UPDATE vote SET weight=$1 WHERE criterion_id=$2 and ballot_id=$3", weight, cid, bid)
+	_, err = dbmap.Exec("UPDATE vote SET weight=$1 WHERE criterion_id=$2 and ballot_id=$3 and alternative_id=$4", weight, cid, bid, aid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
 		return
 	}
 
-	new_vote := Vote{Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
+	new_vote := Vote{Alternative_ID: aid, Criterion_ID: cid, Ballot_ID: bid, Weight: weight}
 	result := gin.H{"vote": new_vote}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -106,22 +126,28 @@ func HVoteUpdate(c *gin.Context) {
 
 // HVoteDelete deletes a vote by a ballot
 func HVoteDelete(c *gin.Context) {
+	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
-	v := Vote{Ballot_ID: bid, Criterion_ID: cid}
+	v := Vote{Alternative_ID: aid, Ballot_ID: bid, Criterion_ID: cid}
 	err = v.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -138,14 +164,14 @@ func HVoteDelete(c *gin.Context) {
 func HVotesBallotList(c *gin.Context) {
 	bid, err := strconv.Atoi(c.Param("ballot_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var vs []Vote
 	_, err = dbmap.Select(&vs, "select * from vote WHERE ballot_id=$1", bid)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -160,7 +186,8 @@ func HVotesBallotList(c *gin.Context) {
 
 // Destroy removes a vote from the database
 func (v *Vote) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM vote WHERE ballot_id=$1 and criterion_id=$2", v.Ballot_ID, v.Criterion_ID)
+	_, err := dbmap.Exec("DELETE FROM vote WHERE ballot_id=$1 and criterion_id=$2 and alternative_id=$3",
+		v.Ballot_ID, v.Criterion_ID, v.Alternative_ID)
 	if err != nil {
 		return err
 	}
@@ -175,7 +202,8 @@ func (v *Vote) Destroy() error {
 func (v *Vote) Save() error {
 
 	// No duplicate votes
-	n, err := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2", v.Ballot_ID, v.Criterion_ID)
+	n, err := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2 and alternative_id=$3",
+		v.Ballot_ID, v.Criterion_ID, v.Alternative_ID)
 	if n >= 1 {
 		return fmt.Errorf("vote %#v already exists", v)
 	}
@@ -196,6 +224,15 @@ func (v *Vote) Save() error {
 		return fmt.Errorf("ballot %d does not exists, can't create a vote without an owner", v.Ballot_ID)
 	}
 
+	// See if there's an alternative that this vote belongs to
+	var alt Alternative
+	err = dbmap.SelectOne(&alt, "select * from alternative where alternative_id=$1",
+		v.Alternative_ID)
+	if err != nil {
+		return fmt.Errorf("alternative %d does not exists, can't create a vote that doesn't belong to an alternative",
+			v.Alternative_ID)
+	}
+
 	// Make sure the criterion and ballot belong to the same decision
 	if cri.Decision_ID != b.Decision_ID {
 		return fmt.Errorf("criterion belongs to decision %d while ballot belongs to decision %d", cri.Decision_ID, b.Decision_ID)
@@ -214,6 +251,7 @@ func (v *Vote) Save() error {
 	return nil
 }
 
+// TODO : need to change and respect alternative_id
 // FindVotesByKeys find votes by keys
 func FindVotesByKeys(criterion_id, ballot_id int) (Vote, error) {
 	var vote Vote

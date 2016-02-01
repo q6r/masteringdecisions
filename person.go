@@ -23,7 +23,7 @@ func HPersonsList(c *gin.Context) {
 	var persons []Person
 	_, err := dbmap.Select(&persons, "select * from person order by person_id")
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find persons")})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find persons")})
 		return
 	}
 
@@ -43,14 +43,14 @@ func HPersonsList(c *gin.Context) {
 func HPersonUpdate(c *gin.Context) {
 	pid, err := strconv.Atoi(c.Param("person_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var p Person
 	err = dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", pid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("person %d not found", pid)})
 		return
 	}
@@ -58,7 +58,7 @@ func HPersonUpdate(c *gin.Context) {
 	var json Person
 	err = c.Bind(&json)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": "Unable to parse person object"})
 		return
 	}
@@ -73,7 +73,7 @@ func HPersonUpdate(c *gin.Context) {
 	}
 	_, err = dbmap.Update(&new_person)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update person %d", pid)})
 		return
 	}
@@ -92,7 +92,7 @@ func HPersonCreate(c *gin.Context) {
 	var person Person
 	err := c.Bind(&person)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "invalid person object"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid person object"})
 		return
 	}
 
@@ -101,12 +101,13 @@ func HPersonCreate(c *gin.Context) {
 
 	err = person.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	person.PW_hash = "<hidden>"
 	result := gin.H{"person": person}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/person/%d", person.Person_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": result})
 	} else {
@@ -118,14 +119,14 @@ func HPersonCreate(c *gin.Context) {
 func HPersonDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("person_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	p := &Person{Person_ID: id}
 	err = p.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -144,7 +145,7 @@ func HPersonInfo(c *gin.Context) {
 	var person Person
 	err := dbmap.SelectOne(&person, "select * from person where person_id=$1", id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "not found"})
 		return
 	}
 
@@ -160,7 +161,7 @@ func HPersonDecisions(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "select * from decision where person_id=$1", id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 

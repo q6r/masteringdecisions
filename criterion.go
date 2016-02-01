@@ -27,7 +27,7 @@ func HCriterionInfo(c *gin.Context) {
 	var cri Criterion
 	err := dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1 and decision_id=$2", cid, did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("criterion id %v for decision id %v not found", cid, did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("criterion id %v for decision id %v not found", cid, did)})
 		return
 	}
 
@@ -44,20 +44,20 @@ func HCriterionInfo(c *gin.Context) {
 func HCriterionDelete(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	cri := &Criterion{Criterion_ID: cid, Decision_ID: did}
 	err = cri.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -74,25 +74,27 @@ func HCriterionDelete(c *gin.Context) {
 func HCriterionCreate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cri Criterion
 	err = c.Bind(&cri)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid criterion object"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid criterion object"})
 		return
 	}
 	cri.Decision_ID = did // inherited
 
 	err = cri.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	result := gin.H{"criterion": cri}
+	c.Writer.Header().Set("Location",
+		fmt.Sprintf("/decision/%d/criterion/%d", did, cri.Criterion_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "criterion_create.js", "body": result})
@@ -105,19 +107,19 @@ func HCriterionCreate(c *gin.Context) {
 func HCriterionUpdate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var cri Criterion
 	err = dbmap.SelectOne(&cri, "SELECT * FROM criterion WHERE decision_id=$1 and criterion_id=$2", did, cid)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("criterion %d for decision %d not found", cid, did)})
 		return
 	}
@@ -125,7 +127,7 @@ func HCriterionUpdate(c *gin.Context) {
 	var json Criterion
 	err = c.Bind(&json)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": "Unable to parse decision object"})
 		return
 	}
@@ -138,7 +140,7 @@ func HCriterionUpdate(c *gin.Context) {
 	}
 	_, err = dbmap.Update(&new_criterion)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update criterion %d for decision %d", cid, did)})
 		return
 	}

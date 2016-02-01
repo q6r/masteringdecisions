@@ -1,0 +1,72 @@
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+	$("#login").click(function(){
+		email=$("#email").val();
+		password=$("#password").val();
+
+		<!-- Login -->
+		$.ajax({
+			type: "POST",
+			url: "http://localhost:9999/login",
+			xhrFields: { withCredentials: true },
+			dataType: 'json',
+			crossDomain: true,
+			data: JSON.stringify({"email":email,"password":password}),
+			contentType: 'application/json; charset=utf-8',
+			success: function(html) {
+
+				<!-- If we Logged in then check who are we -->
+
+				$.ajax({
+					type: "GET",
+					url: "http://localhost:9999/whoami",
+					xhrFields: { withCredentials: true },
+					crossDomain: true,
+					contentType: 'application/json; charset=utf-8',
+					success: function (whoami) {
+						whoami = JSON.parse(whoami)["person_id"];
+						$("#status").html("Logged in as person_id " + whoami);
+					},
+					error: function (r) {
+						errmsg = JSON.parse(r.responseText)["error"];
+						$("#status").html(errmsg);
+					}
+				});
+
+
+			},
+			error: function (r) {
+				errmsg = JSON.parse(r.responseText)["error"];
+				$("#status").html(errmsg);
+			}
+		});
+		return false;
+	});
+});
+</script>
+
+<div class="container" id="login_form">
+
+	<section id="content">
+		<form action="http://localhost:9999/login">
+			<h1>Login</h1>
+			<div>
+				<input type="text" placeholder="Email" required="" id="email"  name="email"/>
+			</div>
+			<div>
+				<input type="password" placeholder="Password" required="" id="password"  name="password"/>
+			</div>
+			<div>
+				<input type="submit" value="Log in" id="login"  />
+			</div>
+		</form>
+
+		<div class="button"></div>
+	</section>
+
+	<!-- Status for stuff we get from the server -->
+	<div class="status" id="status"></div>
+
+</div>

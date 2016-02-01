@@ -23,19 +23,64 @@ type Decision struct {
 }
 
 // HDecisionBallotsList returns a list of ballots beloning
-// to a decision
+// to a decision, show all their information Using
+// an array of BallotAllInfo
 func HDecisionBallotsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var ballots []Ballot
 	_, err := dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find ballots for decision id %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find ballots for decision id %v", did)})
 		return
 	}
 
-	result := gin.H{"ballots": ballots}
+	var ais []BallotAllInfo
+
+	for _, b := range ballots {
+		var ai BallotAllInfo
+		ai.Name = b.Name
+		ai.Email = b.Email
+		ai.URL_Decision = fmt.Sprintf("/decision/%s/ballot/%d", did, b.Ballot_ID)
+		// Get the votes for this ballot
+		_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", b.Ballot_ID)
+		if err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+			return
+		}
+		// Get the ratings for this ballot
+		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM rating where ballot_id=$1", b.Ballot_ID)
+		if err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+			return
+		}
+		ais = append(ais, ai)
+	}
+
+	result := gin.H{"ballots": ais}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_ballots.js", "body": result})
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "decision_ballots.js", "body": result})
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+// HDecisionAlternativesList returns a list of alternatives beloning
+// to a decision
+func HDecisionAlternativesList(c *gin.Context) {
+	did := c.Param("decision_id")
+	var alts []Alternative
+	_, err := dbmap.Select(&alts, "SELECT * FROM alternative WHERE decision_id=$1", did)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find alternatives for decision id %v", did)})
+		return
+	}
+
+	result := gin.H{"alternatives": alts}
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_alternatives.js", "body": result})
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
@@ -48,7 +93,7 @@ func HDecisionCriterionsList(c *gin.Context) {
 	var cris []Criterion
 	_, err := dbmap.Select(&cris, "select * from criterion where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %v", did)})
 		return
 	}
 
@@ -61,16 +106,27 @@ func HDecisionCriterionsList(c *gin.Context) {
 }
 
 // HDecisionsList returns a list of all decision defined
-// in the database
+// in the database their name and url only
 func HDecisionsList(c *gin.Context) {
 	var decisions []Decision
 	_, err := dbmap.Select(&decisions, "SELECT * FROM decision")
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to find decisions in database"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unable to find decisions in database"})
 		return
 	}
 
-	result := gin.H{"decisions": decisions}
+	type Link struct {
+		Name string `json:"name"`
+		Url  string `json:"url"`
+	}
+
+	var links []Link
+	for _, d := range decisions {
+		l := Link{Name: d.Name, Url: fmt.Sprintf("/decision/%d", d.Decision_ID)}
+		links = append(links, l)
+	}
+
+	result := gin.H{"decisions": links}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": result})
 	} else {
@@ -85,7 +141,7 @@ func HDecisionInfo(c *gin.Context) {
 	var decision Decision
 	err := dbmap.SelectOne(&decision, "SELECT * FROM decision where decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
+		c.JSON(http.StatusForbidden, gin.H{"error": fmt.Sprintf("Unable to find decisions with id %v", did)})
 		return
 	}
 
@@ -101,14 +157,14 @@ func HDecisionInfo(c *gin.Context) {
 func HDecisionUpdate(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var d Decision
 	err = dbmap.SelectOne(&d, "SELECT * FROM decision WHERE decision_id=$1", did)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("decision %d not found", did)})
 		return
 	}
@@ -116,7 +172,7 @@ func HDecisionUpdate(c *gin.Context) {
 	var json Decision
 	err = c.Bind(&json)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": "Unable to parse decision object"})
 		return
 	}
@@ -133,7 +189,7 @@ func HDecisionUpdate(c *gin.Context) {
 	}
 	_, err = dbmap.Update(&new_decision)
 	if err != nil {
-		c.JSON(http.StatusNotFound,
+		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update decision %d", did)})
 		return
 	}
@@ -153,17 +209,18 @@ func HDecisionCreate(c *gin.Context) {
 	var decision Decision
 	err := c.Bind(&decision)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "invalid decision object"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid decision object"})
 		return
 	}
 
 	err = decision.Save()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	result := gin.H{"decision": decision}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.Decision_ID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "decision_create.js", "body": result})
@@ -176,14 +233,14 @@ func HDecisionCreate(c *gin.Context) {
 func HDecisionDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	d := &Decision{Decision_ID: id}
 	err = d.Destroy()
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -205,12 +262,13 @@ func (d *Decision) Destroy() error {
 		return fmt.Errorf("Unable to delete decision %#v from database", d)
 	}
 
+	// Remove the ballots of this decision
+	// removes the votes
 	var ballots []Ballot
 	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
 	if err != nil {
 		return fmt.Errorf("Unable to find ballot for decision %#v", d)
 	}
-
 	for _, b := range ballots {
 		err := b.Destroy()
 		if err != nil {
@@ -218,14 +276,28 @@ func (d *Decision) Destroy() error {
 		}
 	}
 
+	// Remove criterions
+	// Does not remove anything..
 	var cris []Criterion
 	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.Decision_ID)
 	if err != nil {
 		return fmt.Errorf("Unable to find criterion for decision %#v", d)
 	}
-
 	for _, cri := range cris {
 		err := cri.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Removing the alternatives remove the votes related to it
+	var alts []Alternative
+	_, err = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.Decision_ID)
+	if err != nil {
+		return fmt.Errorf("Unable to find alternatives for decision %#v", d)
+	}
+	for _, alt := range alts {
+		err := alt.Destroy()
 		if err != nil {
 			return err
 		}

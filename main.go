@@ -1,3 +1,4 @@
+// TODO : Rewrite Destroy to delete in an ORM-ish way
 package main
 
 import (
@@ -45,7 +46,7 @@ func main() {
 		routes.GET("/clean", func(c *gin.Context) {
 			err := dbmap.TruncateTables()
 			if err != nil {
-				c.JSON(http.StatusNotFound, gin.H{"error": err})
+				c.JSON(http.StatusForbidden, gin.H{"error": err})
 				return
 			}
 			c.JSON(http.StatusOK, gin.H{"result": "cleaned"})
@@ -74,11 +75,19 @@ func main() {
 	routes.POST("/decision", HDecisionCreate)
 	routes.GET("/decisions", HDecisionsList)
 	routes.GET("/decision/:decision_id/info", HDecisionInfo)
-	routes.GET("/decision/:decision_id/stats", HStats)
 	routes.DELETE("/decision/:decision_id", HDecisionDelete)
 	routes.PUT("/decision/:decision_id", HDecisionUpdate)
 
+	// decision's alternatives
+	routes.POST("/decision/:decision_id/alternative", HAlternativeCreate)
+	routes.GET("/decision/:decision_id/alternatives", HDecisionAlternativesList)
+	routes.GET("/decision/:decision_id/alternative/:alternative_id/info", HAlternativeInfo)
+	routes.DELETE("/decision/:decision_id/alternative/:alternative_id", HAlternativeDelete)
+	routes.PUT("/decision/:decision_id/alternative/:alternative_id", HAlternativeUpdate)
+
 	// decision's ballots
+	routes.GET("/decision/:decision_id/ballot/:ballot_id", HBallotAllInfo)
+	routes.GET("/decision/:decision_id/ballot/:ballot_id/invite", HBallotInvite)
 	routes.GET("/decision/:decision_id/ballots", HDecisionBallotsList)
 	routes.POST("/decision/:decision_id/ballot", HBallotCreate)
 	routes.GET("/decision/:decision_id/ballot/:ballot_id/info", HBallotInfo)
@@ -90,15 +99,28 @@ func main() {
 
 	// decision's ballot's votes
 	routes.GET(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight", HVoteCreate)
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight", HVoteCreate)
 	routes.GET(
 		"/decision/:decision_id/ballot/:ballot_id/votes", HVotesBallotList)
 	routes.DELETE(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote",
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote",
 		HVoteDelete)
 	routes.PUT(
-		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:weight",
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight",
 		HVoteUpdate)
+
+	// decision's ballot's rating alternative
+	routes.GET(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating", HRatingCreate)
+	routes.GET(
+		"/decision/:decision_id/alternative/:alternative_id/votes", HRatingBallots)
+	routes.DELETE(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote",
+		HRatingDelete)
+
+	routes.PUT(
+		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating",
+		HRatingUpdate)
 
 	// decision's criterions
 	routes.GET("/decision/:decision_id/criterions", HDecisionCriterionsList)
