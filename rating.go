@@ -12,17 +12,17 @@ import (
 // Rating implement ratinging an altenrative
 // by a ballot
 type Rating struct {
-	Alternative_ID int `db:"alternative_id" json:"alternative_id" binding:"required"`
-	Ballot_ID      int `db:"ballot_id" json:"ballot_id" binding:"required"`
-	Rating         int `db:"rating" json:"rating" binding:"required"`
+	Criterion_ID int `db:"criterion_id" json:"criterion_id" binding:"required"`
+	Ballot_ID    int `db:"ballot_id" json:"ballot_id" binding:"required"`
+	Rating       int `db:"rating" json:"rating" binding:"required"`
 }
 
 // HRatingCreate creates rating by a ballot on a
-// specific alternative
+// specific criterion
 // eg : Ballot 1 ratings Alternative  2 with rating 20
-// GET /decision/<n>/ballot/1/alternative/2/vote/20
+// GET /decision/<n>/ballot/1/criterion/2/vote/20
 func HRatingCreate(c *gin.Context) {
-	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
@@ -46,7 +46,7 @@ func HRatingCreate(c *gin.Context) {
 		return
 	}
 
-	r := Rating{Alternative_ID: aid, Ballot_ID: bid, Rating: rating}
+	r := Rating{Criterion_ID: cid, Ballot_ID: bid, Rating: rating}
 	err = r.Save()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -55,8 +55,8 @@ func HRatingCreate(c *gin.Context) {
 
 	result := gin.H{"rating": r}
 	c.Writer.Header().Set("Location",
-		fmt.Sprintf("/decision/%d/ballot/%d/alternative/%d/vote/",
-			b.Decision_ID, bid, aid))
+		fmt.Sprintf("/decision/%d/ballot/%d/criterion/%d/vote/",
+			b.Decision_ID, bid, cid))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "rating_create.js", "body": result})
@@ -66,19 +66,19 @@ func HRatingCreate(c *gin.Context) {
 
 }
 
-// HRatingBallots shows all the ratings on an alternative
+// HRatingBallots shows all the ratings on a criterion
 // made by all the ballots belonging to that decision
-// GET /decision/<n>/ballot/1/alternative/2/votes
+// GET /decision/<n>/ballot/1/criterion/2/votes
 func HRatingBallots(c *gin.Context) {
-	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	var rs []Rating
-	_, err = dbmap.Select(&rs, "select * from rating WHERE alternative_id=$1",
-		aid)
+	_, err = dbmap.Select(&rs, "select * from rating WHERE criterion_id=$1",
+		cid)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
@@ -91,13 +91,12 @@ func HRatingBallots(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
-
 }
 
 // HRatingDelete delete a specific rating on an alternative
 // by a ballot
 func HRatingDelete(c *gin.Context) {
-	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
@@ -109,7 +108,7 @@ func HRatingDelete(c *gin.Context) {
 		return
 	}
 
-	r := Rating{Alternative_ID: aid, Ballot_ID: bid}
+	r := Rating{Criterion_ID: cid, Ballot_ID: bid}
 	err = r.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -123,13 +122,12 @@ func HRatingDelete(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
-
 }
 
-// HRatingUpdate update a specific rating on an alternative
+// HRatingUpdate update a specific rating on a criterion
 // by a ballot
 func HRatingUpdate(c *gin.Context) {
-	aid, err := strconv.Atoi(c.Param("alternative_id"))
+	cid, err := strconv.Atoi(c.Param("criterion_id"))
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
@@ -145,31 +143,29 @@ func HRatingUpdate(c *gin.Context) {
 		return
 	}
 
-	var alt Alternative
-	err = dbmap.SelectOne(&alt,
-		"SELECT * FROM alternative WHERE alternative_id=$1", aid)
+	var cri Criterion
+	err = dbmap.SelectOne(&cri,
+		"SELECT * FROM criterion WHERE criterion_id=$1", cid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("Unable to update rating for ballot %d and alternative %d", bid, aid)})
+			gin.H{"error": fmt.Sprintf("Unable to update rating for ballot %d and criterion %d", bid, cid)})
 		return
 	}
 
-	fmt.Printf("Alt : %#v\n", alt)
-
-	if rating > alt.Rating {
+	if rating > cri.Weight {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("New rating can't be more than %d", alt.Rating)})
+			gin.H{"error": fmt.Sprintf("New rating can't be more than %d", alt.Weight)})
 		return
 	}
 
-	_, err = dbmap.Exec("UPDATE rating SET rating=$1 WHERE ballot_id=$2 and alternative_id=$3", rating, bid, aid)
+	_, err = dbmap.Exec("UPDATE rating SET rating=$1 WHERE ballot_id=$2 and criterion_id=$3", rating, bid, cid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("Unable to update rating for ballot %d and alternative %d", bid, aid)})
+			gin.H{"error": fmt.Sprintf("Unable to update rating for ballot %d and criterion %d", bid, cid)})
 		return
 	}
 
-	new_rating := Rating{Alternative_ID: aid, Ballot_ID: bid, Rating: rating}
+	new_rating := Rating{Criterion_ID: cid, Ballot_ID: bid, Rating: rating}
 	result := gin.H{"rating": new_rating}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -183,7 +179,7 @@ func HRatingUpdate(c *gin.Context) {
 func (w *Rating) Save() error {
 
 	// No duplicate ratings
-	n, err := dbmap.SelectInt("select count(*) from rating where ballot_id=$1 and alternative_id=$2", w.Ballot_ID, w.Alternative_ID)
+	n, err := dbmap.SelectInt("select count(*) from rating where ballot_id=$1 and criterion_id=$2", w.Ballot_ID, w.Criterion_ID)
 	if n >= 1 {
 		return fmt.Errorf("rating %#v already exists", w)
 	}
@@ -194,21 +190,21 @@ func (w *Rating) Save() error {
 		return fmt.Errorf("ballot %d does not exists, can't create a rating without an owner", w.Ballot_ID)
 	}
 
-	var alt Alternative
-	err = dbmap.SelectOne(&alt, "select * from alternative where alternative_id=$1", w.Alternative_ID)
+	var cri Criterion
+	err = dbmap.SelectOne(&alt, "select * from criterion where criterion_id=$1", w.Criterion_ID)
 	if err != nil {
-		return fmt.Errorf("alternative %d does not exists, can't create a vote that doesn't belong to an alternative",
-			w.Alternative_ID)
+		return fmt.Errorf("criterion %d does not exists, can't create a vote that doesn't belong to a criterion",
+			w.Criterion_ID)
 	}
 
-	// Make sure the alternative and ballot belong to the same decision
-	if alt.Decision_ID != b.Decision_ID {
-		return fmt.Errorf("The alternative and ballot don't belong to this decision")
+	// Make sure the criterion and ballot belong to the same decision
+	if cri.Decision_ID != b.Decision_ID {
+		return fmt.Errorf("The criterion and ballot don't belong to this decision")
 	}
 
 	// Make sure the rating is not more than the alternative rating
-	if w.Rating > alt.Rating {
-		return fmt.Errorf("The rating is more than the maximum defined %d", alt.Rating)
+	if w.Rating > cri.Weight {
+		return fmt.Errorf("The rating is more than the maximum defined %d", cri.Weight)
 	}
 
 	err = dbmap.Insert(w)
@@ -221,8 +217,8 @@ func (w *Rating) Save() error {
 
 // Destroy removes a rating from the database
 func (w *Rating) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM rating WHERE ballot_id=$1 and alternative_id=$2",
-		w.Ballot_ID, w.Alternative_ID)
+	_, err := dbmap.Exec("DELETE FROM rating WHERE ballot_id=$1 and criterion_id=$2",
+		w.Ballot_ID, w.Criterion_ID)
 	if err != nil {
 		return err
 	}

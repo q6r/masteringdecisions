@@ -109,17 +109,17 @@ func main() {
 		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/criterion/:criterion_id/vote/:weight",
 		HVoteUpdate)
 
-	// decision's ballot's rating alternative
+	// decision's ballot's rating criterion
 	routes.GET(
-		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating", HRatingCreate)
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:rating", HRatingCreate)
 	routes.GET(
-		"/decision/:decision_id/alternative/:alternative_id/votes", HRatingBallots)
+		"/decision/:decision_id/criterion/:criterion_id/votes", HRatingBallots)
 	routes.DELETE(
-		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote",
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote",
 		HRatingDelete)
 
 	routes.PUT(
-		"/decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating",
+		"/decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:rating",
 		HRatingUpdate)
 
 	// decision's criterions
