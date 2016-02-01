@@ -116,10 +116,10 @@ ballots, and gather statistics.
 | Delete an alternative         | /decision/:decision_id/alternative/:alternative_id                                                        | DELETE | nothing | r1          |
 | Update an alternative         | /decision/:decision_id/alternative/:alternative_id                                                        | PUT    | a1      | a1          |
 | More ballot information       | /decision/:decision_id/ballot/:ballot_id                                                                  | GET    | nothing | b3          |
-| Ballot rate an alternative    | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating                         | GET    | nothing | k1          |
-| Get alternative ratings       | /decision/:decision_id/alternative/:alternative_id/votes                                                  | GET    | nothing | array of k1 |
-| Delete a rating on an altern. | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote                                 | DELETE | nothign | r1          |
-| Update alternative rating     | /decision/:decision_id/ballot/:ballot_id/alternative/:alternative_id/vote/:rating                         | PUT    | nothing | k1          |
+| Ballot rate a criterion       | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:rating                             | GET    | nothing | k1          |
+| Get criterion ratings         | /decision/:decision_id/criterion/:criterion_id/votes                                                      | GET    | nothing | array of k1 |
+| Delete a rating on an altern. | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote                                     | DELETE | nothign | r1          |
+| Update criterion rating       | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:rating                             | PUT    | nothing | k1          |
 
 Wants/Gives
 
@@ -136,7 +136,7 @@ c2 = {"criterion_id":<int>, "decision_id":<int>, "name":<str>, "weight":<str>}
 v1 = {"weight":<int>}
 v2 = {"criterion_id":<int>, "ballot_id":<int>, "weight":<int>}
 r1 = {"result": "deleted"}
-k1 = {"alternative_id": <int>, "ballot_id":<int>, "rating":<int> }
+k1 = {"criterion_id": <int>, "ballot_id":<int>, "rating":<int> }
 ```
 
 What we actually return is `{"somehting": object}` for example :
