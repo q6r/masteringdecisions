@@ -154,7 +154,7 @@ func HRatingUpdate(c *gin.Context) {
 
 	if rating > cri.Weight {
 		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("New rating can't be more than %d", alt.Weight)})
+			gin.H{"error": fmt.Sprintf("New rating can't be more than %d", cri.Weight)})
 		return
 	}
 
@@ -191,7 +191,7 @@ func (w *Rating) Save() error {
 	}
 
 	var cri Criterion
-	err = dbmap.SelectOne(&alt, "select * from criterion where criterion_id=$1", w.Criterion_ID)
+	err = dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1", w.Criterion_ID)
 	if err != nil {
 		return fmt.Errorf("criterion %d does not exists, can't create a vote that doesn't belong to a criterion",
 			w.Criterion_ID)
