@@ -56,7 +56,7 @@ func HAuthLogout(c *gin.Context) {
 }
 
 func HAuthUnauthenticated(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"error": "unauthenticated"})
+	c.JSON(http.StatusForbidden, gin.H{"error": "unauthenticated"})
 	c.Abort()
 }
 

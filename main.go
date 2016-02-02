@@ -59,6 +59,14 @@ func main() {
 	//routes.LoadHTMLGlob("static/*")
 	routes.Static("static/", "static/")
 
+	// Roots of pages for the frontend
+	/////////////////////////
+	routes.GET("/", HRootHome)
+	routes.GET("/login.html", HRootLogin)
+	routes.GET("/logout.html", HRootLogout)
+	routes.GET("/ballot.html", HRootBallot)
+	routes.GET("/decision/:decision_id", HRootDecision)
+
 	// Person
 	////////////////
 	routes.POST("/person", HPersonCreate)
