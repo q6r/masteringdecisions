@@ -349,6 +349,14 @@ func TestHDecisionCriterionsList(t *testing.T) {
 					ExpectJson("ballot.name", "b2").
 					ExpectJson("ballot.email", "email2")
 
+				frisby.Create("Test HBallotAllInfo").
+					Get(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d", did, bid)).
+					SetHeader("Content-Type", "application/json").
+					Send().
+					ExpectStatus(200).
+					ExpectJson("ballot.name", "b2").
+					ExpectJson("ballot.email", "email2")
+
 				frisby.Create("Test HBallotDelete").
 					Delete(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d", did, bid)).
 					SetHeader("Content-Type", "application/json").
