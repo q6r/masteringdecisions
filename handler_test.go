@@ -730,3 +730,111 @@ func TestHRatings(t *testing.T) {
 
 	frisby.Global.PrintReport()
 }
+
+func TestHAlternativeStar(t *testing.T) {
+
+	cleanDatabase(t)
+
+	frisby.Create("Test HPersonCreate").
+		Post("http://localhost:9999/person").
+		SetHeader("Content-Type", "application/json").
+		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		Send().
+		ExpectStatus(200).
+		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+		pid, err := json.Get("person").Get("person_id").Int()
+		if err != nil {
+			t.Error(err)
+		}
+
+		frisby.Create("Test HDecisionCreate").
+			Post("http://localhost:9999/decision").
+			SetHeader("Content-Type", "application/json").
+			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
+			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			Send().
+			ExpectStatus(200).
+			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+			did, err := json.Get("decision").Get("decision_id").Int()
+			if err != nil {
+				t.Error(err)
+			}
+
+			frisby.Create("Test HAlternativeCreate").
+				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
+				SetHeader("Content-Type", "application/json").
+				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				Send().
+				ExpectStatus(200).
+				ExpectJson("alternative.name", "alt").
+				ExpectJson("alternative.description", "desc1").
+				ExpectJson("alternative.rating", 22)
+
+			frisby.Create("Test HAlternativeCreate").
+				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
+				SetHeader("Content-Type", "application/json").
+				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				Send().
+				ExpectStatus(200).
+				ExpectJson("alternative.name", "alt").
+				ExpectJson("alternative.description", "desc1").
+				ExpectJson("alternative.rating", 22)
+
+			frisby.Create("Test HAlternativeCreate").
+				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
+				SetHeader("Content-Type", "application/json").
+				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				Send().
+				ExpectStatus(200).
+				ExpectJson("alternative.name", "alt").
+				ExpectJson("alternative.description", "desc1").
+				ExpectJson("alternative.rating", 22).
+				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+				aid, err := json.Get("alternative").Get("alternative_id").Int()
+				if err != nil {
+					t.Error(err)
+				}
+
+				frisby.Create("Test HAlternativeUpdate").
+					Put(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d", did, aid)).
+					SetHeader("Content-Type", "application/json").
+					SetJson(Alternative{Name: "up", Description: "up2", Rating: 23}).
+					Send().
+					ExpectStatus(200).
+					ExpectJson("alternative.name", "up").
+					ExpectJson("alternative.description", "up2").
+					ExpectJson("alternative.rating", 23)
+
+				frisby.Create("Test HAlternativeInfo").
+					Get(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d/info", did, aid)).
+					SetHeader("Content-Type", "application/json").
+					Send().
+					ExpectStatus(200).
+					ExpectJson("alternative.name", "up").
+					ExpectJson("alternative.description", "up2").
+					ExpectJson("alternative.rating", 23)
+
+				frisby.Create("Test HAlternativeDelete").
+					Delete(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d", did, aid)).
+					SetHeader("Content-Type", "application/json").
+					Send().
+					ExpectStatus(200).
+					ExpectJson("result", "deleted")
+
+			})
+
+			frisby.Create("Test HDecisionAlternativesList").
+				Get(fmt.Sprintf("http://localhost:9999/decision/%d/alternatives", did)).
+				SetHeader("Content-Type", "application/json").
+				Send().
+				ExpectStatus(200).
+				ExpectJsonLength("alternatives", 2)
+
+		})
+	})
+
+	frisby.Global.PrintReport()
+}
