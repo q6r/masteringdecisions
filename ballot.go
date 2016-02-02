@@ -286,7 +286,7 @@ func HBallotLogin(c *gin.Context) {
 	http.SetCookie(c.Writer, &bcookie)
 	http.SetCookie(c.Writer, &dcookie)
 	// TODO : Change url
-	c.Redirect(http.StatusSeeOther, "http://localhost/ballot.html")
+	c.Redirect(http.StatusSeeOther, "http://localhost:9999/static/ballot.html")
 }
 
 func HBallotWhoami(c *gin.Context) {
