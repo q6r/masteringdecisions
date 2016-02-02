@@ -24,3 +24,5 @@ _testmain.go
 *.prof
 gobackend
 cookies.txt
+system.html
+system.out

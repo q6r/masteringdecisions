@@ -14,6 +14,7 @@ type Alternative struct {
 	Alternative_ID int    `db:"alternative_id" json:"alternative_id"`
 	Decision_ID    int    `db:"decision_id" json:"decision_id"`
 	Name           string `db:"name" json:"name" binding:"required"`
+	Description    string `db:"description" json:"description"`
 	Rating         int    `db:"rating" json:"rating" binding:"required"`
 }
 
@@ -88,6 +89,7 @@ func HAlternativeUpdate(c *gin.Context) {
 		Alternative_ID: aid,
 		Decision_ID:    did,
 		Name:           json.Name,
+		Description:    json.Description,
 		Rating:         json.Rating,
 	}
 	_, err = dbmap.Update(&new_alternative)
