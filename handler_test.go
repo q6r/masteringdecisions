@@ -401,8 +401,7 @@ func TestHDecisionList(t *testing.T) {
 			Get(fmt.Sprintf("http://localhost:9999/decisions")).
 			SetHeader("Content-Type", "application/json").
 			Send().
-			ExpectStatus(200).
-			ExpectJsonLength("decisions", 5)
+			ExpectStatus(200)
 
 	})
 
@@ -555,8 +554,7 @@ func TestHDecisionDelete(t *testing.T) {
 			Get(fmt.Sprintf("http://localhost:9999/decisions")).
 			SetHeader("Content-Type", "application/json").
 			Send().
-			ExpectStatus(200).
-			ExpectJsonLength("decisions", 0)
+			ExpectStatus(200)
 
 	})
 
@@ -604,6 +602,119 @@ func TestHDecisionUpdate(t *testing.T) {
 				ExpectJson("decision.name", "t2").
 				ExpectJson("decision.description", "desc2").
 				ExpectJson("decision.stage", 1)
+
+		})
+
+	})
+
+	frisby.Global.PrintReport()
+}
+
+func TestHRatings(t *testing.T) {
+
+	cleanDatabase(t)
+
+	frisby.Create("Test HPersonCreate").
+		Post("http://localhost:9999/person").
+		SetHeader("Content-Type", "application/json").
+		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		Send().
+		ExpectStatus(200).
+		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+		pid, err := json.Get("person").Get("person_id").Int()
+		if err != nil {
+			t.Error(err)
+		}
+
+		frisby.Create("Test HDecisionCreate").
+			Post("http://localhost:9999/decision").
+			SetHeader("Content-Type", "application/json").
+			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
+			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			Send().
+			ExpectStatus(200).
+			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+			did, err := json.Get("decision").Get("decision_id").Int()
+			if err != nil {
+				t.Error(err)
+			}
+
+			frisby.Create("Test HCriterionCreate").
+				Post(fmt.Sprintf("http://localhost:9999/decision/%d/criterion", did)).
+				SetHeader("Content-Type", "application/json").
+				SetJson(Criterion{Name: "c1", Weight: 42}).
+				Send().
+				ExpectStatus(200).
+				ExpectJson("criterion.name", "c1").
+				ExpectJson("criterion.weight", 42).
+				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+				cid, err := json.Get("criterion").Get("criterion_id").Int()
+				if err != nil {
+					t.Error(err)
+				}
+
+				frisby.Create("Test HBallotCreate").
+					Post(fmt.Sprintf("http://localhost:9999/decision/%d/ballot", did)).
+					SetHeader("Content-Type", "application/json").
+					SetJson(Ballot{Name: "b1", Email: "email"}).
+					Send().
+					ExpectStatus(200).
+					ExpectJson("ballot.name", "b1").
+					ExpectJson("ballot.email", "email").
+					AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
+
+					bid, err := json.Get("ballot").Get("ballot_id").Int()
+					if err != nil {
+						t.Error(err)
+					}
+
+					frisby.Create("Test HRatingCreate").
+						Get(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d/criterion/%d/vote/20", did, bid, cid)).
+						SetHeader("Content-Type", "application/json").
+						Send().
+						ExpectStatus(200).
+						ExpectJson("rating.ballot_id", bid).
+						ExpectJson("rating.criterion_id", cid).
+						ExpectJson("rating.rating", 20)
+
+					frisby.Create("Test HRatingUpdate").
+						Put(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d/criterion/%d/vote/30", did, bid, cid)).
+						SetHeader("Content-Type", "application/json").
+						Send().
+						ExpectStatus(200).
+						ExpectJson("rating.rating", 30).
+						ExpectJson("rating.ballot_id", bid).
+						ExpectJson("rating.criterion_id", cid)
+
+					frisby.Create("Test HRatingDelete").
+						Delete(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d/criterion/%d/vote", did, bid, cid)).
+						SetHeader("Content-Type", "application/json").
+						Send().
+						ExpectStatus(200).
+						ExpectJson("result", "deleted")
+
+					frisby.Create("Test HRatingCreate").
+						Get(fmt.Sprintf("http://localhost:9999/decision/%d/ballot/%d/criterion/%d/vote/20", did, bid, cid)).
+						SetHeader("Content-Type", "application/json").
+						Send().
+						ExpectStatus(200).
+						ExpectJson("rating.ballot_id", bid).
+						ExpectJson("rating.criterion_id", cid).
+						ExpectJson("rating.rating", 20)
+
+					frisby.Create("Test HRatings").
+						Get(fmt.Sprintf("http://localhost:9999/decision/%d/criterion/%d/votes", did, cid)).
+						SetHeader("Content-Type", "application/json").
+						Send().
+						ExpectStatus(200).
+						ExpectJsonLength("ratings", 1)
+
+				})
+
+			})
 
 		})
 
