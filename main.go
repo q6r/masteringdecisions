@@ -4,12 +4,10 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/astaxie/beego/config"
 	"github.com/gin-gonic/gin"
 	"github.com/go-gorp/gorp"
-	"github.com/itsjamie/gin-cors"
 	"github.com/rageix/ginAuth"
 )
 
@@ -26,19 +24,6 @@ func main() {
 	defer dbmap.Db.Close()
 
 	routes := gin.Default()
-
-	// Middlewares
-	/////////////////
-	// Apply the middleware to the router (works with groups too)
-	routes.Use(cors.Middleware(cors.Config{
-		Origins:         "*",
-		Methods:         "GET, PUT, POST, DELETE",
-		RequestHeaders:  "Origin, Authorization, Content-Type",
-		ExposedHeaders:  "",
-		MaxAge:          50 * time.Second,
-		Credentials:     false,
-		ValidateHeaders: false,
-	}))
 
 	// Debug routes
 	/////////////////
