@@ -227,12 +227,6 @@ func (b *Ballot) Destroy() error {
 }
 
 // HBallotLogin is used to login users to their ballot
-// it only sets the cookie for the user
-// eg : A ballot is created by a facilitator
-// The ballot has a unique secret pkbdf2 hashed
-// A link is sent to the user in the form
-// /decision/123/ballot/222/login/:secret
-// user click on the link and is redirected to .... some url
 func HBallotLogin(c *gin.Context) {
 	did, err := strconv.Atoi(c.Param("decision_id"))
 	if err != nil {
@@ -246,7 +240,7 @@ func HBallotLogin(c *gin.Context) {
 	}
 	secret := c.Param("secret")
 
-	// find the ballot
+	// Find the ballot
 	var ballot Ballot
 	err = dbmap.SelectOne(&ballot, "SELECT * FROM ballot where ballot_id=$1 and decision_id=$2", bid, did)
 	if err != nil {
@@ -254,13 +248,12 @@ func HBallotLogin(c *gin.Context) {
 		return
 	}
 
-	// TODO : remove this if above todo is done
 	if ballot.Secret != secret {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Secret does not belong to this ballot"})
 		return
 	}
 
-	// set the cookies
+	// Set the cookies
 	ballot_id_str := strconv.Itoa(ballot.Ballot_ID)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "unable to parse ballot_id"})
@@ -285,7 +278,7 @@ func HBallotLogin(c *gin.Context) {
 		Expires: expiration}
 	http.SetCookie(c.Writer, &bcookie)
 	http.SetCookie(c.Writer, &dcookie)
-	// TODO : Change url
+
 	c.Redirect(http.StatusSeeOther, "http://localhost:9999/static/ballot.html")
 }
 
