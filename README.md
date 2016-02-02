@@ -142,15 +142,15 @@ ballots, and gather statistics.
 Wants/Gives
 
 ```
-a1 = {"name": <str>, "rating":<int> }
+a1 = {"name": <str>, "description":<optional-str>, "rating":<int> }
 d1 = {"person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 s1 = "undecided yet"
 b1 = {"name":<str>, "email":<str>}
 b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<str>, "name":<str>, "email":<str>}
 b3 = {"ballot": b1, "ratings": array of v2}
-c1 = {"name":<str>, "weight":<str>}
-c2 = {"criterion_id":<int>, "decision_id":<int>, "name":<str>, "weight":<str>}
+c1 = {"name":<str>, "description":<optional-str>, "weight":<str>}
+c2 = {"criterion_id":<int>, "description":<optional-str>, "decision_id":<int>, "name":<str>, "weight":<str>}
 v1 = {"weight":<int>}
 v2 = {"criterion_id":<int>, "ballot_id":<int>, "weight":<int>}
 r1 = {"result": "deleted"}
