@@ -62,6 +62,10 @@
 		<input type="text" id="crit1_wt"></input>
 		<br />
 
+		<label for="crit1_desc">Crit 1 desc</label>
+		<input type="text" id="crit1_desc"></input>
+		<br />
+
 		<label for="crit2_name">Crit 2 name</label>
 		<input type="text" id="crit2_name"></input>
 		<br />
@@ -70,6 +74,9 @@
 		<input type="text" id="crit2_wt"></input>
 		<br />
 
+		<label for="crit2_desc">Crit 2 desc</label>
+		<input type="text" id="crit2_desc"></input>
+		<br />
 
 		<input type="submit" id="crit_add" value="add criterions"></input>
 
@@ -94,12 +101,20 @@
 		<br />
 
 
+		<label for="alt1_desc">Alt 1 desc</label>
+		<input type="text" id="alt1_desc"></input>
+		<br />
+
 		<label for="alt2_name">Alt 2 name</label>
 		<input type="text" id="alt2_name"></input>
 		<br />
 
 		<label for="alt2_rt">Alt 2 rating</label>
 		<input type="text" id="alt2_rt"></input>
+		<br />
+
+		<label for="alt2_desc">Alt 2 desc</label>
+		<input type="text" id="alt2_desc"></input>
 		<br />
 
 		<input type="submit" id="alt_add" value="add alternatives"></input>
@@ -236,9 +251,11 @@ document.getElementById("testdec").onclick = function () {
 
 document.getElementById("crit_add").onclick = function() {
 	crit1 = {"name":document.getElementById("crit1_name").value,
-		 "weight":+document.getElementById("crit1_wt").value};	
+		"description":document.getElementById("crit1_desc").value,
+		"weight":+document.getElementById("crit1_wt").value};	
 
 	crit2 = {"name":document.getElementById("crit2_name").value,
+		"description":document.getElementById("crit2_desc").value,
 		"weight":+document.getElementById("crit2_wt").value};
 
 	crits = [crit1, crit2];	
@@ -260,9 +277,11 @@ document.getElementById("crit_add").onclick = function() {
 document.getElementById("alt_add").onclick = function() {
 
 	alt1 = {"name":document.getElementById("alt1_name").value,
+		"description":document.getElementById("alt1_desc").value,
 		 "rating":+document.getElementById("alt1_rt").value};	
 
-	alt2 = {"name":document.getElementById("alt2_name").value,
+	 alt2 = {"name":document.getElementById("alt2_name").value,
+		 "description":document.getElementById("alt2_desc").value,
 		"rating":+document.getElementById("alt2_rt").value};
 
 	alts = [alt1, alt2];	
