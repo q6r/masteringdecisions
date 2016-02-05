@@ -16,14 +16,22 @@ function login() {
     "password":document.getElementById('password').value}
 
   post_text("/login", JSON.stringify(new_login), function (result) {
-    get_text("/whoami", function (result) {
-      //redirect
-      window.location.replace("/");
-    });
+    if(result['status'] == "logged in") {
+      //Authenticate and redirect
+      get_text("/whoami", function (result) {
+        //redirect
+        window.location.replace("/");
+      });
+    }
+    else if(result['error']) {
+      $('#status').html('<b>Error:</b> ' + result['error']);
+      $('#status').show();
+    }
+    else {
+      $('#status').html('<b>Error:</b> Something went wrong :(');
+      $('#status').show();
+    }
   });
-
-  $('#status').html('<b>Error:</b> Unable to sign in');
-  $('#status').show();
 
   //Avoid refreshing
   return false;
@@ -88,6 +96,7 @@ get_text = function(url, cb) {
   request.send();
 }
 
+/* This version also returns on 403! */
 post_text = function(url, data, cb) {
   var request = new XMLHttpRequest();
   request.open('POST', base_url+url, true);
@@ -95,6 +104,9 @@ post_text = function(url, data, cb) {
 
   request.onreadystatechange = function() {
     if(request.readyState == 4 && request.status == 200) {
+      cb(JSON.parse(request.responseText));
+    }
+    else if(request.status == 403) {
       cb(JSON.parse(request.responseText));
     }
   }
