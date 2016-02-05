@@ -24,8 +24,8 @@ function main(body)
 		var alternative_descriptions = [];
 
 
-		$("body")
-		.append("Decision_id: "+decision_id+"<br>"+"Ballot_id: "+ballot_id+"<br>");
+		//$("body")
+		//.append("Decision_id: "+decision_id+"<br>"+"Ballot_id: "+ballot_id+"<br>");
 		
 		get_text("/decision/"+decision_id+"/info", function(dec) {
 
@@ -47,8 +47,8 @@ function main(body)
 			}
 			else {
 
-				$("body")
-				.append("name: "+decision_name+"<br>"+"desc: "+decision_desc+"<br>"+"stage: "+decision_stage+"<br>");
+				//$("body")
+				//.append("name: "+decision_name+"<br>"+"desc: "+decision_desc+"<br>"+"stage: "+decision_stage+"<br>");
 
 				get_text("/decision/"+decision_id+"/criterions", function (crits) {
 
@@ -59,15 +59,15 @@ function main(body)
 
 					}
 
-					for(var j=0; j<crits.criterions.length; j++) {
+					//for(var j=0; j<crits.criterions.length; j++) {
 
-						$("body")
-						.append("Crit "+j+" name: "+criterion_names[j]+"<br>");
+					//	$("body")
+					//	.append("Crit "+j+" name: "+criterion_names[j]+"<br>");
 
-						$("body")
-						.append("Crit "+j+" desc: "+criterion_descriptions[j]+"<br>");
+					//	$("body")
+					//	.append("Crit "+j+" desc: "+criterion_descriptions[j]+"<br>");
 
-					}
+					//}
 			
 					get_text("/decision/"+decision_id+"/alternatives", function(alts) {
 
@@ -78,15 +78,57 @@ function main(body)
 				
 						}
 	
-						for(var j=0; j<alts.alternatives.length; j++) {
+						//for(var j=0; j<alts.alternatives.length; j++) {
+						//	
+						//	$("body")
+						//	.append("Alt "+j+" name: "+alternative_names[j]+"<br>");
+						//
+						//	$("body")
+						//	.append("Alt "+j+" desc: "+alternative_descriptions[j]+"<br>");
+						//}	
 							
-							$("body")
-							.append("Alt "+j+" name: "+alternative_names[j]+"<br>");
+						var page="<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">"
+						+"<div class=\"container\">"
+						+"<a class=\"navbar-brand\">"+decision_name+"</a>"
+						+"</div>"
+						+"</div>"
+						+"<div id=\"ballotbody\" class=\"container\">"
+						+"<div class=\"row\">"
+						+"<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">"
+						+"<p class=\"lead\">"+decision_desc+"</p>"
+						+"<p>Instructions for criterion</p>"
+						+"<p>Click on a criterion name for description</p>"
+						+"</div>"
+						+"</div>"
+						+"<form class=\"form-horizontal\" role=\"form\">";
 
-							$("body")
-							.append("Alt "+j+" desc: "+alternative_descriptions[j]+"<br>");
-						}	
+						for(var i=0; i<criterion_names.length; i++) {
+						
+							page+="<div class=\"row\">"
+							+"<div class=\"form-group\">"
+							+"<label id=crit"+i+" class=\"col-sm-4 control-label criterion\">"+criterion_names[i]+"</label>"
+							+"<div class=\"col-sm-8 btn-group\" data-toggle=\"buttons\">";
 
+							for(var j=1; j<11; j++) {
+
+								page+="<label class=\"btn btn-default votebtn\">"+"<input type=\"radio\" name=\"crit"+parseInt(i)+"\" id=\"crit"+i+"_"+j+"\" value=\""+j+"\">"+j+"</label>";
+
+
+							}
+
+							page+="</div>"
+							+"<div class=\"alert alert-success center\" id=\"crit"+i+"Desc\">"+criterion_descriptions[i]+"</div>"
+							+"</div>"
+							+"</div>";
+			
+						}
+
+						page+="</form>"
+						+"</div>";
+
+						$("body").append(page);
+
+						
 					});
 
 				});
@@ -96,6 +138,9 @@ function main(body)
 			}
 
 		});
+
+
+
 
 	}
 }
