@@ -106,21 +106,6 @@
 		}
 	}
 
-	function create_person(person, cb) {
-		post_text("/person", JSON.stringify(person), cb)
-	}
-	
-	function create_geoff() {
-		var geoff = {
-		"email": "gmaggi@pdx.edu",
-		"pw_hash":"password",
-		"name_first":"Geoff",
-		"name_last":"Maggi"};
-		
-		
-		create_person(geoff, function() {alert("Created Geoff!")});
-	}
-	
 	function delay() {
 		var now = new Date().getTime();
 		while(new Date().getTime() < now + 500){ /* do nothing */ } 
