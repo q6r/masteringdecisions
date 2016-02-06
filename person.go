@@ -55,7 +55,17 @@ func HPersonUpdate(c *gin.Context) {
 		return
 	}
 
-	var json Person
+	// PersonEasy represent a person in the database
+	// with no password requirement
+	type PersonEasy struct {
+		Person_ID  int    `db:"person_id" json:"person_id"`
+		Email      string `db:"email" json:"email" binding:"required"`
+		PW_hash    string `db:"pw_hash" json:"pw_hash"`
+		Name_First string `db:"name_first" json:"name_first" binding:"required"`
+		Name_Last  string `db:"name_last" json:"name_last" binding:"required"`
+	}
+
+	var json PersonEasy
 	err = c.Bind(&json)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
@@ -63,7 +73,13 @@ func HPersonUpdate(c *gin.Context) {
 		return
 	}
 
-	new_hash := HashPassword(json.PW_hash)
+	var new_hash string
+	if json.PW_hash != "" {
+		new_hash = HashPassword(json.PW_hash)
+	} else {
+		new_hash = p.PW_hash
+	}
+
 	new_person := Person{
 		Person_ID:  pid,
 		Email:      json.Email,
