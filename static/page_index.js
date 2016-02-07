@@ -93,7 +93,7 @@ function buildTemplate() {
                         
                         //'<li><a ><i class="glyphicon glyphicon-cog"></i> Options</a></li>',
                         
-                        '<li><a href="/static/person.html"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
+                        '<li><a onclick="buildAddUser()"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
                         '<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
                         
                         '<li><a ><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
@@ -286,4 +286,69 @@ function updateUser() {
 	}
 	
 	return false;
+}
+
+function buildAddUser(){
+	$('title').html('Add User!');
+	clearContent();
+	
+	$('<strong><i class="glyphicon glyphicon-cog"></i> Add User</strong><hr/>').appendTo('#content');
+	//build the sign up form
+	var signupForm = $('<form id="myform"></form>')
+	
+	var showUsers = $('<table id="Users"></table>')
+	
+	var email = $('<label> Email<input type="text" name ="email" id="emailInput" placeholder ="Email" class="form-control"/> </label></br>')
+				.appendTo('body');
+				
+	var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" placeholder="Password" class="form-control"/> </label></br>')
+				.appendTo('body');
+				
+	var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" placeholder="First Name" class="form-control"/> </label></br>')
+				.appendTo('body');
+	
+	var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" placeholder="Last Name" class="form-control" /> </label></br>')
+				.appendTo('body');
+				
+	var submit = $(' <input type="button" onclick="addUserSubmitform()" value="Sign Up" class="btn btn-sm-9 btn-primary" />')
+				.appendTo('body');
+				
+	//var showUsers = $('<input type ="button" onclick="get_all_users()" value="Show all users" class="btn btn-default"/>').appendTo('body');
+
+	signupForm.append(email,pwd, firstname,lastname,submit,showUsers);
+	signupForm.appendTo('#content');
+	showUsers.appendTo('#content');
+	
+	
+	
+	var base_url = "http://localhost:9999";
+	//helper function
+	post_text = function(url, data, cb) {
+		var request = new XMLHttpRequest();
+		request.open('POST', base_url+url, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if(request.readyState == 4 && request.status == 200) {
+				cb(JSON.parse(request.responseText));
+			}
+		}
+
+		request.send(data);
+	}
+
+}
+
+function addUserSubmitform(){		
+	var new_person = $('#myform').serializeArray().reduce(function(obj, v) { obj[v.name] = v.value; return obj; }, { });
+	post_text("/person", JSON.stringify(new_person), function(person){
+			console.info(person);
+			var signupSucceed = $(['<div class="alert alert-success">',
+                    '<strong><span class="glyphicon glyphicon-ok"></span> Success! Message sent.</strong>',
+                '</div>'
+				].join('\n'));
+			clearContent();
+			$('#content').append(signupSucceed)
+			})
+		
 }
