@@ -1,9 +1,5 @@
 function main(body)
 {
-    $('title')
-        .html('title goes here');
-
-    $('<p>')
-        .html('Data : ' + JSON.stringify(body))
-        .appendTo('body');
+    get_text("/logout", function (result) { });
+	window.location.replace("/login.html");
 }

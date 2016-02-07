@@ -39,7 +39,7 @@ function buildTemplate() {
 					'<li><a onclick="buildEditUser()" style="cursor: pointer; cursor: hand;">Edit Profile</a></li>',
 				'</ul>',
 		'</li>',
-		'<li><a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
+		'<li><a href="/logout.html"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
 	'</ul>'
 	].join("\n"));
 				
@@ -116,6 +116,10 @@ function buildTemplate() {
 	});
 }
 
+function clearContent() {
+	$('#content').empty();
+}
+
 function buildHome() {
 	$('title').html('Decision Home');
 	
@@ -170,10 +174,6 @@ function buildHome() {
 	display_section.append('</div>' + '</div> \n')
 	
 	display_section.appendTo('#content');
-}
-
-function clearContent() {
-	$('#content').empty();
 }
 
 function buildEditUser() {
