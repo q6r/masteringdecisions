@@ -112,11 +112,7 @@ function buildTemplate() {
 	div_row.append(display_section)
 	div_dashboard.append(div_row)
 
-	get_text("/whoami", function (result) {
-		get_text("/person/"+result['person_id']+"/info", function (result) {
-			$('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
-		});
-	});
+	updateUserText();
 	
 	$("a").attr("aria-expanded","true");
 	$("a").click(function(){
@@ -126,6 +122,14 @@ function buildTemplate() {
 
 function clearContent() {
 	$('#content').empty();
+}
+
+function updateUserText() {
+	get_text("/whoami", function (result) {
+		get_text("/person/"+result['person_id']+"/info", function (result) {
+			$('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
+		});
+	});
 }
 
 function buildHome() {
@@ -276,6 +280,7 @@ function updateUser() {
 				document.getElementById('password2').value = "";
 				$('#success').html('<b>Update successful!</b>');
 				$('#success').show();
+				updateUserText();
 			});
 		});
 	}
