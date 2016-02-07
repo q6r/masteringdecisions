@@ -23,9 +23,6 @@ function main(body)
 		var alternative_names = [];
 		var alternative_descriptions = [];
 
-
-		//$("body")
-		//.append("Decision_id: "+decision_id+"<br>"+"Ballot_id: "+ballot_id+"<br>");
 		
 		get_text("/decision/"+decision_id+"/info", function(dec) {
 
@@ -47,8 +44,6 @@ function main(body)
 			}
 			else {
 
-				//$("body")
-				//.append("name: "+decision_name+"<br>"+"desc: "+decision_desc+"<br>"+"stage: "+decision_stage+"<br>");
 
 				get_text("/decision/"+decision_id+"/criterions", function (crits) {
 
@@ -59,15 +54,6 @@ function main(body)
 
 					}
 
-					//for(var j=0; j<crits.criterions.length; j++) {
-
-					//	$("body")
-					//	.append("Crit "+j+" name: "+criterion_names[j]+"<br>");
-
-					//	$("body")
-					//	.append("Crit "+j+" desc: "+criterion_descriptions[j]+"<br>");
-
-					//}
 			
 					get_text("/decision/"+decision_id+"/alternatives", function(alts) {
 
@@ -78,15 +64,6 @@ function main(body)
 				
 						}
 	
-						//for(var j=0; j<alts.alternatives.length; j++) {
-						//	
-						//	$("body")
-						//	.append("Alt "+j+" name: "+alternative_names[j]+"<br>");
-						//
-						//	$("body")
-						//	.append("Alt "+j+" desc: "+alternative_descriptions[j]+"<br>");
-						//}	
-							
 						var page="<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">"
 						+"<div class=\"container\">"
 						+"<a class=\"navbar-brand\">"+decision_name+"</a>"
@@ -124,7 +101,113 @@ function main(body)
 						}
 
 						page+="</form>"
-						+"</div>";
+						+"</div>"
+						+"<div class=\"container\" id=\"alternative_table\">"
+						+"<div class=\"row\">"
+						+"<p>Instructions for Alternatives</p>"
+						+"<table class=\"table\">"
+						+"<thead>"
+						+"<tr>"
+						+"<th></th>"
+
+						for(var i=0; i<criterion_names.length; i++) {
+						
+							page+="<th id=\"critT"+i+"\">"
+							+criterion_names[i]
+							+"<div class=\"alert alert-success center\" id=\"critT"+i+"Desc\">"
+							+criterion_descriptions[i]
+							+"</div>"
+							+"</th>";	
+
+						}
+
+						page+="</thead>"
+						+"<tbody>";
+
+						for(var i=0; i<alternative_names.length; i++) {
+		
+							page+="<tr>"
+							+"<td id=\"Alt"+i+"\" class=\"alternative\">"
+							+alternative_names[i]
+							+"<div class=\"alert alert-success center\" id=\"Alt"+i+"Desc\">"
+							+alternative_descriptions[i]
+							+"</div>"
+							+"</td>";
+
+							for(var j=0; j<criterion_names.length; j++) {
+
+								page+="<td>"
+								+"<div class=\"dropup\">"
+								+"<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu"+i+j+"\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+								+"<div id=\"alt"+i+"crit"+j+"_color\" class=\"color_pick\"></div>"
+								+"</button>"
+								+"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+i+j+"\">"
+								+"<li id=\"alt"+i+"crit"+j+"r\" class=\"color1\">Red</li>"
+								+"<li id=\"alt"+i+"crit"+j+"y\" class=\"color2\">Yellow</li>"
+								+"<li id=\"alt"+i+"crit"+j+"g\" class=\"color3\">Green</li>"
+								+"</ul>"
+								+"</div>"
+								+"</td>";
+				
+
+							}
+								
+							page+="</tr>";
+
+						}
+						
+						page+="</tbody>"
+						+"</table>"
+						+"</div>"
+						+"</div>"
+						+"<div id=\"ballotbottom\" class=\"container\">"
+						+"<div class=\"col-md-6 col-md-offset-3\" id=\"bottomRow\">"
+						+"<button class=\"btn btn-primary\" id=\"submitbtn\">Submit</button>"
+						+"<button class=\"btn btn-warning\" id=\"clearbtn\">Clear</button>"
+						+"</div>"
+						+"</div>"
+						+"</div>"
+
+
+						//add event handlers
+						page+="<script>"
+						+"$(\'#clearbtn\').click(function(event) {"
+						+"location.reload();"
+						+"});"
+
+						+"$(\'#submitbtn\').click(function(event) {"
+						+"alert(\'submit clicked\');"
+						+"});"
+
+
+						+"$(\'.criterion\').click(function(event) {"
+						+"var id = \"#\" + this.id;"
+						+"$(id+\"Desc\").toggle();"
+						+"$(\'.alert\').not(id +\"Desc\").hide();"
+						+"});"
+
+						+"$(\'.alternative\').click(function(event) {"
+						+"var id = \"#\" + this.id;"
+						+"$(id+\"Desc\").toggle();"
+						+"$(\'.alert\').not(id +\"Desc\").hide();"
+						+"});"
+
+
+						+"$(\'.color1\').click(function(event) {"
+						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
+						+"$(id).css(\'background-color\',\'red\');"
+						+"});"
+
+						+"$(\'.color2\').click(function(event) {"
+						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
+						+"$(id).css(\'background-color\',\'yellow\');"
+						+"});"	
+
+						+"$(\'.color3\').click(function(event) {"
+						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
+						+"$(id).css(\'background-color\',\'green\');"
+						+"});";
+
 
 						$("body").append(page);
 
@@ -141,8 +224,9 @@ function main(body)
 
 
 
-
 	}
+
+
 }
 
 function getBallotCookies() {
@@ -204,3 +288,12 @@ post_text = function(url, data, cb) {
 
 	request.send(data);
 }
+
+
+//event handlers
+
+
+
+
+
+

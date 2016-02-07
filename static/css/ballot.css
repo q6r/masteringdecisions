@@ -39,15 +39,17 @@
 
 		}
 
+		.alternative:hover {
+			
+			cursor:pointer;
+		}
+
 		.votebtn {
 			height:30px;
 			text-align:center;
 			
 		}
 
-		.contentContainer {
-
-		}
 
 		.color_pick {
 			height:20px;
