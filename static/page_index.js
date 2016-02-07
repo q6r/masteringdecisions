@@ -1,5 +1,8 @@
 function main(body)
 {
+	//Add CSS
+	$.loadCSS('static/css/index.css');
+	
 	buildTemplate();
 	
 	buildHome();
@@ -26,17 +29,17 @@ function buildTemplate() {
 	].join('\n'));
 					
 	div_nav_header.append(button_nav)	
-	div_nav_header.append($('<a class = "navbar-brand" style="padding:0px;" href="#"><img id="logo" src="../static/images/logo.png" style="height:50px;">'))
+	div_nav_header.append($('<a class = "navbar-brand"><img id="logo" src="../static/images/logo.png">'))
 	
 	var div_collapse = $('<div class="collapse navbar-collapse" id="myNavbar">')
 	
-	var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a onclick="buildHome()" style="cursor: pointer; cursor: hand;">Dashboard</a></li></ul>')
+	var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a onclick="buildHome()">Dashboard</a></li></ul>')
 	var nav_ul2 = $([
 	'<ul class="nav navbar-nav navbar-right">',
 		'<li class="dropdown">',
-			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-expanded="false"><i class="glyphicon glyphicon-user"></i> ' + userName+ '<span class="caret"></span></a>',
+			'<a class="dropdown-toggle" role="button" data-toggle="dropdown"  aria-expanded="false"><i class="glyphicon glyphicon-user"></i> ' + userName+ '<span class="caret"></span></a>',
 				'<ul id="g-account-menu" class="dropdown-menu" role="menu">',
-					'<li><a onclick="buildEditUser()" style="cursor: pointer; cursor: hand;">Edit Profile</a></li>',
+					'<li><a onclick="buildEditUser()">Edit Profile</a></li>',
 				'</ul>',
 		'</li>',
 		'<li><a href="/logout.html"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
@@ -57,44 +60,44 @@ function buildTemplate() {
 	var nav_section = $([
 			
 			'<div class="col-sm-3" >',
-				'<a href ="#">',
+				'<a>',
 					'<strong><i class="glyphicon glyphicon-wrench"></i> Tools</strong>',
 				'</a>',
 				'<hr>',
 				'<ul class="nav nav-stacked">',
-				'<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu" aria-expanded="false" class="collapsed">Decisions <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+				'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu" aria-expanded="false" class="collapsed">Decisions <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
                     '<ul class="nav nav-stacked collapse" id="userMenu" aria-expanded="false" style="height: 0px;">',
 						
-                        '<li class="active"> <a href="#"><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
-						'<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+                        '<li class="active"> <a ><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
+						'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 							'<ul class="nav nav-stacked collapse" id="userMenu3" aria-expanded="false" style="height: 0px;">',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision1 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision2 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision3 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision4 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision1 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision2 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision3 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision4 </a></li>',
 							'</ul>',
 						'</li>',
-                       '<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#userMenu4" aria-expanded="false" class="collapsed">Completed <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+                       '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu4" aria-expanded="false" class="collapsed">Completed <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 							'<ul class="nav nav-stacked collapse" id="userMenu4" aria-expanded="false" style="height: 0px;">',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision5 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision6 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision7 </a></li>',
-								'<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Decision8 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision5 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision6 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision7 </a></li>',
+								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision8 </a></li>',
 							'</ul>',
 						'</li>',
                     '</ul>',
                 '</li>',
-				'<li class="nav-header"> <a href="#" data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+				'<li class="nav-header"> <a  data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 					
                     '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
-                        '<li class="active"> <a href="#"><i class="glyphicon glyphicon-home"></i> Home</a></li>',
+                        '<li class="active"> <a ><i class="glyphicon glyphicon-home"></i> Home</a></li>',
                         
-                        //'<li><a href="#"><i class="glyphicon glyphicon-cog"></i> Options</a></li>',
+                        //'<li><a ><i class="glyphicon glyphicon-cog"></i> Options</a></li>',
                         
                         '<li><a href="/static/person.html"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
-                        '<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
+                        '<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
                         
-                        '<li><a href="#"><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
+                        '<li><a ><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
 						
                     '</ul>',
 				'</li>',
@@ -130,7 +133,7 @@ function buildHome() {
 	
 	var display_section = $([
 				'<div>',
-				'<a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong></a>',
+				'<strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong>',
 				'<hr>',
 				
 				'<div class="jumbotron">',
@@ -162,13 +165,13 @@ function buildHome() {
 				'<div class="list-group">',
 					
 						
-					'<a href="#" class="list-group-item active">',
+					'<a  class="list-group-item active">',
 							'Decisions In Progress',
 					'</a>'
 	].join('\n'));
 	
 	for(var i = 0; i < decisions_inProgress.length; i++){
-		display_section.append('<a href="#" class="list-group-item">' + decisions_inProgress[i] + '</a>')
+		display_section.append('<a  class="list-group-item">' + decisions_inProgress[i] + '</a>')
 	}
 					
 	display_section.append('</div>' + '</div> \n')
@@ -181,7 +184,7 @@ function buildEditUser() {
 
 	clearContent();
 	
-	$('<a href="#"><strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong></a><hr/>').appendTo('#content');
+	$('<strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong><hr/>').appendTo('#content');
 	
 	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
 	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateUser()').appendTo(wrapper);
