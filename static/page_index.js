@@ -10,7 +10,6 @@ function main(body)
 } 
 
 function buildTemplate() {
-	var userName = "Admin"
 	var decisions_inProgress = ["decision1", "decision2", "decision3","decision4"]
 	var decisions_completed = ["decision5", "decision6", "decision7","decision8"]
 	
@@ -37,7 +36,7 @@ function buildTemplate() {
 	var nav_ul2 = $([
 	'<ul class="nav navbar-nav navbar-right">',
 		'<li class="dropdown">',
-			'<a class="dropdown-toggle" role="button" data-toggle="dropdown"  aria-expanded="false"><i class="glyphicon glyphicon-user"></i> ' + userName+ '<span class="caret"></span></a>',
+			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
 				'<ul id="g-account-menu" class="dropdown-menu" role="menu">',
 					'<li><a onclick="buildEditUser()">Edit Profile</a></li>',
 				'</ul>',
@@ -112,6 +111,12 @@ function buildTemplate() {
 	div_row.append(nav_section)
 	div_row.append(display_section)
 	div_dashboard.append(div_row)
+
+	get_text("/whoami", function (result) {
+		get_text("/person/"+result['person_id']+"/info", function (result) {
+			$('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
+		});
+	});
 	
 	$("a").attr("aria-expanded","true");
 	$("a").click(function(){
