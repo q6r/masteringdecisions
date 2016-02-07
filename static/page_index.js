@@ -1,21 +1,18 @@
 function main(body)
 {
-/*
-    $('title')
-        .html('title goes here');
+	buildTemplate();
+	
+	buildHome();
+	
+} 
 
-    $('<p>')
-        .html('Data : ' + JSON.stringify(body))
-        .appendTo('body');
-*/
-	
-	
+function buildTemplate() {
 	var userName = "Admin"
 	var decisions_inProgress = ["decision1", "decision2", "decision3","decision4"]
 	var decisions_completed = ["decision5", "decision6", "decision7","decision8"]
 	
 	//nav section
-	var nav = $('<nav class="navbar navbar-inverse navbar-fixed-top">').appendTo('body')
+	var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
 	var div_container = $('<div class="container-fluid">').appendTo(nav)
 	var div_nav_header = $('<div class="navbar-header">').appendTo(div_container)
 						
@@ -29,17 +26,17 @@ function main(body)
 	].join('\n'));
 					
 	div_nav_header.append(button_nav)	
-	div_nav_header.append($('<a class = "navbar-brand" href="#"><img id="logo" src="new-woodentable.png">'))
+	div_nav_header.append($('<a class = "navbar-brand" style="padding:0px;" href="#"><img id="logo" src="../static/images/logo.png" style="height:50px;">'))
 	
 	var div_collapse = $('<div class="collapse navbar-collapse" id="myNavbar">')
 	
-	var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a href="#">Dashboard</a></li></ul>')
+	var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a onclick="buildHome()" style="cursor: pointer; cursor: hand;">Dashboard</a></li></ul>')
 	var nav_ul2 = $([
 	'<ul class="nav navbar-nav navbar-right">',
 		'<li class="dropdown">',
-			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-expanded="false"><i class="glyphicon glyphicon-user"></i>' + userName+ '<span class="caret"></span></a>',
+			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-expanded="false"><i class="glyphicon glyphicon-user"></i> ' + userName+ '<span class="caret"></span></a>',
 				'<ul id="g-account-menu" class="dropdown-menu" role="menu">',
-					'<li><a href="#">My Profile</a></li>',
+					'<li><a onclick="buildEditUser()" style="cursor: pointer; cursor: hand;">Edit Profile</a></li>',
 				'</ul>',
 		'</li>',
 		'<li><a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
@@ -53,9 +50,9 @@ function main(body)
 	
 	//dashboard section
 	
-	var div_dashboard = $('<div class="container-fluid" id="my-own-style">').appendTo('body')
+	var div_dashboard = $('<div class="container-fluid" style="margin-top:75px;">').appendTo('body')
 	
-	var div_row = $('<div class="row-fluid" >')
+	var div_row = $('<div class="row-fluid">')
 	
 	var nav_section = $([
 			
@@ -107,8 +104,28 @@ function main(body)
 			'</div>'
 		].join('\n'));
 	
+	var display_section = $('<div class="col-sm-9" id="content">');
+	
+	div_row.append(nav_section)
+	div_row.append(display_section)
+	div_dashboard.append(div_row)
+	
+	$("a").attr("aria-expanded","true");
+	$("a").click(function(){
+		$(this).find('i#arrow_change').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
+	});
+}
+
+function buildHome() {
+	$('title').html('Decision Home');
+	
+	clearContent();
+	
+	var decisions_inProgress = ["decision1", "decision2", "decision3","decision4"]
+	var decisions_completed = ["decision5", "decision6", "decision7","decision8"]
+	
 	var display_section = $([
-				'<div class="col-sm-9">',
+				'<div>',
 				'<a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong></a>',
 				'<hr>',
 				
@@ -152,34 +169,108 @@ function main(body)
 					
 	display_section.append('</div>' + '</div> \n')
 	
-	div_row.append(nav_section)
-	div_row.append(display_section)
-	div_dashboard.append(div_row)
-	var footer = $([
-	    '<div >',
-        '<hr />',
-        '<footer id="portfolio">',
-            '<p>DECISION TOOL</p>',
-        '</footer>',
-    '</div>',
-    '</div>',
-	].join('\n'))
-	footer.appendTo('body')
+	display_section.appendTo('#content');
+}
+
+function clearContent() {
+	$('#content').empty();
+}
+
+function buildEditUser() {
+	$('title').html('Update User!');
+
+	clearContent();
 	
+	$('<a href="#"><strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong></a><hr/>').appendTo('#content');
 	
+	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
+	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateUser()').appendTo(wrapper);
+		$('<h3>').addClass('form-signin-heading').text('Update Details').appendTo(form);
+		
+		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+		$('#success').hide();
+		
+		$('<input type="text" />').addClass('form-control')
+			.attr('name', 'username')
+			.attr('placeholder', 'Email Address')
+			.attr('id', 'username')
+			.appendTo(form);
+		
+		$('<input type="text" />').addClass('form-control')
+			.attr('name', 'firstname')
+			.attr('placeholder', 'First Name')
+			.attr('id', 'firstname')
+			.appendTo(form);
+		
+		$('<input type="text" />').addClass('form-control')
+			.attr('name', 'lastname')
+			.attr('placeholder', 'Last Name')
+			.attr('id', 'lastname')
+			.appendTo(form);
+		
+		$('<h3>').addClass('form-signin-heading').text('Password').appendTo(form);
+		
+		$('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+		$('#error').hide();
+		
+		$('<input type="password" />').addClass('form-control')
+			.attr('name', 'password')
+			.attr('placeholder', 'Password')
+			.attr('id', 'password')
+			.appendTo(form);
+			
+		$('<input type="password" />').addClass('form-control')
+			.attr('name', 'password2')
+			.attr('placeholder', 'Password')
+			.attr('id', 'password2')
+			.appendTo(form);
+
+		$('<hr/>').appendTo(form);
+		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+		
+		get_text("/whoami", function (result) {
+			get_text("/person/"+result['person_id']+"/info", function (result) {
+				$('#username').val(result['person']['email']);
+				$('#firstname').val(result['person']['name_first']);
+				$('#lastname').val(result['person']['name_last']);
+			});
+		});
+}
+
+function updateUser() {
+	$('#error').hide();
 	
-	$("a").attr("aria-expanded","true");
-	$("a").click(function(){
-		$(this).find('i#arrow_change').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
-	});
-	/*
-	$("a").click(function(){
-		$('#my-own-style').load("/static/person.html");
+	if(document.getElementById('password').value != document.getElementById('password2').value) {
+		$('#error').html('<b>Error:</b> Passwords do not match!');
+		$('#error').show();
 	}
-	*/
-} 
-
-
-
-
-
+	else {
+		if(document.getElementById('password').value == "") {
+			new_info = {
+				"email":document.getElementById('username').value,
+				"name_first":document.getElementById('firstname').value,
+				"name_last":document.getElementById('lastname').value
+				}
+		}
+		else {
+			new_info = {
+					"email":document.getElementById('username').value,
+					"pw_hash":document.getElementById('password').value,
+					"name_first":document.getElementById('firstname').value,
+					"name_last":document.getElementById('lastname').value
+					}
+		}
+		
+		get_text("/whoami", function (result) {
+			put_text("/person/"+result['person_id'], JSON.stringify(new_info), function (result) {
+				//alert(JSON.stringify(result));
+				document.getElementById('password').value = "";
+				document.getElementById('password2').value = "";
+				$('#success').html('<b>Update successful!</b>');
+				$('#success').show();
+			});
+		});
+	}
+	
+	return false;
+}

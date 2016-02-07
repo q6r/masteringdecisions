@@ -30,6 +30,22 @@ post_text = function(url, data, cb) {
   request.send(data);
 }
 
+/* This version also returns on 403 */
+put_text = function(url, data, cb) {
+	var request = new XMLHttpRequest();
+	request.open('PUT', base_url+url, true);
+	request.setRequestHeader("Content-Type", "application/json");
+
+	request.onreadystatechange = function() {
+		if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
+			cb(JSON.parse(request.responseText));
+		}
+	}
+
+	request.send(data);
+}
+
+
 function assert(condition, message) {
   if (!condition) {
     throw message || "Assertion failed";
