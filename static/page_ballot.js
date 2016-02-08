@@ -1,4 +1,8 @@
 var base_url = "http://localhost:9999";
+var criterion_names = [];
+var alternative_names = [];
+var criterion_ids = [];
+var alt_ids = [];
 
 function main(body)
 {
@@ -18,9 +22,7 @@ function main(body)
 		var decision_name;
 		var decision_desc;
 		var decision_stage;
-		var criterion_names = [];
 		var criterion_descriptions = [];
-		var alternative_names = [];
 		var alternative_descriptions = [];
 
 		
@@ -51,7 +53,7 @@ function main(body)
 
 						criterion_names[i] = crits.criterions[i].name;
 						criterion_descriptions[i] = crits.criterions[i].description;
-
+						criterion_ids[i] = crits.criterions[i].criterion_id;
 					}
 
 			
@@ -61,6 +63,7 @@ function main(body)
 
 							alternative_names[i] = alts.alternatives[i].name;
 							alternative_descriptions[i] = alts.alternatives[i].description;
+							alt_ids[i] = alts.alternatives[i].alternative_id;
 				
 						}
 	
@@ -164,54 +167,136 @@ function main(body)
 						+"<div class=\"col-md-6 col-md-offset-3\" id=\"bottomRow\">"
 						+"<button class=\"btn btn-primary\" id=\"submitbtn\">Submit</button>"
 						+"<button class=\"btn btn-warning\" id=\"clearbtn\">Clear</button>"
+						+"<div class=\"alert alert-danger\" id=\"errordiv\"></div>"
 						+"</div>"
 						+"</div>"
 						+"</div>"
-
-
-						//add event handlers
-						page+="<script>"
-						+"$(\'#clearbtn\').click(function(event) {"
-						+"location.reload();"
-						+"});"
-
-						+"$(\'#submitbtn\').click(function(event) {"
-						+"alert(\'submit clicked\');"
-						+"});"
-
-
-						+"$(\'.criterion\').click(function(event) {"
-						+"var id = \"#\" + this.id;"
-						+"$(id+\"Desc\").toggle();"
-						+"$(\'.alert\').not(id +\"Desc\").hide();"
-						+"});"
-
-						+"$(\'.alternative\').click(function(event) {"
-						+"var id = \"#\" + this.id;"
-						+"$(id+\"Desc\").toggle();"
-						+"$(\'.alert\').not(id +\"Desc\").hide();"
-						+"});"
-
-
-						+"$(\'.color1\').click(function(event) {"
-						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
-						+"$(id).css(\'background-color\',\'red\');"
-						+"});"
-
-						+"$(\'.color2\').click(function(event) {"
-						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
-						+"$(id).css(\'background-color\',\'yellow\');"
-						+"});"	
-
-						+"$(\'.color3\').click(function(event) {"
-						+"var id = \"#\"+this.id.slice(0,-1)+\"_color\";"
-						+"$(id).css(\'background-color\',\'green\');"
-						+"});";
-
+					
 
 						$("body").append(page);
 
+						// Event Handlers -------------------------------------------------------
+
+						$('#clearbtn').click(function(event) {
+							location.reload();
+						});
+
+						$('#submitbtn').click(function(event) {
+
+							var crit_votes = [];
+							var alt_votes = [];
+							var row_votes = [];
+							var alt_missing = false;
+
+							$("#errordiv").empty();
+							$("#errordiv").hide();
+
+							//collect criterion votes
+							for(var i=0; i<criterion_names.length; i++) {
+	
+								crit_votes.push( $("input[name=crit"+i+"]:checked").val());
+
+								if(crit_votes[i] == undefined) {
+									$("#errordiv").html("Please vote on all criterion<br>");
+									$("#errordiv").show();
+								}
+
+							}
+								
+							//collect alternative votes
+							for(var i=0; i<alternative_names.length; i++) {
+
+									alt_votes[i] = [];	
+
+								for(var j=0; j<criterion_names.length; j++) {
+
+
+									if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 0, 0)") {
+										alt_votes[i].push("1");
+									}
+									if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 255, 0)") {
+										alt_votes[i].push("3");
+									}
+									if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(0, 128, 0)") {
+										alt_votes[i].push("5");
+									}
+									if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(128, 128, 128)") {
+										alt_missing = true;
+									}
+
+								}
+
+							}
+							
+							if(alt_missing == true) {
+								$("#errordiv").append("Please vote on all alternatives");
+								$("#errordiv").show();
+							}
+
+							//if ballot is complete, send votes
+							if($("#errordiv").is(":empty")) {
+								
+								//console.log(crit_votes);
+								//console.log(alt_votes);
+
+								for(var i=0; i<criterion_names.length; i++) {
+									
+									get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/criterion/"+criterion_ids[i]+"/vote/"+crit_votes[i], function(crits) {
+										console.log(crits);
+									});
+								}
+
+
+								for(var i=0; i<alternative_names.length; i++) {
+
+									for(var j=0; j<criterion_names.length; j++) {
+
+										
+										get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/alternative/"+alt_ids[i]+"/criterion/"+criterion_ids[j]+"/vote/"+alt_votes[i][j], function(alts) {
+											console.log(alts);
+										});
+										
+
+									}
+
+								}	
+
+
+							}
 						
+						});
+
+
+						$('.criterion').click(function(event) {
+							var id = "#" + this.id;
+							$(id+"Desc").toggle();
+							$('.alert').not(id +"Desc").hide();
+						});
+
+						$('.alternative').click(function(event) {
+							var id = "#" + this.id;
+							$(id+"Desc").toggle();
+							$('.alert').not(id +"Desc").hide();
+						});
+
+
+						$('.color1').click(function(event) {
+							var id = "#"+this.id.slice(0,-1)+"_color";
+							$(id).css('background-color','red');
+						});
+
+						$('.color2').click(function(event) {
+							var id = "#"+this.id.slice(0,-1)+"_color";
+							$(id).css('background-color','yellow');
+						});	
+
+						$('.color3').click(function(event) {
+							var id = "#"+this.id.slice(0,-1)+"_color";
+							$(id).css('background-color','green');
+						});
+					
+
+
 					});
 
 				});
@@ -267,7 +352,7 @@ get_text = function(url, cb) {
 	request.setRequestHeader("Content-Type", "application/json");
 
 	request.onreadystatechange = function() {
-		if(request.readyState == 4 && request.status == 200) {
+		if(request.readyState == 4 && (request.status == 200 || request.status==403)) {
 			cb(JSON.parse(request.responseText));
 		}
 	}
@@ -288,12 +373,4 @@ post_text = function(url, data, cb) {
 
 	request.send(data);
 }
-
-
-//event handlers
-
-
-
-
-
 
