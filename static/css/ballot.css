@@ -24,6 +24,18 @@
 			text-align:center;
 		}
 
+		.color1 {
+			background-color:red;
+		}
+
+		.color2 {
+			background-color:yellow;
+		}
+
+		.color3 {
+			background-color:green;
+		}
+
 		.alert {
 			display:none;
 		}

@@ -76,8 +76,9 @@ function main(body)
 						+"<div class=\"row\">"
 						+"<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">"
 						+"<p class=\"lead\">"+decision_desc+"</p>"
-						+"<p>Instructions for criterion</p>"
-						+"<p>Click on a criterion name for description</p>"
+						+"<p>How important are each of this decision's criterion to you?</p>"
+						+"<p>Please rate each one between 1 (not at all important) and 10 (vital)</p>"
+						+"<p>Click on a criterion name to view its description</p>"
 						+"</div>"
 						+"</div>"
 						+"<form class=\"form-horizontal\" role=\"form\">";
@@ -107,7 +108,9 @@ function main(body)
 						+"</div>"
 						+"<div class=\"container\" id=\"alternative_table\">"
 						+"<div class=\"row\">"
-						+"<p>Instructions for Alternatives</p>"
+						+"<p>For each alternative below, rate how you feel each criterion will impact it.</p>"
+						+"<p>Red represents least beneficial, yellow represents neutral, and green represents most beneficial</p>"
+						+"<p>Click on an alternative name to view its description</p>"
 						+"<table class=\"table\">"
 						+"<thead>"
 						+"<tr>"
@@ -168,6 +171,7 @@ function main(body)
 						+"<button class=\"btn btn-primary\" id=\"submitbtn\">Submit</button>"
 						+"<button class=\"btn btn-warning\" id=\"clearbtn\">Clear</button>"
 						+"<div class=\"alert alert-danger\" id=\"errordiv\"></div>"
+						+"<div class=\"alert alert-success\" id=\"successdiv\">Your vote has been received, thanks!</div>"
 						+"</div>"
 						+"</div>"
 						+"</div>"
@@ -188,6 +192,7 @@ function main(body)
 							var row_votes = [];
 							var alt_missing = false;
 
+							$("#successdiv").hide();
 							$("#errordiv").empty();
 							$("#errordiv").hide();
 
@@ -243,8 +248,13 @@ function main(body)
 									
 									get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/criterion/"+criterion_ids[i]+"/vote/"+crit_votes[i], function(crits) {
 										if(crits.error) {
-											$("#errordiv").html("You have already voted");
+											$("#errordiv").html("Your vote has already been recorded");
 											$("#errordiv").show();
+										}
+										else {
+
+											$('#successdiv').show();
+
 										}
 									});
 								}
@@ -258,9 +268,15 @@ function main(body)
 										get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/alternative/"+alt_ids[i]+"/criterion/"+criterion_ids[j]+"/vote/"+alt_votes[i][j], function(alts) {
 											
 											if(alts.error) {
-												$("#errordiv").html("You have already voted");
+												$("#errordiv").html("Your vote has already been recorded");
 												$("#errordiv").show();
 											}
+											else {
+											
+												$('successdiv').show();
+
+											}
+								
 										});
 										
 
