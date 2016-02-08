@@ -242,7 +242,10 @@ function main(body)
 								for(var i=0; i<criterion_names.length; i++) {
 									
 									get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/criterion/"+criterion_ids[i]+"/vote/"+crit_votes[i], function(crits) {
-										console.log(crits);
+										if(crits.error) {
+											$("#errordiv").html("You have already voted");
+											$("#errordiv").show();
+										}
 									});
 								}
 
@@ -253,7 +256,11 @@ function main(body)
 
 										
 										get_text("/decision/"+decision_id+"/ballot/"+ballot_id+"/alternative/"+alt_ids[i]+"/criterion/"+criterion_ids[j]+"/vote/"+alt_votes[i][j], function(alts) {
-											console.log(alts);
+											
+											if(alts.error) {
+												$("#errordiv").html("You have already voted");
+												$("#errordiv").show();
+											}
 										});
 										
 
@@ -352,7 +359,7 @@ get_text = function(url, cb) {
 	request.setRequestHeader("Content-Type", "application/json");
 
 	request.onreadystatechange = function() {
-		if(request.readyState == 4 && (request.status == 200 || request.status==403)) {
+		if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
 			cb(JSON.parse(request.responseText));
 		}
 	}
