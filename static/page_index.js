@@ -28,7 +28,7 @@ function buildTemplate() {
 	].join('\n'));
 					
 	div_nav_header.append(button_nav)	
-	div_nav_header.append($('<a class = "navbar-brand"><img id="logo" src="../static/images/logo.png">'))
+	div_nav_header.append($('<a onclick="buildHome()"class = "navbar-brand"><img id="logo" src="../static/images/logo.png">'))
 	
 	var div_collapse = $('<div class="collapse navbar-collapse" id="myNavbar">')
 	
