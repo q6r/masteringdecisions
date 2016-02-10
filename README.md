@@ -142,7 +142,7 @@ ballots, and gather statistics.
 Wants/Gives
 
 ```
-a1 = {"name": <str>, "description":<optional-str>, "rating":<int> }
+a1 = {"name": <str>, "description":<optional-str>, "rating":<int>, "cost":<optiona-int> }
 d1 = {"person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 s1 = "undecided yet"
