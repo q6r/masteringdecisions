@@ -1,9 +1,5 @@
 package main
 
-// TODO : Change checklogin
-// TODO : Improve all returned things
-// TODO : .....
-
 import (
 	"fmt"
 	"net/http"

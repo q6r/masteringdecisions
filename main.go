@@ -1,4 +1,3 @@
-// TODO : Rewrite Destroy to delete in an ORM-ish way
 package main
 
 import (

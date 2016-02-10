@@ -251,7 +251,6 @@ func (v *Vote) Save() error {
 	return nil
 }
 
-// TODO : need to change and respect alternative_id
 // FindVotesByKeys find votes by keys
 func FindVotesByKeys(criterion_id, ballot_id int) (Vote, error) {
 	var vote Vote
