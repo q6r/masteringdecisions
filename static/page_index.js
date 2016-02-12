@@ -130,13 +130,13 @@ function buildTemplate() {
 		for(var i in inprogress) {
 			dname = inprogress[i]["name"];
 			did   = inprogress[i]["decision_id"];
-			$("#userMenu3").append("<li><a onclick=\"editDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+			$("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
 		}
 
 		for(var i in completed) {
 			dname = completed[i]["name"];
 			did   = completed[i]["decision_id"];
-			$("#userMenu4").append("<li><a onclick=\"editDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+			$("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
 		}
 
 	});
@@ -221,13 +221,13 @@ function buildHome() {
 		for(var i in inprogress) {
 			dname = inprogress[i]["name"];
 			did   = inprogress[i]["decision_id"];
-			$("#inprogress_list").append("<a  onclick=\"editDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+			$("#inprogress_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
 		}
 
 		for(var i in completed) {
 			dname = completed[i]["name"];
 			did   = completed[i]["decision_id"];
-			$("#completed_list").append("<a  onclick=\"editDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+			$("#completed_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
 		}
 
 		// Set progressbar lengths
@@ -476,7 +476,7 @@ function createNewDecision() {
 }
 
 /**** Edit Decision ****/
-function editDecision(decisionID) {
+function buildEditDecision(decisionID) {
   $('title').html('Edit Decision');
 	clearContent();
 	
