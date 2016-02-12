@@ -476,7 +476,7 @@ function createNewDecision() {
 }
 
 /**** Edit Decision ****/
-function buildEditDecision(decisionID) {
+function editDecision(decisionID) {
   $('title').html('Edit Decision');
 	clearContent();
 	
