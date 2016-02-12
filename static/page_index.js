@@ -31,11 +31,6 @@ function decisionListByCategory(cb) {
 }
 
 function buildTemplate() {
-	var decisions_inProgress = ["xdecision1", "xdecision2", "decision3","decision4"]
-	var decisions_completed = ["xdecision5", "xdecision6", "decision7","decision8"]
-	
-	//var decisions_inProgress = []
-	//var decisions_completed = []
 
 	//nav section
 	var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
