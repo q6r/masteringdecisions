@@ -408,8 +408,7 @@ function createNewDecision() {
         "client_settings":"c"
       }
       post_text("/decision", JSON.stringify(new_decision), function(result){
-        //we should redirect to edit page using new decision id!
-        alert(result['decision']['decision_id']);
+        buildEditDecision(result['decision']['decision_id']);
         return false;
       });
       $('#error').html('<b>Error:</b> Something went wrong! :(');
@@ -420,4 +419,44 @@ function createNewDecision() {
 		$('#error').show();
   }
   return false;
+}
+
+/**** Edit Decision ****/
+function buildEditDecision(decisionID) {
+  $('title').html('Edit Decision');
+	clearContent();
+	
+	$('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+	
+	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
+	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return editDecision()').appendTo(wrapper);
+		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+		$('#success').hide();
+		
+		$('<div class="form-group">').append(
+      $('<label for="name">Decision Name</label>'),
+      $('<input type="text" />').addClass('form-control')
+			.attr('name', 'name')
+			.attr('placeholder', 'Decision Name')
+			.attr('id', 'name')
+      .attr('required', ''))
+		.appendTo(form);
+		
+    $('<div class="form-group">').append(
+      $('<label for="description">Decision Description</label>'),
+      $('<textarea>').addClass('form-control')
+        .attr('rows','3')
+        .attr('name', 'description')
+        .attr('placeholder', 'Decision Description')
+        .attr('id', 'description')
+        .attr('required', '')) //Backend rejects code if this is null :(
+		.appendTo(form);
+
+		$('<hr/>').appendTo(form);
+		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+    
+    get_text("/decision/"+decisionID+"/info", function (result) {
+      $('#name').val(result['decision']['name']);
+      $('#description').val(result['decision']['description']);
+    });
 }
