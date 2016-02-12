@@ -474,8 +474,6 @@ function createNewDecision() {
   }
   return false;
 }
-<<<<<<< HEAD
-=======
 
 /**** Edit Decision ****/
 function buildEditDecision(decisionID) {
@@ -516,4 +514,3 @@ function buildEditDecision(decisionID) {
       $('#description').val(result['decision']['description']);
     });
 }
->>>>>>> 2b4d6f1e6eedb50171fbf1726c3d20af3bc75610
