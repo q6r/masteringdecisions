@@ -91,3 +91,15 @@ function confirmYesNo(title, msg, yesFn, noFn) {
         $confirm.modal("hide");
     });
 }
+
+function loggedIn(cb) {
+  get_text("/whoami", function (result) {
+    if(result['person_id']) {
+      cb();
+    }
+    else {
+      alert('Please Login!');
+      window.location.replace("/login.html");
+    }
+  });
+}

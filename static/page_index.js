@@ -1,9 +1,10 @@
 function main(body) {
-	//Add CSS
-	$.loadCSS('static/css/index.css');
-
-	buildTemplate();
-	buildHome();
+	loggedIn(function() {
+    $.loadCSS('static/css/index.css');
+    
+    buildTemplate();
+    buildHome(); 
+  });
 } 
 
 // decisionListByCategory expect a callback cb(inprogress,completed)
