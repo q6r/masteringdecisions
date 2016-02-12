@@ -36,7 +36,7 @@ function buildTemplate() {
 	var nav_ul2 = $([
 	'<ul class="nav navbar-nav navbar-right">',
 		'<li class="dropdown">',
-			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
+			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
 				'<ul id="g-account-menu" class="dropdown-menu" role="menu">',
 					'<li><a onclick="buildEditUser()">Edit Profile</a></li>',
 				'</ul>',
@@ -67,7 +67,7 @@ function buildTemplate() {
 				'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu" aria-expanded="false" class="collapsed">Decisions <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
                     '<ul class="nav nav-stacked collapse" id="userMenu" aria-expanded="false" style="height: 0px;">',
 						
-                        '<li class="active"> <a ><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
+                        '<li class="active"> <a onclick="buildCreateDecision()"><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
 						'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 							'<ul class="nav nav-stacked collapse" id="userMenu3" aria-expanded="false" style="height: 0px;">',
 								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision1 </a></li>',
@@ -188,6 +188,7 @@ function buildHome() {
 	display_section.appendTo('#content');
 }
 
+/**** Edit Profile ****/
 function buildEditUser() {
 	$('title').html('Update User!');
 
@@ -288,6 +289,7 @@ function updateUser() {
 	return false;
 }
 
+/**** Add User ****/
 function buildAddUser(){
 	$('title').html('Add User!');
 	clearContent();
@@ -349,6 +351,73 @@ function addUserSubmitform(){
 				].join('\n'));
 			clearContent();
 			$('#content').append(signupSucceed)
-			})
+			});
+}
+
+/**** Create Decision ****/
+function buildCreateDecision() {
+  $('title').html('Create New Decision');
+	clearContent();
+	
+	$('<strong><i class="glyphicon glyphicon-cog"></i> Create New Decision</strong><hr/>').appendTo('#content');
+	
+	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
+	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return createNewDecision()').appendTo(wrapper);
+		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+		$('#success').hide();
 		
+		$('<input type="text" />').addClass('form-control')
+			.attr('name', 'name')
+			.attr('placeholder', 'Decision Name')
+			.attr('id', 'name')
+      .attr('required', '')
+			.appendTo(form);
+		$('<br/>').appendTo(form);
+		$('<textarea>').addClass('form-control')
+			.attr('rows','3')
+      .attr('name', 'description')
+			.attr('placeholder', 'Decision Description')
+			.attr('id', 'description')
+      .attr('required', '') //Backend rejects code if this is null :(
+			.appendTo(form);
+
+		$('<hr/>').appendTo(form);
+		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+}
+
+function createNewDecision() {
+  $('#error').hide();
+	
+	if(document.getElementById('name') == '') {
+		$('#error').html('<b>Error:</b> No name set!');
+		$('#error').show();
+	}
+  else if(document.getElementById('description') == '') {
+		$('#error').html('<b>Error:</b> No description set!');
+		$('#error').show();
+	}
+  else {
+    get_text("/whoami", function (result) {
+      var new_decision = {
+        "person_id":+result['person_id'],
+        "name":document.getElementById("name").value,
+        "description":document.getElementById("description").value,
+        "stage":+1,
+        "criterion_vote_style":"a",
+        "alternative_vote_style":"b",
+        "client_settings":"c"
+      }
+      post_text("/decision", JSON.stringify(new_decision), function(result){
+        //we should redirect to edit page using new decision id!
+        alert(result['decision']['decision_id']);
+        return false;
+      });
+      $('#error').html('<b>Error:</b> Something went wrong! :(');
+      $('#error').show();
+      return false;
+    });
+    $('#error').html('<b>Error:</b> The world blew up!');
+		$('#error').show();
+  }
+  return false;
 }
