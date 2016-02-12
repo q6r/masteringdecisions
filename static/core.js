@@ -45,6 +45,21 @@ put_text = function(url, data, cb) {
 	request.send(data);
 }
 
+/* This version also returns on 403! */
+delete_text = function(url, cb) {
+  var request = new XMLHttpRequest();
+  request.open('DELETE', base_url+url, true);
+  request.setRequestHeader("Content-Type", "application/json");
+
+  request.onreadystatechange = function() {
+    if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
+      cb(JSON.parse(request.responseText));
+    }
+  }
+
+  request.send();
+}
+
 
 function assert(condition, message) {
   if (!condition) {
@@ -60,4 +75,19 @@ function delay() {
 jQuery.loadCSS = function(url) {
   if (!$('link[href="' + url + '"]').length)
       $('head').append('<link rel="stylesheet" type="text/css" href="' + url + '">');
+}
+
+function confirmYesNo(title, msg, yesFn, noFn) {
+    var $confirm = $("#modalConfirmYesNo");
+    $confirm.modal('show');
+    $("#lblTitleConfirmYesNo").html(title);
+    $("#lblMsgConfirmYesNo").html(msg);
+    $("#btnYesConfirmYesNo").off('click').click(function () {
+        yesFn();
+        $confirm.modal("hide");
+    });
+    $("#btnNoConfirmYesNo").off('click').click(function () {
+        noFn();
+        $confirm.modal("hide");
+    });
 }

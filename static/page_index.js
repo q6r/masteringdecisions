@@ -1,12 +1,9 @@
-function main(body)
-{
+function main(body) {
 	//Add CSS
 	$.loadCSS('static/css/index.css');
 
 	buildTemplate();
-	
 	buildHome();
-	
 } 
 
 // decisionListByCategory expect a callback cb(inprogress,completed)
@@ -30,7 +27,52 @@ function decisionListByCategory(cb) {
 	});
 }
 
+function updateLeftNav() {
+  	decisionListByCategory(function(inprogress, completed) {
+
+		$("#userMenu3").html("");
+		$("#userMenu4").html("");
+
+		for(var i in inprogress) {
+			dname = inprogress[i]["name"];
+			did   = inprogress[i]["decision_id"];
+			$("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+		}
+
+		for(var i in completed) {
+			dname = completed[i]["name"];
+			did   = completed[i]["decision_id"];
+			$("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+		}
+
+	});
+}
+
 function buildTemplate() {
+  //Add alert box used in scripts
+  $('body').append(
+    '<div id="modalConfirmYesNo" class="modal fade">' +
+        '<div class="modal-dialog">' +
+            '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                    '<button type="button" ' +
+                    'class="close" data-dismiss="modal" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '<h4 id="lblTitleConfirmYesNo" class="modal-title">Confirmation</h4>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                    '<p id="lblMsgConfirmYesNo"></p>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                    '<button id="btnYesConfirmYesNo" type="button" class="btn btn-primary">Yes</button>' +
+                    '<button id="btnNoConfirmYesNo" type="button" class="btn btn-default">No</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+    '</div>'
+  );
+
 
 	//nav section
 	var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
@@ -117,24 +159,7 @@ function buildTemplate() {
 		].join('\n'));
 
 	// Update the navbar portion with decisions
-	decisionListByCategory(function(inprogress, completed) {
-
-		$("#userMenu3").html("");
-		$("#userMenu4").html("");
-
-		for(var i in inprogress) {
-			dname = inprogress[i]["name"];
-			did   = inprogress[i]["decision_id"];
-			$("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
-		}
-
-		for(var i in completed) {
-			dname = completed[i]["name"];
-			did   = completed[i]["decision_id"];
-			$("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
-		}
-
-	});
+  updateLeftNav();
 	
 	var display_section = $('<div class="col-sm-9" id="content">');
 	
@@ -412,8 +437,8 @@ function buildCreateDecision() {
 	
 	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
 	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return createNewDecision()').appendTo(wrapper);
-		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
-		$('#success').hide();
+		$('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+		$('#error').hide();
 		
 		$('<input type="text" />').addClass('form-control')
 			.attr('name', 'name')
@@ -449,23 +474,18 @@ function createNewDecision() {
     get_text("/whoami", function (result) {
       var new_decision = {
         "person_id":+result['person_id'],
-        "name":document.getElementById("name").value,
-        "description":document.getElementById("description").value,
+        "name":$("#name").val(),
+        "description":$("#description").val(),
         "stage":+1,
         "criterion_vote_style":"a",
         "alternative_vote_style":"b",
         "client_settings":"c"
       }
       post_text("/decision", JSON.stringify(new_decision), function(result){
+        updateLeftNav();
         buildEditDecision(result['decision']['decision_id']);
-        return false;
       });
-      $('#error').html('<b>Error:</b> Something went wrong! :(');
-      $('#error').show();
-      return false;
     });
-    $('#error').html('<b>Error:</b> The world blew up!');
-		$('#error').show();
   }
   return false;
 }
@@ -478,12 +498,14 @@ function buildEditDecision(decisionID) {
 	$('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
 	
 	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
-	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return editDecision()').appendTo(wrapper);
+	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
 		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
-		$('#success').hide();
+    $('#success').hide();
+    $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+		$('#error').hide();
 		
 		$('<div class="form-group">').append(
-      $('<label for="name">Decision Name</label>'),
+      $('<label for="name">Name</label>'),
       $('<input type="text" />').addClass('form-control')
 			.attr('name', 'name')
 			.attr('placeholder', 'Decision Name')
@@ -492,7 +514,7 @@ function buildEditDecision(decisionID) {
 		.appendTo(form);
 		
     $('<div class="form-group">').append(
-      $('<label for="description">Decision Description</label>'),
+      $('<label for="description">Description</label>'),
       $('<textarea>').addClass('form-control')
         .attr('rows','3')
         .attr('name', 'description')
@@ -500,12 +522,73 @@ function buildEditDecision(decisionID) {
         .attr('id', 'description')
         .attr('required', '')) //Backend rejects code if this is null :(
 		.appendTo(form);
+    
+    $('<div class="form-group">').append(
+      '<label for="stage">Current Stage</label>' +
+        '<select id="stage" class="form-control">' +
+          '<option value="1">In Development</option>' +
+          '<option value="2">Setup</option>' +
+          '<option value="3">Voting in Progress</option>' +
+          '<option value="4">Completed</option>' +
+        '</select>').appendTo(form);
 
 		$('<hr/>').appendTo(form);
-		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
+    $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
     
     get_text("/decision/"+decisionID+"/info", function (result) {
       $('#name').val(result['decision']['name']);
       $('#description').val(result['decision']['description']);
+      $('#stage').val(result['decision']['stage'])
     });
+}
+
+function deleteDecision(decisionID) {
+  confirmYesNo(
+      "Delete Decision",
+      "Are you sure you want to delete this decision and all associated ballots?",
+      function() {
+        delete_text("/decision/"+decisionID, function (result) {
+          if(result['result'] == "deleted")
+            alert("Decision Deleted!");
+          //redirect
+          updateLeftNav();
+          buildHome();
+        });
+      },
+      function() { /* Do nothing */}
+  );
+}
+
+function updateDecision(decisionID) {
+  $('#error').hide();
+  $('#success').hide();
+	
+	if(document.getElementById('name') == '') {
+		$('#error').html('<b>Error:</b> No name set!');
+		$('#error').show();
+	}
+  else if(document.getElementById('description') == '') {
+		$('#error').html('<b>Error:</b> No description set!');
+		$('#error').show();
+	}
+  else {
+    get_text("/whoami", function (result) {
+      var new_decision = {
+        "person_id":+result['person_id'],
+        "name":$("#name").val(),
+        "description":$("#description").val(),
+        "stage":+$("#stage").val(),
+        "criterion_vote_style":"a",
+        "alternative_vote_style":"b",
+        "client_settings":"c"
+      }
+
+      put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){
+        updateLeftNav();
+        $('#success').html('Updated Successfully');
+        $('#success').show();
+      });
+    });
+  }
 }
