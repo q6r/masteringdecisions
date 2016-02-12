@@ -2,23 +2,46 @@ function main(body)
 {
 	//Add CSS
 	$.loadCSS('static/css/index.css');
-	
+
 	buildTemplate();
 	
 	buildHome();
 	
 } 
 
+// decisionListByCategory expect a callback cb(inprogress,completed)
+// contains a list of decisions in progress or completed. for the
+// currently logged in user.
+function decisionListByCategory(cb) {
+	get_text("/whoami", function (person) {
+		get_text("/person/"+person['person_id']+"/decisions", function (decisions) {
+			var inprogress = [];
+			var completed  = [];
+			for(var i in decisions["decisions"]) {
+				d = decisions["decisions"][i];
+				if(d["stage"] < 3) {
+					inprogress.push(d);
+				} else {
+					completed.push(d);
+				}
+			}
+			cb(inprogress, completed);
+		});
+	});
+}
+
 function buildTemplate() {
-	var decisions_inProgress = ["decision1", "decision2", "decision3","decision4"]
-	var decisions_completed = ["decision5", "decision6", "decision7","decision8"]
+	var decisions_inProgress = ["xdecision1", "xdecision2", "decision3","decision4"]
+	var decisions_completed = ["xdecision5", "xdecision6", "decision7","decision8"]
 	
+	//var decisions_inProgress = []
+	//var decisions_completed = []
+
 	//nav section
 	var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
 	var div_container = $('<div class="container-fluid">').appendTo(nav)
 	var div_nav_header = $('<div class="navbar-header">').appendTo(div_container)
-						
-					
+	
 	var button_nav = $([
 			'<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">',
 						'<span class="icon-bar"></span>',
@@ -70,18 +93,10 @@ function buildTemplate() {
                         '<li class="active"> <a onclick="buildCreateDecision()"><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
 						'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 							'<ul class="nav nav-stacked collapse" id="userMenu3" aria-expanded="false" style="height: 0px;">',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision1 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision2 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision3 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision4 </a></li>',
 							'</ul>',
 						'</li>',
                        '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu4" aria-expanded="false" class="collapsed">Completed <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
 							'<ul class="nav nav-stacked collapse" id="userMenu4" aria-expanded="false" style="height: 0px;">',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision5 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision6 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision7 </a></li>',
-								'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Decision8 </a></li>',
 							'</ul>',
 						'</li>',
                     '</ul>',
@@ -105,10 +120,30 @@ function buildTemplate() {
 				
 			'</div>'
 		].join('\n'));
+
+	// Update the navbar portion with decisions
+	decisionListByCategory(function(inprogress, completed) {
+
+		$("#userMenu3").html("");
+		$("#userMenu4").html("");
+
+		for(var i in inprogress) {
+			dname = inprogress[i]["name"];
+			did   = inprogress[i]["decision_id"];
+			$("#userMenu3").append("<li><a onclick=\"editDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+		}
+
+		for(var i in completed) {
+			dname = completed[i]["name"];
+			did   = completed[i]["decision_id"];
+			$("#userMenu4").append("<li><a onclick=\"editDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+		}
+
+	});
 	
 	var display_section = $('<div class="col-sm-9" id="content">');
 	
-	div_row.append(nav_section)
+	div_row.append(nav_section);
 	div_row.append(display_section)
 	div_dashboard.append(div_row)
 
@@ -136,10 +171,9 @@ function buildHome() {
 	$('title').html('Decision Home');
 	
 	clearContent();
-	
-	var decisions_inProgress = ["decision1", "decision2", "decision3","decision4"]
-	var decisions_completed = ["decision5", "decision6", "decision7","decision8"]
-	
+
+	// The progress bar in here are meaning less ?
+	// remove them
 	var display_section = $([
 				'<div>',
 				'<strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong>',
@@ -155,37 +189,57 @@ function buildHome() {
 						'<h4>Report</h4>',
 					'</div>',
 					'<div class="panel-body">',
-					//	'<small>Decisions completed</small>',
+						'<small>Decisions completed</small>',
 						
-					//	'<div class="progress">',
-                    //            '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" style="width: 72%">',
-                    //                '72 decisions Complete',
-                    //            '</div>',
-                    //    '</div>',
+						'<div class="progress">',
+                                '<div id="completed_length" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100" style="width: 5%">',
+                                '</div>',
+                        '</div>',
 						'<small>Decisions in progress</small>',
 						'<div class="progress">',
-                                '<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100" style="width: 5%">',
-                                    '4 decisions in progress',
+                                '<div id="inprogress_length" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100" style="width: 5%">',
                                 '</div>',
                             '</div>',
 					'</div>',
 				'</div>',
 				
-				'<div class="list-group">',
-					
-						
-					'<a  class="list-group-item active">',
-							'Decisions In Progress',
-					'</a>'
+				'<div class="list-group" id="inprogress_list">',
+				'</div>',
+				'<div class="list-group" id="completed_list">',
+				'</div>',
+				'</div>'
 	].join('\n'));
 	
-	for(var i = 0; i < decisions_inProgress.length; i++){
-		display_section.append('<a  class="list-group-item">' + decisions_inProgress[i] + '</a>')
-	}
-					
-	display_section.append('</div>' + '</div> \n')
-	
 	display_section.appendTo('#content');
+
+	// Update the navbar portion with decisions
+	decisionListByCategory(function(inprogress, completed) {
+
+		$("#inprogress_list").html("<a class=\"list-group-item active\">Decisions In Progress</a>");
+		$("#completed_list").html("<a class=\"list-group-item active\">Decisions Completed</a>");
+
+		for(var i in inprogress) {
+			dname = inprogress[i]["name"];
+			did   = inprogress[i]["decision_id"];
+			$("#inprogress_list").append("<a  onclick=\"editDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+		}
+
+		for(var i in completed) {
+			dname = completed[i]["name"];
+			did   = completed[i]["decision_id"];
+			$("#completed_list").append("<a  onclick=\"editDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+		}
+
+		// Set progressbar lengths
+		totalLength = inprogress.length + completed.length;
+		inprogress_progress = ((inprogress.length / totalLength) * 100); 
+		completed_progress  = ((completed.length  / totalLength) * 100);
+		$("#inprogress_length").width(inprogress_progress + "%");
+		$("#completed_length").width(completed_progress + "%");
+
+	});
+	
+					
 }
 
 /**** Edit Profile ****/
