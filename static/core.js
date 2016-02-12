@@ -94,12 +94,12 @@ function confirmYesNo(title, msg, yesFn, noFn) {
 
 function loggedIn(cb) {
   get_text("/whoami", function (result) {
-    if(result['person_id']) {
-      cb();
-    }
-    else {
+    if(result['error'] == "unauthenticated") {
       alert('Please Login!');
       window.location.replace("/login.html");
+    }
+    else {
+      cb();
     }
   });
 }
