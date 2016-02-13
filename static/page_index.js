@@ -555,8 +555,7 @@ function buildEditDecision(decisionID) {
       $('<input type="text" />').addClass('form-control')
 			.attr('name', 'newCritName')
 			.attr('placeholder', 'Criterion Name')
-			.attr('id', 'newCritName')
-      .attr('required', ''))
+			.attr('id', 'newCritName'))
 		.appendTo(form);
     
     $('<div class="form-group">').append(
@@ -573,8 +572,7 @@ function buildEditDecision(decisionID) {
       $('<input type="text" />').addClass('form-control')
 			.attr('name', 'newCritWeight')
 			.attr('placeholder', 'Criterion Weight')
-			.attr('id', 'newCritWeight')
-      .attr('required', ''))
+			.attr('id', 'newCritWeight'))
 		.appendTo(form);
     
     $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo(form);
