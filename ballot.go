@@ -366,7 +366,14 @@ func (b *Ballot) Save() error {
 
 	b.SetupSecret()
 
-	if err := dbmap.Insert(b); err != nil {
+	// Check if decision exists or not
+	var d Decision
+	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", b.Decision_ID)
+	if err != nil {
+		return fmt.Errorf("Decision %d does not exists, can't create ballot without a decision", b.Decision_ID)
+	}
+
+	if err = dbmap.Insert(b); err != nil {
 		return fmt.Errorf("Unable to insert ballot %#v to database", b)
 	}
 	return nil
