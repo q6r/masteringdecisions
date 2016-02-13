@@ -347,9 +347,6 @@ function main(body)
 				//if ballot is complete, send votes
 				if($("#errordiv").is(":empty")) {
 								
-					console.log(crit_votes);
-					console.log(alt_votes);
-
 					for(var i=0; i<criterion_names.length; i++) {
 							
 						var vote1 = vote_criterion(decision_id, ballot_id, criterion_ids[i], crit_votes[i]);
@@ -416,20 +413,6 @@ function main(body)
 				var id = "#"+this.id.slice(0,-1)+"_color";
 				$(id).css('background-color','green');
 			});
-					
-
-
-					//});
-
-			//	});
-				
-
-
-		//	}
-
-		//});
-
-
 
 		}
 
