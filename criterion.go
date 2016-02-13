@@ -169,7 +169,6 @@ func (cri *Criterion) Destroy() error {
 
 // Save saves a criterion in the database
 // Restrictions decision should exist
-// TODO : Don't allow duplication ?
 func (cri *Criterion) Save() error {
 	// See if there's a decision this belongs to
 	var d Decision

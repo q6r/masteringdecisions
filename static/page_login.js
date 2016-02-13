@@ -72,9 +72,7 @@ function login() {
 function checkLogin() {
   get_text("/whoami", function (result) {
     if(result['person_id']) {
-      //Note: we may need to do a check and log-off to avoid an inf loop
-      alert('You are already logged in, delete me and redirect after dev!');
-      //window.location.replace("/");
+      window.location.replace("/");
     }
   });
 }
