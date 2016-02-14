@@ -8,6 +8,11 @@ function main(body)
 	$('title').html('Ballot');
 	$('head').prepend(custom_header());
 
+	$('head').append('<script src="/static/nouislider.min.js"></script>');
+	$('head').append('<link rel="stylesheet" href="/static/css/nouislider.min.css">');
+	$('head').append('<link rel="stylesheet" href="/static/css/nouislider.pips.css">');
+	$('head').append('<link rel="stylesheet" href="/static/css/nouislider.tooltips.css">');
+
 	var ballot_info = getBallotCookies();
 
 	if(ballot_info == null || ballot_info == undefined) {
