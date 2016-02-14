@@ -371,62 +371,69 @@ function buildAddUser(){
 	
 	$('<strong><i class="glyphicon glyphicon-cog"></i> Add User</strong><hr/>').appendTo('#content');
 	//build the sign up form
-	var signupForm = $('<form id="myform"></form>')
+	var signupForm = $('<form id="myform" onsubmit="return false"></form>')
+	$('<div id= "signup_successful" class = "alert alert-success"></div>').appendTo("#content")
+	$('<div id="signup_error" class="alert alert-danger" style="display: none;"></div>').appendTo("#content")
 	
-	var showUsers = $('<table id="Users"></table>')
-	
-	var email = $('<label> Email<input type="text" name ="email" id="emailInput" placeholder ="Email" class="form-control"/> </label></br>')
+	var email = $('<label> Email<input type="text" name ="email" id="emailInput" required="required" placeholder ="Email" class="form-control"/> </label></br>')
 				.appendTo('body');
 				
-	var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" placeholder="Password" class="form-control"/> </label></br>')
+	var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" required="required" placeholder="Password" class="form-control"/> </label></br>')
 				.appendTo('body');
 				
-	var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" placeholder="First Name" class="form-control"/> </label></br>')
+	var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" required="required" placeholder="First Name" class="form-control"/> </label></br>')
 				.appendTo('body');
 	
-	var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" placeholder="Last Name" class="form-control" /> </label></br>')
+	var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" required="required" placeholder="Last Name" class="form-control" /> </label></br>')
 				.appendTo('body');
 				
 	var submit = $(' <input type="button" onclick="addUserSubmitform()" value="Sign Up" class="btn btn-sm-9 btn-primary" />')
 				.appendTo('body');
 				
-	//var showUsers = $('<input type ="button" onclick="get_all_users()" value="Show all users" class="btn btn-default"/>').appendTo('body');
 
-	signupForm.append(email,pwd, firstname,lastname,submit,showUsers);
+	signupForm.append(email,pwd, firstname,lastname,submit);
 	signupForm.appendTo('#content');
-	showUsers.appendTo('#content');
+	$("#signup_successful").hide()
+	$("#signup_error").hide()
 	
-	
-	
-	var base_url = "http://localhost:9999";
-	//helper function
-	post_text = function(url, data, cb) {
-		var request = new XMLHttpRequest();
-		request.open('POST', base_url+url, true);
-		request.setRequestHeader("Content-Type", "application/json");
-
-		request.onreadystatechange = function() {
-			if(request.readyState == 4 && request.status == 200) {
-				cb(JSON.parse(request.responseText));
-			}
-		}
-
-		request.send(data);
-	}
 
 }
 
 function addUserSubmitform(){		
-	var new_person = $('#myform').serializeArray().reduce(function(obj, v) { obj[v.name] = v.value; return obj; }, { });
-	post_text("/person", JSON.stringify(new_person), function(person){
-			console.info(person);
-			var signupSucceed = $(['<div class="alert alert-success">',
-                    '<strong><span class="glyphicon glyphicon-ok"></span> Success! Message sent.</strong>',
-                '</div>'
-				].join('\n'));
-			clearContent();
-			$('#content').append(signupSucceed)
-			});
+	$("#signup_successful").hide()
+	$("#signup_error").hide()
+
+	if(document.getElementById("emailInput").value =='') {
+		$('#signup_error').html('<b>Error:</b> No email set!');
+		$('#signup_error').show();
+	}
+	else if(document.getElementById("passwordInput").value =='') {
+		$('#signup_error').html('<b>Error:</b> No password set!');
+		$('#signup_error').show();
+	}else if(document.getElementById("firstnameInput").value==''){
+		$('#signup_error').html('<b>Error:</b> No first name set!');
+		$('#signup_error').show()
+	}else if(document.getElementById("lastnameInput").value==''){
+		$('#signup_error').html('<b>Error:</b> No last name set!');
+		$('#signup_error').show()
+	}else if(!isEmail(document.getElementById("emailInput").value)){
+		$('#signup_error').html('<b>Error:</b> Invalid Email!');
+		$('#signup_error').show()
+	}else{
+		new_signup = {
+		"email":document.getElementById("emailInput").value,
+		"pw_hash":document.getElementById("passwordInput").value,
+		"name_first":document.getElementById("firstnameInput").value,
+		"name_last": document.getElementById("lastnameInput").value 
+		};
+		
+		post_text("/person", JSON.stringify(new_signup), function(person){
+			console.log("success")
+			buildAddUser()
+			$("#signup_successful").html("Sign up successful!")
+			$("#signup_successful").show()
+		})
+	}
 }
 
 /**** Create Decision ****/
@@ -534,6 +541,7 @@ function buildEditDecision(decisionID) {
           '<option value="3">Completed</option>' +
         '</select>').appendTo(form);
 
+		$('<button>').addClass('btn btn-lg btn-default btn-block').attr('onclick', 'buildInvitePeople('+decisionID+');').append('<span> <i class="glyphicon glyphicon-envelope"></i> Invite</span>').appendTo(form);
 		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
     $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
     
@@ -655,4 +663,81 @@ function updateCritList(decisionID) {
 				table.append('<tr><td>' + c['name'] + '</td><td>' + c['description'] + '</td><td>' + c['weight'] + '</td></tr>');
 			}
 		});
+}
+
+
+/****Invite people ****/
+function buildInvitePeople(decisionID){
+
+	$('title').html('Invite People');
+	clearContent();
+	
+	$('<strong><i class="glyphicon glyphicon-cog"></i> Invite People</strong><hr/>').appendTo('#content');
+
+	var form = $([
+		'<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
+		
+		'<div id= "invitation_sent" class = "alert alert-success"></div>',
+		'<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
+		'<label for="bal_dec_id" >Decision Name: </label>',
+		'<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
+		'<br />',
+
+		'<label for="bal_name">Name</label>',
+		'<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
+		'<br />',
+		'<label for="bal_email">Email</label>',
+		'<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
+		'<br />',
+		'</form>'
+		].join('\n'));
+		
+		$('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'buildEditDecision('+decisionID+');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
+		$('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'sendInvite('+decisionID+');').attr('style','float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
+		
+	
+		get_text("/decision/"+decisionID+"/info", function (result) {
+			$('#dName').val(result.decision.name)
+		})
+		
+		$("#content").append(form)
+
+		$("#invitation_sent").hide()
+		$("#invitation_error").hide()
+}
+
+function sendInvite(decisionID){
+	$("#invitation_sent").hide()
+	$("#invitation_error").hide()
+	id = decisionID
+	
+	if(document.getElementById("i_name").value =='') {
+		$('#invitation_error').html('<b>Error:</b> No name set!');
+		$('#invitation_error').show();
+	}
+	else if(document.getElementById("i_email").value =='') {
+		$('#invitation_error').html('<b>Error:</b> No email set!');
+		$('#invitation_error').show();
+	}else if(!isEmail(document.getElementById("i_email").value)){
+		$('#invitation_error').html('<b>Error:</b> Invalid email!');
+		$('#invitation_error').show()
+	}else{
+		
+		new_invite = {
+		"name":document.getElementById("i_name").value,
+		"email":document.getElementById("i_email").value 
+		};
+		post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
+			console.log(result);	
+			buildInvitePeople(id)
+			$('#invitation_sent').html('Invitation sent Successfully!');
+			$('#invitation_sent').show()
+		})
+	}
+
+}
+
+function isEmail(email) {
+  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  return regex.test(email);
 }
