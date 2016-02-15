@@ -625,46 +625,90 @@ function buildHome() {
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
       var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
         //Table of existing criteria here
-        $('<div id="critList">').appendTo(form);
+        $('<div id="critList">').appendTo(wrapper);
         $('#critList').hide();
+        $('<hr/>').appendTo(wrapper);
+      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
         
         $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
         $('#success').hide();
         $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
         $('#error').hide();
-        $('<div>').addClass('clearfix').appendTo(form);
-            
-        $('<h3>Add New Criteria</h3>').appendTo(form);
-        $('<div class="form-group">').append(
-          $('<label for="newCritName">Name</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'newCritName')
-          .attr('placeholder', 'Criterion Name')
-          .attr('id', 'newCritName'))
-        .appendTo(form);
         
-        $('<div class="form-group">').append(
-          $('<label for="newCritDesc">Description</label>'),
-          $('<textarea>').addClass('form-control')
-            .attr('rows','3')
-            .attr('name', 'newCritDesc')
-            .attr('placeholder', 'Criterion Description')
-            .attr('id', 'newCritDesc'))
-        .appendTo(form);
-        
-        $('<div class="form-group">').append(
-          $('<label for="newCritWeight">Weight</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'newCritWeight')
-          .attr('placeholder', 'Criterion Weight')
-          .attr('id', 'newCritWeight'))
-        .appendTo(form);
-        
-        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo(form);
+        $('<div>').attr('id', 'critForm').appendTo(form);    
+        showAddCriteria(decisionID);
         
         updateCritList(decisionID);
+    }
+    
+    function showAddCriteria(decisionID) {
+      $('#critForm').html("");
+      $('<h3>Add New Criterion</h3>').appendTo('#critForm');
+        $('<div class="form-group">').append(
+          $('<label for="critName">Name</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critName')
+          .attr('placeholder', 'Criterion Name')
+          .attr('id', 'critName'))
+        .appendTo('#critForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="critDesc">Description</label>'),
+          $('<textarea>').addClass('form-control')
+            .attr('rows','3')
+            .attr('name', 'critDesc')
+            .attr('placeholder', 'Criterion Description')
+            .attr('id', 'critDesc'))
+        .appendTo('#critForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="critWeight">Weight</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critWeight')
+          .attr('placeholder', 'Criterion Weight')
+          .attr('id', 'critWeight'))
+        .appendTo('#critForm');
+        
+        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo('#critForm');
+    }
+    
+    function showEditCriteria(decisionID, criterionID) {
+      $('#critForm').html("");
+      $('<h3>Edit Criterion</h3>').appendTo('#critForm');
+        $('<div class="form-group">').append(
+          $('<label for="critName">Name</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critName')
+          .attr('placeholder', 'Criterion Name')
+          .attr('id', 'critName'))
+        .appendTo('#critForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="critDesc">Description</label>'),
+          $('<textarea>').addClass('form-control')
+            .attr('rows','3')
+            .attr('name', 'critDesc')
+            .attr('placeholder', 'Criterion Description')
+            .attr('id', 'critDesc'))
+        .appendTo('#critForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="critWeight">Weight</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critWeight')
+          .attr('placeholder', 'Criterion Weight')
+          .attr('id', 'critWeight'))
+        .appendTo('#critForm');
+        
+        $('<button>').addClass('btn btn-primary').attr('onclick', 'showAddCriteria('+decisionID+');').text('Back to Add New Criteria').attr('style','float: left').appendTo('#critForm');
+        $('<button>').addClass('btn btn-primary').attr('onclick', 'editCriteria('+decisionID+', ' + criterionID + ');').text('Update Criteria').attr('style','float: right').appendTo('#critForm');
+        $('<div>').addClass('clearfix').appendTo('#critForm'); //added to fix display issue
+        get_text("/decision/"+decisionID+"/criterion/"+criterionID+"/info", function (result) {
+          $('#critName').val(result['criterion']['name']);
+          $('#critDesc').val(result['criterion']['description']);
+          $('#critWeight').val(result['criterion']['weight'])
+        });
     }
 
     function addCriteria(decisionID) {
@@ -672,19 +716,37 @@ function buildHome() {
       $('#error').hide();
       
       var new_crit = {
-        "name":$("#newCritName").val(),
-        "description":$("#newCritDesc").val(),
-        "weight":+$("#newCritWeight").val(),
+        "name":$("#critName").val(),
+        "description":$("#critDesc").val(),
+        "weight":+$("#critWeight").val(),
       }
 
       post_text("/decision/" + decisionID + '/criterion', JSON.stringify(new_crit), function(result){
-        updateLeftNav();
-        $('#success').html('Updated Successfully');
-        $('#success').show();
+        //$('#success').html('Updated Successfully');
+        //$('#success').show();
         updateCritList(decisionID);
+        showAddCriteria(decisionID); //clears it
       });
     }
 
+    function editCriteria(decisionID, criterionID) {
+      $('#success').hide();
+      $('#error').hide();
+      
+      var crit = {
+        "name":$("#critName").val(),
+        "description":$("#critDesc").val(),
+        "weight":+$("#critWeight").val(),
+      }
+
+      put_text("/decision/" + decisionID + '/criterion/' + criterionID, JSON.stringify(crit), function(result){
+        //$('#success').html('Updated Successfully');
+        //$('#success').show();
+        updateCritList(decisionID);
+        showAddCriteria(decisionID); //clears it
+      });
+    }
+    
     function deleteCriteria(decisionID, criterionID) {
       $('#success').hide();
       $('#error').hide();
@@ -695,10 +757,11 @@ function buildHome() {
           function() {
             delete_text("/decision/"+decisionID+"/criterion/"+criterionID, function (result) {
               if(result['result'] == "deleted") {
-                $('#success').html('Deleted Successfully');
-                $('#success').show();
+                //$('#success').html('Deleted Successfully');
+                //$('#success').show();
               }
               updateCritList(decisionID);
+              showAddCriteria(decisionID);
             });
           },
           function() { /* Do nothing */}
@@ -711,14 +774,18 @@ function buildHome() {
       
       get_text("/decision/"+decisionID+"/criterions", function (results) {
           var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#critList');
-          table.append('<tr><th>Name</th><th>Description</th><th>Weight</th><th><!--Delete--></th></tr>');
+          table.append('<tr><th>Name</th><th>Description</th><th>Weight</th><th></th></tr>');
           
           if(results["criterions"].length < 1) $('#critList').hide();
           else $('#critList').show();
           
           for(var i in results["criterions"]) {
             c = results["criterions"][i];
-            table.append('<tr><td>' + c['name'] + '</td><td>' + c['description'] + '</td><td>' + c['weight'] + '</td><td><a onclick="deleteCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger"></span></a></td></tr>');
+            table.append('<tr><td>' + c['name'] + '</td><td>'
+              + c['description'] + '</td><td>'
+              + c['weight'] + '</td><td>'
+              + '<div style="width:45px; float:right;"><a onclick="showEditCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
+              + '<a onclick="deleteCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
           }
         });
     }
