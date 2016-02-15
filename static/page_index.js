@@ -264,68 +264,68 @@ function buildHome() {
 }
 
 /**** Edit Profile ****/
-function buildEditUser() {
-	$('title').html('Update User!');
+  function buildEditUser() {
+    $('title').html('Update User!');
 
-	clearContent();
-	
-	$('<strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong><hr/>').appendTo('#content');
-	
-	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
-	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateUser()').appendTo(wrapper);
-		$('<h3>').addClass('form-signin-heading').text('Update Details').appendTo(form);
-		
-		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
-		$('#success').hide();
-		
-		$('<input type="text" />').addClass('form-control')
-			.attr('name', 'username')
-			.attr('placeholder', 'Email Address')
-			.attr('id', 'username')
-			.appendTo(form);
-		
-		$('<input type="text" />').addClass('form-control')
-			.attr('name', 'firstname')
-			.attr('placeholder', 'First Name')
-			.attr('id', 'firstname')
-			.appendTo(form);
-		
-		$('<input type="text" />').addClass('form-control')
-			.attr('name', 'lastname')
-			.attr('placeholder', 'Last Name')
-			.attr('id', 'lastname')
-			.appendTo(form);
-		
-		$('<h3>').addClass('form-signin-heading').text('Password').appendTo(form);
-		
-		$('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
-		$('#error').hide();
-		
-		$('<input type="password" />').addClass('form-control')
-			.attr('name', 'password')
-			.attr('placeholder', 'Password')
-			.attr('id', 'password')
-			.appendTo(form);
-			
-		$('<input type="password" />').addClass('form-control')
-			.attr('name', 'password2')
-			.attr('placeholder', 'Password')
-			.attr('id', 'password2')
-			.appendTo(form);
+    clearContent();
+    
+    $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong><hr/>').appendTo('#content');
+    
+    var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
+    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateUser()').appendTo(wrapper);
+      $('<h3>').addClass('form-signin-heading').text('Update Details').appendTo(form);
+      
+      $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+      $('#success').hide();
+      
+      $('<input type="text" />').addClass('form-control')
+        .attr('name', 'username')
+        .attr('placeholder', 'Email Address')
+        .attr('id', 'username')
+        .appendTo(form);
+      
+      $('<input type="text" />').addClass('form-control')
+        .attr('name', 'firstname')
+        .attr('placeholder', 'First Name')
+        .attr('id', 'firstname')
+        .appendTo(form);
+      
+      $('<input type="text" />').addClass('form-control')
+        .attr('name', 'lastname')
+        .attr('placeholder', 'Last Name')
+        .attr('id', 'lastname')
+        .appendTo(form);
+      
+      $('<h3>').addClass('form-signin-heading').text('Password').appendTo(form);
+      
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+      $('#error').hide();
+      
+      $('<input type="password" />').addClass('form-control')
+        .attr('name', 'password')
+        .attr('placeholder', 'Password')
+        .attr('id', 'password')
+        .appendTo(form);
+        
+      $('<input type="password" />').addClass('form-control')
+        .attr('name', 'password2')
+        .attr('placeholder', 'Password')
+        .attr('id', 'password2')
+        .appendTo(form);
 
-		$('<hr/>').appendTo(form);
-		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
-		
-		get_text("/whoami", function (result) {
-			get_text("/person/"+result['person_id']+"/info", function (result) {
-				$('#username').val(result['person']['email']);
-				$('#firstname').val(result['person']['name_first']);
-				$('#lastname').val(result['person']['name_last']);
-			});
-		});
-}
+      $('<hr/>').appendTo(form);
+      $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+      
+      get_text("/whoami", function (result) {
+        get_text("/person/"+result['person_id']+"/info", function (result) {
+          $('#username').val(result['person']['email']);
+          $('#firstname').val(result['person']['name_first']);
+          $('#lastname').val(result['person']['name_last']);
+        });
+      });
+  }
 
-function updateUser() {
+  function updateUser() {
 	$('#error').hide();
 	
 	if(document.getElementById('password').value != document.getElementById('password2').value) {
@@ -362,382 +362,490 @@ function updateUser() {
 	}
 	
 	return false;
-}
+  }
 
 /**** Add User ****/
-function buildAddUser(){
-	$('title').html('Add User!');
-	clearContent();
-	
-	$('<strong><i class="glyphicon glyphicon-cog"></i> Add User</strong><hr/>').appendTo('#content');
-	//build the sign up form
-	var signupForm = $('<form id="myform" onsubmit="return false"></form>')
-	$('<div id= "signup_successful" class = "alert alert-success"></div>').appendTo("#content")
-	$('<div id="signup_error" class="alert alert-danger" style="display: none;"></div>').appendTo("#content")
-	
-	var email = $('<label> Email<input type="text" name ="email" id="emailInput" required="required" placeholder ="Email" class="form-control"/> </label></br>')
-				.appendTo('body');
-				
-	var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" required="required" placeholder="Password" class="form-control"/> </label></br>')
-				.appendTo('body');
-				
-	var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" required="required" placeholder="First Name" class="form-control"/> </label></br>')
-				.appendTo('body');
-	
-	var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" required="required" placeholder="Last Name" class="form-control" /> </label></br>')
-				.appendTo('body');
-				
-	var submit = $(' <input type="button" onclick="addUserSubmitform()" value="Sign Up" class="btn btn-sm-9 btn-primary" />')
-				.appendTo('body');
-				
+  function buildAddUser(){
+    $('title').html('Add User!');
+    clearContent();
+    
+    $('<strong><i class="glyphicon glyphicon-cog"></i> Add User</strong><hr/>').appendTo('#content');
+    //build the sign up form
+    var signupForm = $('<form id="myform" onsubmit="return false"></form>')
+    $('<div id= "signup_successful" class = "alert alert-success"></div>').appendTo("#content")
+    $('<div id="signup_error" class="alert alert-danger" style="display: none;"></div>').appendTo("#content")
+    
+    var email = $('<label> Email<input type="text" name ="email" id="emailInput" required="required" placeholder ="Email" class="form-control"/> </label></br>')
+          .appendTo('body');
+          
+    var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" required="required" placeholder="Password" class="form-control"/> </label></br>')
+          .appendTo('body');
+          
+    var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" required="required" placeholder="First Name" class="form-control"/> </label></br>')
+          .appendTo('body');
+    
+    var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" required="required" placeholder="Last Name" class="form-control" /> </label></br>')
+          .appendTo('body');
+          
+    var submit = $(' <input type="button" onclick="addUserSubmitform()" value="Sign Up" class="btn btn-sm-9 btn-primary" />')
+          .appendTo('body');
+          
 
-	signupForm.append(email,pwd, firstname,lastname,submit);
-	signupForm.appendTo('#content');
-	$("#signup_successful").hide()
-	$("#signup_error").hide()
-	
+    signupForm.append(email,pwd, firstname,lastname,submit);
+    signupForm.appendTo('#content');
+    $("#signup_successful").hide()
+    $("#signup_error").hide()
+    
 
-}
+  }
 
-function addUserSubmitform(){		
-	$("#signup_successful").hide()
-	$("#signup_error").hide()
+  function addUserSubmitform(){		
+    $("#signup_successful").hide()
+    $("#signup_error").hide()
 
-	if(document.getElementById("emailInput").value =='') {
-		$('#signup_error').html('<b>Error:</b> No email set!');
-		$('#signup_error').show();
-	}
-	else if(document.getElementById("passwordInput").value =='') {
-		$('#signup_error').html('<b>Error:</b> No password set!');
-		$('#signup_error').show();
-	}else if(document.getElementById("firstnameInput").value==''){
-		$('#signup_error').html('<b>Error:</b> No first name set!');
-		$('#signup_error').show()
-	}else if(document.getElementById("lastnameInput").value==''){
-		$('#signup_error').html('<b>Error:</b> No last name set!');
-		$('#signup_error').show()
-	}else if(!isEmail(document.getElementById("emailInput").value)){
-		$('#signup_error').html('<b>Error:</b> Invalid Email!');
-		$('#signup_error').show()
-	}else{
-		new_signup = {
-		"email":document.getElementById("emailInput").value,
-		"pw_hash":document.getElementById("passwordInput").value,
-		"name_first":document.getElementById("firstnameInput").value,
-		"name_last": document.getElementById("lastnameInput").value 
-		};
-		
-		post_text("/person", JSON.stringify(new_signup), function(person){
-			console.log("success")
-			buildAddUser()
-			$("#signup_successful").html("Sign up successful!")
-			$("#signup_successful").show()
-		})
-	}
-}
+    if(document.getElementById("emailInput").value =='') {
+      $('#signup_error').html('<b>Error:</b> No email set!');
+      $('#signup_error').show();
+    }
+    else if(document.getElementById("passwordInput").value =='') {
+      $('#signup_error').html('<b>Error:</b> No password set!');
+      $('#signup_error').show();
+    }else if(document.getElementById("firstnameInput").value==''){
+      $('#signup_error').html('<b>Error:</b> No first name set!');
+      $('#signup_error').show()
+    }else if(document.getElementById("lastnameInput").value==''){
+      $('#signup_error').html('<b>Error:</b> No last name set!');
+      $('#signup_error').show()
+    }else if(!isEmail(document.getElementById("emailInput").value)){
+      $('#signup_error').html('<b>Error:</b> Invalid Email!');
+      $('#signup_error').show()
+    }else{
+      new_signup = {
+      "email":document.getElementById("emailInput").value,
+      "pw_hash":document.getElementById("passwordInput").value,
+      "name_first":document.getElementById("firstnameInput").value,
+      "name_last": document.getElementById("lastnameInput").value 
+      };
+      
+      post_text("/person", JSON.stringify(new_signup), function(person){
+        console.log("success")
+        buildAddUser()
+        $("#signup_successful").html("Sign up successful!")
+        $("#signup_successful").show()
+      })
+    }
+  }
 
 /**** Create Decision ****/
-function buildCreateDecision() {
-  $('title').html('Create New Decision');
-	clearContent();
-	
-	$('<strong><i class="glyphicon glyphicon-cog"></i> Create New Decision</strong><hr/>').appendTo('#content');
-	
-	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
-	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return createNewDecision()').appendTo(wrapper);
-		$('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
-		$('#error').hide();
-		
-		$('<input type="text" />').addClass('form-control')
-			.attr('name', 'name')
-			.attr('placeholder', 'Decision Name')
-			.attr('id', 'name')
-      .attr('required', '')
-			.appendTo(form);
-		$('<br/>').appendTo(form);
-		$('<textarea>').addClass('form-control')
-			.attr('rows','3')
-      .attr('name', 'description')
-			.attr('placeholder', 'Decision Description')
-			.attr('id', 'description')
-      .attr('required', '') //Backend rejects code if this is null :(
-			.appendTo(form);
-
-		$('<hr/>').appendTo(form);
-		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
-}
-
-function createNewDecision() {
-  $('#error').hide();
-	
-	if(document.getElementById('name') == '') {
-		$('#error').html('<b>Error:</b> No name set!');
-		$('#error').show();
-	}
-  else if(document.getElementById('description') == '') {
-		$('#error').html('<b>Error:</b> No description set!');
-		$('#error').show();
-	}
-  else {
-    get_text("/whoami", function (result) {
-      var new_decision = {
-        "person_id":+result['person_id'],
-        "name":$("#name").val(),
-        "description":$("#description").val(),
-        "stage":+1,
-        "criterion_vote_style":"a",
-        "alternative_vote_style":"b",
-        "client_settings":"c"
-      }
-      post_text("/decision", JSON.stringify(new_decision), function(result){
-        updateLeftNav();
-        buildEditDecision(result['decision']['decision_id']);
-      });
-    });
-  }
-  return false;
-}
-
-/**** Edit Decision ****/
-function buildEditDecision(decisionID) {
-  $('title').html('Edit Decision');
-	clearContent();
-	
-	$('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
-	
-	var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
-	var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
-		$('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
-    $('#success').hide();
-    $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
-		$('#error').hide();
-		
-    $('<h2>Edit Decision</h2>').appendTo(form);
+  function buildCreateDecision() {
+    $('title').html('Create New Decision');
+    clearContent();
     
-    $('<div class="form-group">').append(
-      $('<label for="name">Name</label>'),
+    $('<strong><i class="glyphicon glyphicon-cog"></i> Create New Decision</strong><hr/>').appendTo('#content');
+    
+    var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
+    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return createNewDecision()').appendTo(wrapper);
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+      $('#error').hide();
+      
       $('<input type="text" />').addClass('form-control')
-			.attr('name', 'name')
-			.attr('placeholder', 'Decision Name')
-			.attr('id', 'name')
-      .attr('required', ''))
-		.appendTo(form);
-		
-    $('<div class="form-group">').append(
-      $('<label for="description">Description</label>'),
+        .attr('name', 'name')
+        .attr('placeholder', 'Decision Name')
+        .attr('id', 'name')
+        .attr('required', '')
+        .appendTo(form);
+      $('<br/>').appendTo(form);
       $('<textarea>').addClass('form-control')
         .attr('rows','3')
         .attr('name', 'description')
         .attr('placeholder', 'Decision Description')
         .attr('id', 'description')
-        .attr('required', '')) //Backend rejects code if this is null :(
-		.appendTo(form);
-    
-    $('<div class="form-group">').append(
-      '<label for="stage">Current Stage</label>' +
-        '<select id="stage" class="form-control">' +
-          '<option value="1">In Development</option>' +
-          '<option value="2">Voting in Progress</option>' +
-          '<option value="3">Completed</option>' +
-        '</select>').appendTo(form);
+        .attr('required', '') //Backend rejects code if this is null :(
+        .appendTo(form);
 
-		$('<button>').addClass('btn btn-lg btn-default btn-block').attr('onclick', 'buildInvitePeople('+decisionID+');').append('<span> <i class="glyphicon glyphicon-envelope"></i> Invite</span>').appendTo(form);
-		$('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
-    $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
-    
-    get_text("/decision/"+decisionID+"/info", function (result) {
-      $('#name').val(result['decision']['name']);
-      $('#description').val(result['decision']['description']);
-      $('#stage').val(result['decision']['stage'])
-    });
-    
-    $('<hr/>').appendTo(form);
-    $('<h2>Edit Criteria</h2>').appendTo(form);
-    
-    //Table of existing criteria here
-    $('<div id="critList">').appendTo(form);
-    
-    $('<h3>Add New Criteria</h3>').appendTo(form);
-    $('<div class="form-group">').append(
-      $('<label for="newCritName">Name</label>'),
-      $('<input type="text" />').addClass('form-control')
-			.attr('name', 'newCritName')
-			.attr('placeholder', 'Criterion Name')
-			.attr('id', 'newCritName'))
-		.appendTo(form);
-    
-    $('<div class="form-group">').append(
-      $('<label for="newCritDesc">Description</label>'),
-      $('<textarea>').addClass('form-control')
-        .attr('rows','3')
-        .attr('name', 'newCritDesc')
-        .attr('placeholder', 'Criterion Description')
-        .attr('id', 'newCritDesc'))
-		.appendTo(form);
-    
-    $('<div class="form-group">').append(
-      $('<label for="newCritWeight">Weight</label>'),
-      $('<input type="text" />').addClass('form-control')
-			.attr('name', 'newCritWeight')
-			.attr('placeholder', 'Criterion Weight')
-			.attr('id', 'newCritWeight'))
-		.appendTo(form);
-    
-    $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo(form);
-    
-    updateCritList(decisionID);
-}
+      $('<hr/>').appendTo(form);
+      $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
+  }
 
-function deleteDecision(decisionID) {
-  confirmYesNo(
-      "Delete Decision",
-      "Are you sure you want to delete this decision and all associated ballots?",
-      function() {
-        delete_text("/decision/"+decisionID, function (result) {
-          if(result['result'] == "deleted")
-            alert("Decision Deleted!");
-          //redirect
+  function createNewDecision() {
+    $('#error').hide();
+    
+    if(document.getElementById('name') == '') {
+      $('#error').html('<b>Error:</b> No name set!');
+      $('#error').show();
+    }
+    else if(document.getElementById('description') == '') {
+      $('#error').html('<b>Error:</b> No description set!');
+      $('#error').show();
+    }
+    else {
+      get_text("/whoami", function (result) {
+        var new_decision = {
+          "person_id":+result['person_id'],
+          "name":$("#name").val(),
+          "description":$("#description").val(),
+          "stage":+1,
+          "criterion_vote_style":"a",
+          "alternative_vote_style":"b",
+          "client_settings":"c"
+        }
+        post_text("/decision", JSON.stringify(new_decision), function(result){
           updateLeftNav();
-          buildHome();
+          buildEditDecision(result['decision']['decision_id']);
         });
-      },
-      function() { /* Do nothing */}
-  );
-}
+      });
+    }
+    return false;
+  }
 
-function updateDecision(decisionID) {
-  $('#error').hide();
-  $('#success').hide();
-	
-	if(document.getElementById('name') == '') {
-		$('#error').html('<b>Error:</b> No name set!');
-		$('#error').show();
-	}
-  else if(document.getElementById('description') == '') {
-		$('#error').html('<b>Error:</b> No description set!');
-		$('#error').show();
-	}
-  else {
-    get_text("/whoami", function (result) {
-      var new_decision = {
-        "person_id":+result['person_id'],
-        "name":$("#name").val(),
-        "description":$("#description").val(),
-        "stage":+$("#stage").val(),
-        "criterion_vote_style":"a",
-        "alternative_vote_style":"b",
-        "client_settings":"c"
+/**** Edit Decision ****/
+  function buildEditDecision(decisionID) {
+    $('title').html('Edit Decision');
+    clearContent();
+    
+    $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+    
+    var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+    $('<li class="active"><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+    $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+    $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+    $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+    $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+    
+    var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
+      $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+      $('#success').hide();
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+      $('#error').hide();
+      $('<div>').addClass('clearfix').appendTo(form);
+      $('<div class="form-group">').append(
+        $('<label for="name">Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'name')
+        .attr('placeholder', 'Decision Name')
+        .attr('id', 'name')
+        .attr('required', ''))
+      .appendTo(form);
+      
+      $('<div class="form-group">').append(
+        $('<label for="description">Description</label>'),
+        $('<textarea>').addClass('form-control')
+          .attr('rows','3')
+          .attr('name', 'description')
+          .attr('placeholder', 'Decision Description')
+          .attr('id', 'description')
+          .attr('required', '')) //Backend rejects code if this is null :(
+      .appendTo(form);
+      
+      $('<div class="form-group">').append(
+        '<label for="stage">Current Stage</label>' +
+          '<select id="stage" class="form-control">' +
+            '<option value="1">In Development</option>' +
+            '<option value="2">Voting in Progress</option>' +
+            '<option value="3">Completed</option>' +
+          '</select>').appendTo(form);
+
+      $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
+      $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
+      
+      get_text("/decision/"+decisionID+"/info", function (result) {
+        $('#name').val(result['decision']['name']);
+        $('#description').val(result['decision']['description']);
+        $('#stage').val(result['decision']['stage'])
+      });
+  }
+
+  function deleteDecision(decisionID) {
+    confirmYesNo(
+        "Delete Decision",
+        "Are you sure you want to delete this decision and all associated ballots?",
+        function() {
+          delete_text("/decision/"+decisionID, function (result) {
+            if(result['result'] == "deleted")
+              alert("Decision Deleted!");
+            //redirect
+            updateLeftNav();
+            buildHome();
+          });
+        },
+        function() { /* Do nothing */}
+    );
+  }
+
+  function updateDecision(decisionID) {
+    $('#error').hide();
+    $('#success').hide();
+    
+    if(document.getElementById('name') == '') {
+      $('#error').html('<b>Error:</b> No name set!');
+      $('#error').show();
+    }
+    else if(document.getElementById('description') == '') {
+      $('#error').html('<b>Error:</b> No description set!');
+      $('#error').show();
+    }
+    else {
+      get_text("/whoami", function (result) {
+        var new_decision = {
+          "person_id":+result['person_id'],
+          "name":$("#name").val(),
+          "description":$("#description").val(),
+          "stage":+$("#stage").val(),
+          "criterion_vote_style":"a",
+          "alternative_vote_style":"b",
+          "client_settings":"c"
+        }
+
+        put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){
+          updateLeftNav();
+          $('#success').html('Updated Successfully');
+          $('#success').show();
+        });
+      });
+    }
+  }
+
+  /*
+    TO DO: Disable editing while Voting is in progress
+  */
+
+  /**** Decision Criteria ****/
+    function buildEditCriteria(decisionID) {
+      $('title').html('Edit Decision');
+      clearContent();
+      
+      $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+      
+      var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li class="active"><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+      
+      var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
+        //Table of existing criteria here
+        $('<div id="critList">').appendTo(form);
+        $('#critList').hide();
+        
+        $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+        $('#success').hide();
+        $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+        $('#error').hide();
+        $('<div>').addClass('clearfix').appendTo(form);
+            
+        $('<h3>Add New Criteria</h3>').appendTo(form);
+        $('<div class="form-group">').append(
+          $('<label for="newCritName">Name</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'newCritName')
+          .attr('placeholder', 'Criterion Name')
+          .attr('id', 'newCritName'))
+        .appendTo(form);
+        
+        $('<div class="form-group">').append(
+          $('<label for="newCritDesc">Description</label>'),
+          $('<textarea>').addClass('form-control')
+            .attr('rows','3')
+            .attr('name', 'newCritDesc')
+            .attr('placeholder', 'Criterion Description')
+            .attr('id', 'newCritDesc'))
+        .appendTo(form);
+        
+        $('<div class="form-group">').append(
+          $('<label for="newCritWeight">Weight</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'newCritWeight')
+          .attr('placeholder', 'Criterion Weight')
+          .attr('id', 'newCritWeight'))
+        .appendTo(form);
+        
+        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo(form);
+        
+        updateCritList(decisionID);
+    }
+
+    function addCriteria(decisionID) {
+      $('#success').hide();
+      $('#error').hide();
+      
+      var new_crit = {
+        "name":$("#newCritName").val(),
+        "description":$("#newCritDesc").val(),
+        "weight":+$("#newCritWeight").val(),
       }
 
-      put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){
+      post_text("/decision/" + decisionID + '/criterion', JSON.stringify(new_crit), function(result){
         updateLeftNav();
         $('#success').html('Updated Successfully');
         $('#success').show();
+        updateCritList(decisionID);
       });
-    });
-  }
-}
+    }
 
-function addCriteria(decisionID) {
-  //{"name":<str>, "description":<optional-str>, "weight":<str>}
-  var new_crit = {
-    "name":$("#newCritName").val(),
-    "description":$("#newCritDesc").val(),
-    "weight":+$("#newCritWeight").val(),
-  }
-
-  post_text("/decision/" + decisionID + '/criterion', JSON.stringify(new_crit), function(result){
-    updateLeftNav();
-    $('#success').html('Updated Successfully');
-    $('#success').show();
-  });
-}
-
-function updateCritList(decisionID) {
-  get_text("/decision/"+decisionID+"/criterions", function (results) {
-      var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#critList');
-      table.append('<tr><th>Name</th><th>Description</th><th>Weight</th></tr>');
+    function deleteCriteria(decisionID, criterionID) {
+      $('#success').hide();
+      $('#error').hide();
       
-      for(var i in results["criterions"]) {
-				c = results["criterions"][i];
-				table.append('<tr><td>' + c['name'] + '</td><td>' + c['description'] + '</td><td>' + c['weight'] + '</td></tr>');
-			}
-		});
-}
+      confirmYesNo(
+          "Delete Criteria",
+          "Are you sure you want to delete this criterion?",
+          function() {
+            delete_text("/decision/"+decisionID+"/criterion/"+criterionID, function (result) {
+              if(result['result'] == "deleted") {
+                $('#success').html('Deleted Successfully');
+                $('#success').show();
+              }
+              updateCritList(decisionID);
+            });
+          },
+          function() { /* Do nothing */}
+      );
+    }
 
+    function updateCritList(decisionID) {
+      //clear it to repopulate it
+      $('#critList').html("");
+      
+      get_text("/decision/"+decisionID+"/criterions", function (results) {
+          var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#critList');
+          table.append('<tr><th>Name</th><th>Description</th><th>Weight</th><th><!--Delete--></th></tr>');
+          
+          if(results["criterions"].length < 1) $('#critList').hide();
+          else $('#critList').show();
+          
+          for(var i in results["criterions"]) {
+            c = results["criterions"][i];
+            table.append('<tr><td>' + c['name'] + '</td><td>' + c['description'] + '</td><td>' + c['weight'] + '</td><td><a onclick="deleteCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger"></span></a></td></tr>');
+          }
+        });
+    }
 
-/****Invite people ****/
-function buildInvitePeople(decisionID){
+  /**** Decision Alternative ****/
+    function buildEditAlternative(decisionID) {
+      $('title').html('Edit Decision');
+      clearContent();
+      
+      $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+      
+      var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+      $('<li class="active"><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+      
+      var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
+        //Table of existing criteria here
+        $('<div id="altList">').appendTo(form);
+        $('#altList').hide();
+        
+        $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+        $('#success').hide();
+        $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+        $('#error').hide();
+        $('<div>').addClass('clearfix').appendTo(form);
+            
+        $('<h3>Add New Alternative</h3>').appendTo(form);
+    }
 
-	$('title').html('Invite People');
-	clearContent();
-	
-	$('<strong><i class="glyphicon glyphicon-cog"></i> Invite People</strong><hr/>').appendTo('#content');
+  /**** Decision Status ****/
+    function buildDecisionStatus(decisionID) {
+      $('title').html('Edit Decision');
+      clearContent();
+      
+      $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+      
+      var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+      $('<li class="active"><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+      
+      var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+      $('<p>Put Awesome stuff here!</p>').appendTo(wrapper);
+    }
 
-	var form = $([
-		'<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
-		
-		'<div id= "invitation_sent" class = "alert alert-success"></div>',
-		'<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
-		'<label for="bal_dec_id" >Decision Name: </label>',
-		'<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
-		'<br />',
+  /**** Decision Invite ****/
+    function buildDecisionInvite(decisionID){
 
-		'<label for="bal_name">Name</label>',
-		'<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
-		'<br />',
-		'<label for="bal_email">Email</label>',
-		'<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
-		'<br />',
-		'</form>'
-		].join('\n'));
-		
-		$('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'buildEditDecision('+decisionID+');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
-		$('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'sendInvite('+decisionID+');').attr('style','float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
-		
-	
-		get_text("/decision/"+decisionID+"/info", function (result) {
-			$('#dName').val(result.decision.name)
-		})
-		
-		$("#content").append(form)
+      $('title').html('Invite People');
+      clearContent();
+      
+      $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+      
+      var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+      $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+      $('<li class="active"><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+      
+      var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
 
-		$("#invitation_sent").hide()
-		$("#invitation_error").hide()
-}
+      var form = $([
+        '<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
+        
+        '<div id= "invitation_sent" class = "alert alert-success"></div>',
+        '<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
+        '<label for="bal_dec_id" >Decision Name: </label>',
+        '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
+        '<br />',
 
-function sendInvite(decisionID){
-	$("#invitation_sent").hide()
-	$("#invitation_error").hide()
-	id = decisionID
-	
-	if(document.getElementById("i_name").value =='') {
-		$('#invitation_error').html('<b>Error:</b> No name set!');
-		$('#invitation_error').show();
-	}
-	else if(document.getElementById("i_email").value =='') {
-		$('#invitation_error').html('<b>Error:</b> No email set!');
-		$('#invitation_error').show();
-	}else if(!isEmail(document.getElementById("i_email").value)){
-		$('#invitation_error').html('<b>Error:</b> Invalid email!');
-		$('#invitation_error').show()
-	}else{
-		
-		new_invite = {
-		"name":document.getElementById("i_name").value,
-		"email":document.getElementById("i_email").value 
-		};
-		post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
-			console.log(result);	
-			buildInvitePeople(id)
-			$('#invitation_sent').html('Invitation sent Successfully!');
-			$('#invitation_sent').show()
-		})
-	}
+        '<label for="bal_name">Name</label>',
+        '<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
+        '<br />',
+        '<label for="bal_email">Email</label>',
+        '<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
+        '<br />',
+        '</form>'
+        ].join('\n'));
+        
+        $('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'buildEditDecision('+decisionID+');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
+        $('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'sendInvite('+decisionID+');').attr('style','float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
+        
+      
+        get_text("/decision/"+decisionID+"/info", function (result) {
+          $('#dName').val(result.decision.name)
+        })
+        
+        $(wrapper).append(form)
 
-}
+        $("#invitation_sent").hide()
+        $("#invitation_error").hide()
+    }
 
-function isEmail(email) {
-  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-  return regex.test(email);
-}
+    function sendInvite(decisionID){
+      $("#invitation_sent").hide()
+      $("#invitation_error").hide()
+      id = decisionID
+      
+      if(document.getElementById("i_name").value =='') {
+        $('#invitation_error').html('<b>Error:</b> No name set!');
+        $('#invitation_error').show();
+      }
+      else if(document.getElementById("i_email").value =='') {
+        $('#invitation_error').html('<b>Error:</b> No email set!');
+        $('#invitation_error').show();
+      }else if(!isEmail(document.getElementById("i_email").value)){
+        $('#invitation_error').html('<b>Error:</b> Invalid email!');
+        $('#invitation_error').show()
+      }else{
+        
+        new_invite = {
+        "name":document.getElementById("i_name").value,
+        "email":document.getElementById("i_email").value 
+        };
+        post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
+          console.log(result);	
+          buildInvitePeople(id)
+          $('#invitation_sent').html('Invitation sent Successfully!');
+          $('#invitation_sent').show()
+        })
+      }
+    }
+  
