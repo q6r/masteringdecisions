@@ -11,12 +11,12 @@ import (
 
 // Alternative represent an alternative in a decision
 type Alternative struct {
-	Alternative_ID int    `db:"alternative_id" json:"alternative_id"`
-	Decision_ID    int    `db:"decision_id" json:"decision_id"`
-	Name           string `db:"name" json:"name" binding:"required"`
-	Description    string `db:"description" json:"description"`
-	Cost           int    `db:"cost" json:"cost"`
-	Rating         int    `db:"rating" json:"rating" binding:"required"`
+	Alternative_ID int     `db:"alternative_id" json:"alternative_id"`
+	Decision_ID    int     `db:"decision_id" json:"decision_id"`
+	Name           string  `db:"name" json:"name" binding:"required"`
+	Description    string  `db:"description" json:"description"`
+	Cost           float32 `db:"cost" json:"cost"`
+	Rating         int     `db:"rating" json:"rating" binding:"required"`
 }
 
 // HAlternativeCreate create a ballot that belongs
