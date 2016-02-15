@@ -450,15 +450,13 @@ function getBallotCookies() {
 	
 			var temp = my_cookies[i].split('=');
 
-			console.log(temp);
-
 			if(temp[0] == "ballot_id") {
-				console.log("ballot_id");		
+
 				ballot_id = temp[1];		
 	
 			}
 			else if(temp[0] == "decision_id") {
-				console.log("dec_id");
+
 				decision_id = temp[1];
 	
 			}
