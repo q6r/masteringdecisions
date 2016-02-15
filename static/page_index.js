@@ -707,7 +707,7 @@ function buildHome() {
         get_text("/decision/"+decisionID+"/criterion/"+criterionID+"/info", function (result) {
           $('#critName').val(result['criterion']['name']);
           $('#critDesc').val(result['criterion']['description']);
-          $('#critWeight').val(result['criterion']['weight'])
+          $('#critWeight').val(result['criterion']['weight']);
         });
     }
 
@@ -805,18 +805,192 @@ function buildHome() {
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
       var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
         //Table of existing criteria here
-        $('<div id="altList">').appendTo(form);
+        $('<div id="altList">').appendTo(wrapper);
         $('#altList').hide();
+        $('<hr/>').appendTo(wrapper);
+      var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
         
         $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
         $('#success').hide();
         $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
         $('#error').hide();
-        $('<div>').addClass('clearfix').appendTo(form);
-            
-        $('<h3>Add New Alternative</h3>').appendTo(form);
+        
+        $('<div>').attr('id', 'altForm').appendTo(form);    
+        showAddAlternative(decisionID);
+        
+        updateAltList(decisionID);
+    }
+    
+    function showAddAlternative(decisionID) {
+      $('#altForm').html("");
+      $('<h3>Add New Alternative</h3>').appendTo('#altForm');
+      
+        $('<div class="form-group">').append(
+          $('<label for="altName">Name</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altName')
+          .attr('placeholder', 'Alternative Name')
+          .attr('id', 'altName'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altDesc">Description</label>'),
+          $('<textarea>').addClass('form-control')
+            .attr('rows','3')
+            .attr('name', 'altDesc')
+            .attr('placeholder', 'Alternative Description')
+            .attr('id', 'altDesc'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altRating">Rating</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altRating')
+          .attr('placeholder', 'Alternative Rating')
+          .attr('id', 'altRating'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altCost">Cost</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altCost')
+          .attr('placeholder', 'Alternative Cost')
+          .attr('id', 'altCost'))
+        .appendTo('#altForm');
+        
+        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addAlternative('+decisionID+');').text('Add Alternative').appendTo('#altForm');
+    }
+    
+    function showEditAlternative(decisionID, alternativeID) {
+      $('#altForm').html("");
+      $('<h3>Edit Alternative</h3>').appendTo('#altForm');
+      
+        $('<div class="form-group">').append(
+          $('<label for="altName">Name</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altName')
+          .attr('placeholder', 'Alternative Name')
+          .attr('id', 'altName'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altDesc">Description</label>'),
+          $('<textarea>').addClass('form-control')
+            .attr('rows','3')
+            .attr('name', 'altDesc')
+            .attr('placeholder', 'Alternative Description')
+            .attr('id', 'altDesc'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altRating">Rating</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altRating')
+          .attr('placeholder', 'Alternative Rating')
+          .attr('id', 'altRating'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
+          $('<label for="altCost">Cost</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altCost')
+          .attr('placeholder', 'Alternative Cost')
+          .attr('id', 'altCost'))
+        .appendTo('#altForm');
+        
+        $('<button>').addClass('btn btn-primary').attr('onclick', 'showAddAlternative('+decisionID+');').text('Back to Add New Alternative').attr('style','float: left').appendTo('#altForm');
+        $('<button>').addClass('btn btn-primary').attr('onclick', 'editAlternative('+decisionID+', ' + alternativeID + ');').text('Update Alternative').attr('style','float: right').appendTo('#altForm');
+        $('<div>').addClass('clearfix').appendTo('#altForm'); //added to fix display issue
+        
+        get_text("/decision/"+decisionID+"/alternative/"+alternativeID+"/info", function (result) {
+          $('#altName').val(result['alternative']['name']);
+          $('#altDesc').val(result['alternative']['description']);
+          $('#altRating').val(result['alternative']['rating']);
+          $('#altCost').val(result['alternative']['cost']);
+        });
+    }
+
+    function addAlternative(decisionID) {
+      $('#success').hide();
+      $('#error').hide();
+      
+      var new_alt = {
+        "name":$("#altName").val(),
+        "description":$("#altDesc").val(),
+        "rating":+$("#altRating").val(),
+        "cost":+$("#altCost").val()
+      }
+
+      post_text("/decision/" + decisionID + '/alternative', JSON.stringify(new_alt), function(result){
+        //$('#success').html('Updated Successfully');
+        //$('#success').show();
+        updateAltList(decisionID);
+        showAddAlternative(decisionID); //clears it
+      });
+    }
+
+    function editAlternative(decisionID, alternativeID) {
+      $('#success').hide();
+      $('#error').hide();
+      
+      var alt = {
+        "name":$("#altName").val(),
+        "description":$("#altDesc").val(),
+        "rating":+$("#altRating").val(),
+        "cost":+$("#altCost").val()
+      }
+
+      put_text("/decision/" + decisionID + '/alternative/' + alternativeID, JSON.stringify(alt), function(result){
+        //$('#success').html('Updated Successfully');
+        //$('#success').show();
+        updateAltList(decisionID);
+        showAddAlternative(decisionID); //clears it
+      });
+    }
+    
+    function deleteAlternative(decisionID, alternativeID) {
+      $('#success').hide();
+      $('#error').hide();
+      
+      confirmYesNo(
+          "Delete Alternative",
+          "Are you sure you want to delete this alternative?",
+          function() {
+            delete_text("/decision/"+decisionID+"/alternative/"+alternativeID, function (result) {
+              if(result['result'] == "deleted") {
+                //$('#success').html('Deleted Successfully');
+                //$('#success').show();
+              }
+              updateAltList(decisionID);
+              showAddAlternative(decisionID);
+            });
+          },
+          function() { /* Do nothing */}
+      );
+    }
+
+    function updateAltList(decisionID) {
+      //clear it to repopulate it
+      $('#altList').html("");
+      
+      get_text("/decision/"+decisionID+"/alternatives", function (results) {
+          var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#altList');
+          table.append('<tr><th>Name</th><th>Description</th><th>Rating</th><th>Cost</th><th></th></tr>');
+          
+          if(results["alternatives"].length < 1) $('#altList').hide();
+          else $('#altList').show();
+          
+          for(var i in results["alternatives"]) {
+            a = results["alternatives"][i];
+            table.append('<tr><td>' + a['name'] + '</td><td>'
+              + a['description'] + '</td><td>'
+              + a['rating'] + '</td><td>'
+              + a['cost'] + '</td><td>'
+              + '<div style="width:45px; float:right;"><a onclick="showEditAlternative('+ decisionID + ',' + a['alternative_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
+              + '<a onclick="deleteAlternative('+ decisionID + ',' + a['alternative_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
+          }
+        });
     }
 
   /**** Decision Status ****/
@@ -909,7 +1083,7 @@ function buildHome() {
         };
         post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
           console.log(result);	
-          buildInvitePeople(id)
+          buildDecisionInvite(id)
           $('#invitation_sent').html('Invitation sent Successfully!');
           $('#invitation_sent').show()
         })
