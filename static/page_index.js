@@ -485,8 +485,8 @@ function buildHome() {
           "name":$("#name").val(),
           "description":$("#description").val(),
           "stage":+1,
-          "criterion_vote_style":"a",
-          "alternative_vote_style":"b",
+          "criterion_vote_style":"s",
+          "alternative_vote_style":"1",
           "client_settings":"c"
         }
         post_text("/decision", JSON.stringify(new_decision), function(result){
@@ -539,6 +539,19 @@ function buildHome() {
       .appendTo(form);
       
       $('<div class="form-group">').append(
+        '<label for="critStyle">Criteria Style</label>' +
+          '<select id="critStyle" class="form-control">' +
+            '<option value="s">Sliders</option>' +
+            '<option value="b">Buttons</option>' +
+          '</select>').appendTo(form);
+          
+      $('<div class="form-group">').append(
+        '<label for="altStyle">Criteria Style</label>' +
+          '<select id="altStyle" class="form-control">' +
+            '<option value="1">Red/Yellow/Green</option>' +
+          '</select>').appendTo(form);
+      
+      $('<div class="form-group">').append(
         '<label for="stage">Current Stage</label>' +
           '<select id="stage" class="form-control">' +
             '<option value="1">In Development</option>' +
@@ -552,7 +565,9 @@ function buildHome() {
       get_text("/decision/"+decisionID+"/info", function (result) {
         $('#name').val(result['decision']['name']);
         $('#description').val(result['decision']['description']);
-        $('#stage').val(result['decision']['stage'])
+        $('#stage').val(result['decision']['stage']);
+        $('#critStyle').val(result['decision']['criterion_vote_style']);
+        $('#altStyle').val(result['decision']['alternative_vote_style']);
       });
   }
 
@@ -592,8 +607,8 @@ function buildHome() {
           "name":$("#name").val(),
           "description":$("#description").val(),
           "stage":+$("#stage").val(),
-          "criterion_vote_style":"a",
-          "alternative_vote_style":"b",
+          "criterion_vote_style":$("#critStyle").val(),
+          "alternative_vote_style":$("#altStyle").val(),
           "client_settings":"c"
         }
 
