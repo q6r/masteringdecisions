@@ -439,29 +439,35 @@ function bindValues(slider, span) {
 
 function getBallotCookies() {
 
-	var my_cookies = document.cookie.split(';')
-
-	if(my_cookies == "") {
-		return null;
-	}
-
-	var cookie_1 = my_cookies[0].split('=');
-	var cookie_2 = my_cookies[1].split('=');
-
-	var ballot_id;
+	var my_cookies = document.cookie.split('; ')
 	var decision_id;
-	var ret;
+	var ballot_id;
+	var ret = null;
 
-	if(cookie_1[0] == "ballot_id") {
-		ballot_id = cookie_1[1];
-		decision_id = cookie_2[1];		
+	if(my_cookies != "") {
+	
+		for(var i=0; i<my_cookies.length; i++) {
+	
+			var temp = my_cookies[i].split('=');
 
-	} else if(cookie_1[0] == "decision_id") {
-		ballot_id = cookie_2[1];
-		decision_id = cookie_1[1];
-	} 
+			if(temp[0] == "ballot_id") {
 
-	return ret = [decision_id, ballot_id];
+				ballot_id = temp[1];		
+	
+			}
+			else if(temp[0] == "decision_id") {
+
+				decision_id = temp[1];
+	
+			}
+	
+		}
+
+		ret = [decision_id, ballot_id];
+	}
+	
+	return ret;
+
 }
 
 function custom_header() {
