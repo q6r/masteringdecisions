@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Rating implement ratinging an altenrative
+// Rating implement ratinging an criterion
 // by a ballot
 type Rating struct {
 	Criterion_ID int `db:"criterion_id" json:"criterion_id" binding:"required"`
@@ -93,7 +93,7 @@ func HRatingBallots(c *gin.Context) {
 	}
 }
 
-// HRatingDelete delete a specific rating on an alternative
+// HRatingDelete delete a specific rating on an criterion
 // by a ballot
 func HRatingDelete(c *gin.Context) {
 	cid, err := strconv.Atoi(c.Param("criterion_id"))
@@ -202,7 +202,7 @@ func (w *Rating) Save() error {
 		return fmt.Errorf("The criterion and ballot don't belong to this decision")
 	}
 
-	// Make sure the rating is not more than the alternative rating
+	// Make sure the rating is not more than the criterion weight
 	if w.Rating > cri.Weight {
 		return fmt.Errorf("The rating is more than the maximum defined %d", cri.Weight)
 	}
