@@ -101,11 +101,6 @@ func HVoteUpdate(c *gin.Context) {
 			gin.H{"error": fmt.Sprintf("Unable to update vote for ballot %d and criterion %d", bid, cid)})
 		return
 	}
-	if weight > cri.Weight {
-		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("Vote weight can't be more than %d", cri.Weight)})
-		return
-	}
 
 	_, err = dbmap.Exec("UPDATE vote SET weight=$1 WHERE criterion_id=$2 and ballot_id=$3 and alternative_id=$4", weight, cid, bid, aid)
 	if err != nil {
@@ -236,11 +231,6 @@ func (v *Vote) Save() error {
 	// Make sure the criterion and ballot belong to the same decision
 	if cri.Decision_ID != b.Decision_ID {
 		return fmt.Errorf("criterion belongs to decision %d while ballot belongs to decision %d", cri.Decision_ID, b.Decision_ID)
-	}
-
-	// Make sure the vote's weight is not more than the criterion weight
-	if v.Weight > cri.Weight {
-		return fmt.Errorf("vote weight is more than criterion weight")
 	}
 
 	err = dbmap.Insert(v)

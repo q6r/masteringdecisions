@@ -152,12 +152,6 @@ func HRatingUpdate(c *gin.Context) {
 		return
 	}
 
-	if rating > cri.Weight {
-		c.JSON(http.StatusForbidden,
-			gin.H{"error": fmt.Sprintf("New rating can't be more than %d", cri.Weight)})
-		return
-	}
-
 	_, err = dbmap.Exec("UPDATE rating SET rating=$1 WHERE ballot_id=$2 and criterion_id=$3", rating, bid, cid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
@@ -200,11 +194,6 @@ func (w *Rating) Save() error {
 	// Make sure the criterion and ballot belong to the same decision
 	if cri.Decision_ID != b.Decision_ID {
 		return fmt.Errorf("The criterion and ballot don't belong to this decision")
-	}
-
-	// Make sure the rating is not more than the criterion weight
-	if w.Rating > cri.Weight {
-		return fmt.Errorf("The rating is more than the maximum defined %d", cri.Weight)
 	}
 
 	err = dbmap.Insert(w)

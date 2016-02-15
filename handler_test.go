@@ -450,11 +450,10 @@ func TestHDecisionBallotsList(t *testing.T) {
 			frisby.Create("Test HCriterionCreate").
 				Post(fmt.Sprintf("http://localhost:9999/decision/%d/criterion", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Criterion{Name: "c1", Weight: 42}).
+				SetJson(Criterion{Name: "c1"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("criterion.name", "c1").
-				ExpectJson("criterion.weight", 42).
 				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
 				cid, err := json.Get("criterion").Get("criterion_id").Int()
 				if err != nil {
@@ -473,17 +472,15 @@ func TestHDecisionBallotsList(t *testing.T) {
 					SetHeader("Content-Type", "application/json").
 					Send().
 					ExpectStatus(200).
-					ExpectJson("criterion.name", "c1").
-					ExpectJson("criterion.weight", 42)
+					ExpectJson("criterion.name", "c1")
 
 				frisby.Create("Test HCriterionUpdate").
 					Put(fmt.Sprintf("http://localhost:9999/decision/%d/criterion/%d", did, cid)).
 					SetHeader("Content-Type", "application/json").
-					SetJson(Criterion{Name: "c2", Weight: 43}).
+					SetJson(Criterion{Name: "c2"}).
 					Send().
 					ExpectStatus(200).
-					ExpectJson("criterion.name", "c2").
-					ExpectJson("criterion.weight", 43)
+					ExpectJson("criterion.name", "c2")
 
 				frisby.Create("Test HCriterionDelete").
 					Delete(fmt.Sprintf("http://localhost:9999/decision/%d/criterion/%d", did, cid)).
@@ -652,11 +649,10 @@ func TestHRatings(t *testing.T) {
 			frisby.Create("Test HCriterionCreate").
 				Post(fmt.Sprintf("http://localhost:9999/decision/%d/criterion", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Criterion{Name: "c1", Weight: 42}).
+				SetJson(Criterion{Name: "c1"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("criterion.name", "c1").
-				ExpectJson("criterion.weight", 42).
 				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
 
 				cid, err := json.Get("criterion").Get("criterion_id").Int()
@@ -765,32 +761,29 @@ func TestHAlternativeStar(t *testing.T) {
 			frisby.Create("Test HAlternativeCreate").
 				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				SetJson(Alternative{Name: "alt", Description: "desc1"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("alternative.name", "alt").
-				ExpectJson("alternative.description", "desc1").
-				ExpectJson("alternative.rating", 22)
+				ExpectJson("alternative.description", "desc1")
 
 			frisby.Create("Test HAlternativeCreate").
 				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				SetJson(Alternative{Name: "alt", Description: "desc1"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("alternative.name", "alt").
-				ExpectJson("alternative.description", "desc1").
-				ExpectJson("alternative.rating", 22)
+				ExpectJson("alternative.description", "desc1")
 
 			frisby.Create("Test HAlternativeCreate").
 				Post(fmt.Sprintf("http://localhost:9999/decision/%d/alternative", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Alternative{Name: "alt", Description: "desc1", Rating: 22}).
+				SetJson(Alternative{Name: "alt", Description: "desc1"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("alternative.name", "alt").
 				ExpectJson("alternative.description", "desc1").
-				ExpectJson("alternative.rating", 22).
 				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
 
 				aid, err := json.Get("alternative").Get("alternative_id").Int()
@@ -801,12 +794,11 @@ func TestHAlternativeStar(t *testing.T) {
 				frisby.Create("Test HAlternativeUpdate").
 					Put(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d", did, aid)).
 					SetHeader("Content-Type", "application/json").
-					SetJson(Alternative{Name: "up", Description: "up2", Rating: 23}).
+					SetJson(Alternative{Name: "up", Description: "up2"}).
 					Send().
 					ExpectStatus(200).
 					ExpectJson("alternative.name", "up").
-					ExpectJson("alternative.description", "up2").
-					ExpectJson("alternative.rating", 23)
+					ExpectJson("alternative.description", "up2")
 
 				frisby.Create("Test HAlternativeInfo").
 					Get(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d/info", did, aid)).
@@ -814,8 +806,7 @@ func TestHAlternativeStar(t *testing.T) {
 					Send().
 					ExpectStatus(200).
 					ExpectJson("alternative.name", "up").
-					ExpectJson("alternative.description", "up2").
-					ExpectJson("alternative.rating", 23)
+					ExpectJson("alternative.description", "up2")
 
 				frisby.Create("Test HAlternativeDelete").
 					Delete(fmt.Sprintf("http://localhost:9999/decision/%d/alternative/%d", did, aid)).
