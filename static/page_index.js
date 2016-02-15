@@ -485,8 +485,8 @@ function buildHome() {
           "name":$("#name").val(),
           "description":$("#description").val(),
           "stage":+1,
-          "criterion_vote_style":"s",
-          "alternative_vote_style":"1",
+          "criterion_vote_style":"s", //sliders
+          "alternative_vote_style":"3", //3-color
           "client_settings":"c"
         }
         post_text("/decision", JSON.stringify(new_decision), function(result){
@@ -548,7 +548,8 @@ function buildHome() {
       $('<div class="form-group">').append(
         '<label for="altStyle">Criteria Style</label>' +
           '<select id="altStyle" class="form-control">' +
-            '<option value="1">Red/Yellow/Green</option>' +
+            '<option value="3">3 Color</option>' +
+            '<option value="5">5 Color</option>' +
           '</select>').appendTo(form);
       
       $('<div class="form-group">').append(

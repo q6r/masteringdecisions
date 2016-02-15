@@ -24,15 +24,23 @@
 			text-align:center;
 		}
 
-		.color1 {
+		.vote-red {
 			background-color:red;
 		}
 
-		.color2 {
-			background-color:yellow;
+		.vote-orange {
+			background-color:orange;
 		}
 
-		.color3 {
+		.vote-yellow {
+			background-color:yellow;
+		}
+    
+    .vote-greenyellow {
+			background-color:greenyellow;
+		}
+    
+    .vote-green {
 			background-color:green;
 		}
 

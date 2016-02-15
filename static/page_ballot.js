@@ -68,6 +68,7 @@ function main(body)
 		decision_desc = decision.description;
 		decision_stage = decision.stage;
 		crit_vote_style = decision.criterion_vote_style;
+    alt_vote_style = decision.alternative_vote_style;
 		voter_name = ballot.name;
 
 		for(var i=0; i<criterion.length; i++) {
@@ -196,23 +197,40 @@ function main(body)
 				+"</div>"
 				+"</td>";
 
-				for(var j=0; j<criterion_names.length; j++) {
-
-					page+="<td>"
-					+"<div class=\"dropup\">"
-					+"<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu"+i+j+"\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
-					+"<div id=\"alt"+i+"crit"+j+"_color\" class=\"color_pick\"></div>"
-					+"</button>"
-					+"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+i+j+"\">"
-					+"<li id=\"alt"+i+"crit"+j+"r\" class=\"color1\">Red</li>"
-					+"<li id=\"alt"+i+"crit"+j+"y\" class=\"color2\">Yellow</li>"
-					+"<li id=\"alt"+i+"crit"+j+"g\" class=\"color3\">Green</li>"
-					+"</ul>"
-					+"</div>"
-					+"</td>";
-				
-
-				}
+        if(alt_vote_style=="5") {
+          for(var j=0; j<criterion_names.length; j++) {
+            page+="<td>"
+            +"<div class=\"dropup\">"
+            +"<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu"+i+j+"\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+            +"<div id=\"alt"+i+"crit"+j+"_color\" class=\"color_pick\"></div>"
+            +"</button>"
+            +"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+i+j+"\">"
+            +"<li id=\"alt"+i+"crit"+j+"r\" class=\"vote-red\">Red</li>"
+            +"<li id=\"alt"+i+"crit"+j+"r\" class=\"vote-orange\">Orange</li>"
+            +"<li id=\"alt"+i+"crit"+j+"y\" class=\"vote-yellow\">Yellow</li>"
+            +"<li id=\"alt"+i+"crit"+j+"y\" class=\"vote-greenyellow\">Green Yellow</li>"
+            +"<li id=\"alt"+i+"crit"+j+"g\" class=\"vote-green\">Green</li>"
+            +"</ul>"
+            +"</div>"
+            +"</td>";
+          }
+        }
+        else { //3
+          for(var j=0; j<criterion_names.length; j++) {
+            page+="<td>"
+            +"<div class=\"dropup\">"
+            +"<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu"+i+j+"\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+            +"<div id=\"alt"+i+"crit"+j+"_color\" class=\"color_pick\"></div>"
+            +"</button>"
+            +"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+i+j+"\">"
+            +"<li id=\"alt"+i+"crit"+j+"r\" class=\"vote-red\">Red</li>"
+            +"<li id=\"alt"+i+"crit"+j+"y\" class=\"vote-yellow\">Yellow</li>"
+            +"<li id=\"alt"+i+"crit"+j+"g\" class=\"vote-green\">Green</li>"
+            +"</ul>"
+            +"</div>"
+            +"</td>";
+          }
+        }
 								
 				page+="</tr>";
 
@@ -327,16 +345,22 @@ function main(body)
 					for(var j=0; j<criterion_names.length; j++) {
 
 
-						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 0, 0)") {
-							alt_votes[i].push("1");
+						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 0, 0)") { //RED
+							alt_votes[i].push("2");
 						}
-						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 255, 0)") {
-							alt_votes[i].push("3");
+            if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 165, 0)") { //ORANGE
+							alt_votes[i].push("4");
 						}
-						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(0, 128, 0)") {
-							alt_votes[i].push("5");
+						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 255, 0)") { //YELLOW
+							alt_votes[i].push("6");
 						}
-						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(128, 128, 128)") {
+            if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(173, 255, 47)") { //GREENYELLOW
+							alt_votes[i].push("8");
+						}
+						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(0, 128, 0)") { //GREEN
+							alt_votes[i].push("10");
+						}
+						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(128, 128, 128)") { //GREY
 							alt_missing = true;
 						}
 
@@ -404,17 +428,27 @@ function main(body)
 			});
 
 
-			$('.color1').click(function(event) {
+			$('.vote-red').click(function(event) {
 				var id = "#"+this.id.slice(0,-1)+"_color";
 				$(id).css('background-color','red');
 			});
 
-			$('.color2').click(function(event) {
+			$('.vote-orange').click(function(event) {
 				var id = "#"+this.id.slice(0,-1)+"_color";
-				$(id).css('background-color','yellow');
+				$(id).css('background-color','orange');
 			});	
 
-			$('.color3').click(function(event) {
+			$('.vote-yellow').click(function(event) {
+				var id = "#"+this.id.slice(0,-1)+"_color";
+				$(id).css('background-color','yellow');
+			});
+      
+      $('.vote-greenyellow').click(function(event) {
+				var id = "#"+this.id.slice(0,-1)+"_color";
+				$(id).css('background-color','greenyellow');
+			});
+      
+      $('.vote-green').click(function(event) {
 				var id = "#"+this.id.slice(0,-1)+"_color";
 				$(id).css('background-color','green');
 			});
