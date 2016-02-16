@@ -984,8 +984,105 @@ function buildHome() {
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
       var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-      $('<p>Put Awesome stuff here!</p>').appendTo(wrapper);
+	  var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper) 
+		
+	  var status_table = $([
+	  
+		'<table class="table table-bordered" id="s_table">',
+			'<thead class = "thead-inverse">',
+			'<tr>',
+			'<th>Name</th>',
+			'<th>Email</th>',
+			'<th>Ballot status</th>',
+			'<th>Email</th>',
+			'</tr>',
+			'</thead>',
+		'</table>'
+		].join('\n'));
+	
+	wrapper.append(status_table)
+	$('#s_table').hide()
+
+    getStatus(decisionID)
     }
+	
+	function getStatus(decisionID){
+		get_text("/decision/"+ decisionID + "/ballots", function (result) {
+			console.log(result)
+			var vote_status= ""
+			var totalBallots = 0
+			if(result.ballots != null){
+			$('#s_table').show()
+			//get the total ballot for current stage
+			totalBallots = result.ballots.length
+			getTotalBallots(decisionID,totalBallots)
+			
+			for(var i = 0; i < result.ballots.length; i++){
+				if(result.ballots[i].rating != null && result.ballots[i].rating.length > 0 && result.ballots[i].rating.length!= "undefined" ){
+					vote_status = "Voted"
+				}else{
+					vote_status = "Note Voted"
+				}
+				console.log(result.ballots[i].url)
+				var url = result.ballots[i].url
+				
+				$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');				
+	
+				
+			}
+			}else{
+				getTotalBallots(decisionID,totalBallots)
+			}
+		})
+	}
+	
+	function getTotalBallots(decisionID, ballots){
+		var dballots = 0
+		var vballots = 0
+		var cballots = 0
+		get_text("/decision/"+ decisionID + "/info", function (result) {
+			
+			console.log(result)
+			var decisionName = result.decision.name
+			if(result.decision.stage == 1){
+				dballots = ballots
+			}else if(result.decision.stage == 2){
+				vballots = ballots
+			}else{
+				cballots = ballots
+			}
+			
+			var stageBallots = $([
+			
+			'<ul class="list-group">',
+			'<li class="list-group-item active">',
+			'Total ballots: '+ decisionName ,
+			'</li>',
+			'<li class="list-group-item">',
+			'<span class="badge">'+dballots+ '</span>',
+			'In Development',
+			'</li>',
+			'<li class="list-group-item">',
+			'<span class="badge">'+vballots+'</span>',
+			'Voting in Progress',
+			'</li>',
+			'</li>',
+			'<li class="list-group-item">',
+			'<span class="badge">'+cballots+'</span>',
+			'Completed',
+			'</li>',
+			'</ul>'
+			
+			].join('\n'));
+			stageBallots.appendTo('#totalBallots')
+		})
+	}
+	
+	function resendEmail(url){
+		get_text(url + "/invite", function(result){
+			console.log(result)
+		})
+	}
 
   /**** Decision Invite ****/
     function buildDecisionInvite(decisionID){
