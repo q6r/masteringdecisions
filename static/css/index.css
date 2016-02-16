@@ -14,3 +14,11 @@ a:hover {cursor: pointer; cursor: hand;}
 .form-signin{
   max-width:500px;
 }
+
+.col-sm-3 ul ul{
+  margin-left:20px;
+}
+
+.jumbotron {
+  padding:10px !important; /*override default padding*/
+}

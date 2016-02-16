@@ -1,5 +1,5 @@
 function main(body) {
-	loggedIn(function() {
+  loggedIn(function() {
     $.loadCSS('static/css/index.css');
     
     buildTemplate();
@@ -11,42 +11,42 @@ function main(body) {
 // contains a list of decisions in progress or completed. for the
 // currently logged in user.
 function decisionListByCategory(cb) {
-	get_text("/whoami", function (person) {
-		get_text("/person/"+person['person_id']+"/decisions", function (decisions) {
-			var inprogress = [];
-			var completed  = [];
-			for(var i in decisions["decisions"]) {
-				d = decisions["decisions"][i];
-				if(d["stage"] < 3) {
-					inprogress.push(d);
-				} else {
-					completed.push(d);
-				}
-			}
-			cb(inprogress, completed);
-		});
-	});
+  get_text("/whoami", function (person) {
+    get_text("/person/"+person['person_id']+"/decisions", function (decisions) {
+      var inprogress = [];
+      var completed  = [];
+      for(var i in decisions["decisions"]) {
+        d = decisions["decisions"][i];
+        if(d["stage"] < 3) {
+          inprogress.push(d);
+        } else {
+          completed.push(d);
+        }
+      }
+      cb(inprogress, completed);
+    });
+  });
 }
 
 function updateLeftNav() {
-  	decisionListByCategory(function(inprogress, completed) {
+    decisionListByCategory(function(inprogress, completed) {
 
-		$("#userMenu3").html("");
-		$("#userMenu4").html("");
+    $("#userMenu3").html("");
+    $("#userMenu4").html("");
 
-		for(var i in inprogress) {
-			dname = inprogress[i]["name"];
-			did   = inprogress[i]["decision_id"];
-			$("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
-		}
+    for(var i in inprogress) {
+      dname = inprogress[i]["name"];
+      did   = inprogress[i]["decision_id"];
+      $("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+    }
 
-		for(var i in completed) {
-			dname = completed[i]["name"];
-			did   = completed[i]["decision_id"];
-			$("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
-		}
+    for(var i in completed) {
+      dname = completed[i]["name"];
+      did   = completed[i]["decision_id"];
+      $("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+    }
 
-	});
+  });
 }
 
 function buildTemplate() {
@@ -75,192 +75,182 @@ function buildTemplate() {
   );
 
 
-	//nav section
-	var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
-	var div_container = $('<div class="container-fluid">').appendTo(nav)
-	var div_nav_header = $('<div class="navbar-header">').appendTo(div_container)
-	
-	var button_nav = $([
-			'<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">',
-						'<span class="icon-bar"></span>',
-						'<span class="icon-bar"></span>',
-						'<span class="icon-bar"></span>',
-					'</button>'
-	].join('\n'));
-					
-	div_nav_header.append(button_nav)	
-	div_nav_header.append($('<a onclick="buildHome()"class = "navbar-brand"><img id="logo" src="../static/images/logo.png">'))
-	
-	var div_collapse = $('<div class="collapse navbar-collapse" id="myNavbar">')
-	
-	var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a onclick="buildHome()">Dashboard</a></li></ul>')
-	var nav_ul2 = $([
-	'<ul class="nav navbar-nav navbar-right">',
-		'<li class="dropdown">',
-			'<a class="dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
-				'<ul id="g-account-menu" class="dropdown-menu" role="menu">',
-					'<li><a onclick="buildEditUser()">Edit Profile</a></li>',
-				'</ul>',
-		'</li>',
-		'<li><a href="/logout.html"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
-	'</ul>'
-	].join("\n"));
-				
-				
-	div_collapse.append(nav_ul1)
-	div_collapse.append(nav_ul2)
-	div_container.append(div_collapse)
-	
-	//dashboard section
-	
-	var div_dashboard = $('<div class="container-fluid" style="margin-top:75px;">').appendTo('body')
-	
-	var div_row = $('<div class="row-fluid">')
-	
-	var nav_section = $([
-			
-			'<div class="col-sm-3" >',
-				'<a>',
-					'<strong><i class="glyphicon glyphicon-wrench"></i> Tools</strong>',
-				'</a>',
-				'<hr>',
-				'<ul class="nav nav-stacked">',
-				'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu" aria-expanded="false" class="collapsed">Decisions <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
-                    '<ul class="nav nav-stacked collapse" id="userMenu" aria-expanded="false" style="height: 0px;">',
-						
-                        '<li class="active"> <a onclick="buildCreateDecision()"><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
-						'<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
-							'<ul class="nav nav-stacked collapse" id="userMenu3" aria-expanded="false" style="height: 0px;">',
-							'</ul>',
-						'</li>',
-                       '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu4" aria-expanded="false" class="collapsed">Completed <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
-							'<ul class="nav nav-stacked collapse" id="userMenu4" aria-expanded="false" style="height: 0px;">',
-							'</ul>',
-						'</li>',
-                    '</ul>',
-                '</li>',
-				'<li class="nav-header"> <a  data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
-					
-                    '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
-                        '<li class="active"> <a ><i class="glyphicon glyphicon-home"></i> Home</a></li>',
-                        
-                        //'<li><a ><i class="glyphicon glyphicon-cog"></i> Options</a></li>',
-                        
-                        '<li><a onclick="buildAddUser()"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
-                        '<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
-                        
-                        '<li><a ><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
-						
-                    '</ul>',
-				'</li>',
-				'</ul>',
-				'<hr>',
-				
-			'</div>'
-		].join('\n'));
+  //nav section
+  var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
+  var div_container = $('<div class="container-fluid">').appendTo(nav)
+  var div_nav_header = $('<div class="navbar-header">').appendTo(div_container)
+  
+  var button_nav = $([
+      '<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">',
+            '<span class="icon-bar"></span>',
+            '<span class="icon-bar"></span>',
+            '<span class="icon-bar"></span>',
+          '</button>'
+  ].join('\n'));
+          
+  div_nav_header.append(button_nav) 
+  div_nav_header.append($('<a onclick="buildHome()"class = "navbar-brand"><img id="logo" src="../static/images/logo.png">'))
+  
+  var div_collapse = $('<div class="collapse navbar-collapse" id="myNavbar">')
+  
+  var nav_ul1 = $('<ul class="nav navbar-nav"><li> <a onclick="buildHome()">Dashboard</a></li></ul>')
+  var nav_ul2 = $([
+  '<ul class="nav navbar-nav navbar-right">',
+    '<li class="dropdown">',
+      '<a class="dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
+        '<ul id="g-account-menu" class="dropdown-menu" role="menu">',
+          '<li><a onclick="buildEditUser()">Edit Profile</a></li>',
+        '</ul>',
+    '</li>',
+    '<li><a href="/logout.html"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
+  '</ul>'
+  ].join("\n"));
+        
+        
+  div_collapse.append(nav_ul1)
+  div_collapse.append(nav_ul2)
+  div_container.append(div_collapse)
+  
+  //dashboard section
+  
+  var div_dashboard = $('<div class="container-fluid" style="margin-top:75px;">').appendTo('body')
+  
+  var div_row = $('<div class="row-fluid">')
+  
+  var nav_section = $([
+      '<div class="col-sm-3" >',
+          '<strong><i class="glyphicon glyphicon-wrench"></i> Tools</strong>',
+        '<hr>',
+        '<ul class="nav nav-stacked">',
+        '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu" aria-expanded="false" class="collapsed">Decisions <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+          '<ul class="nav nav-stacked collapse" id="userMenu" aria-expanded="false" style="height: 0px;">',
+            '<li class="active"> <a onclick="buildCreateDecision()"><i class="glyphicon glyphicon-asterisk"></i> New Decision</a></li>',
+            '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu3" aria-expanded="false" class="collapsed">In Progress <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+              '<ul class="nav nav-stacked collapse" id="userMenu3" aria-expanded="false" style="height: 0px;">',
+              '</ul>',
+            '</li>',
+            '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu4" aria-expanded="false" class="collapsed">Completed <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+              '<ul class="nav nav-stacked collapse" id="userMenu4" aria-expanded="false" style="height: 0px;">',
+              '</ul>',
+            '</li>',
+          '</ul>',
+        '</li>',
+        '<li class="nav-header"> <a  data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+          '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
+              '<li class="active"> <a onclick="buildHome()"><i class="glyphicon glyphicon-home"></i> Home</a></li>',              
+              '<li><a onclick="buildAddUser()"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
+              //'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
+              '<li><a href="/logout.html"><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
+          '</ul>',
+        '</li>',
+        '</ul>',
+        '<hr>',
+        
+      '</div>'
+    ].join('\n'));
 
-	// Update the navbar portion with decisions
+  // Update the navbar portion with decisions
   updateLeftNav();
-	
-	var display_section = $('<div class="col-sm-9" id="content">');
-	
-	div_row.append(nav_section);
-	div_row.append(display_section)
-	div_dashboard.append(div_row)
+  
+  var display_section = $('<div class="col-sm-9" id="content">');
+  
+  div_row.append(nav_section);
+  div_row.append(display_section)
+  div_dashboard.append(div_row)
 
-	updateUserText();
-	
-	$("a").attr("aria-expanded","true");
-	$("a").click(function(){
-		$(this).find('i#arrow_change').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
-	});
+  updateUserText();
+  
+  $("a").attr("aria-expanded","true");
+  $("a").click(function(){
+    $(this).find('i#arrow_change').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
+  });
 }
 
 function clearContent() {
-	$('#content').empty();
+  $('#content').empty();
 }
 
 function updateUserText() {
-	get_text("/whoami", function (result) {
-		get_text("/person/"+result['person_id']+"/info", function (result) {
-			$('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
-		});
-	});
+  get_text("/whoami", function (result) {
+    get_text("/person/"+result['person_id']+"/info", function (result) {
+      $('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
+    });
+  });
 }
 
 function buildHome() {
-	$('title').html('Decision Home');
-	
-	clearContent();
+  $('title').html('Decision Home');
+  
+  clearContent();
 
-	// The progress bar in here are meaning less ?
-	// remove them
-	var display_section = $([
-				'<div>',
-				'<strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong>',
-				'<hr>',
-				
-				'<div class="jumbotron">',
-					'<h1>Title</h1>',
-					'<p>Some description.........</p>',
-				'</div>',
-				'<hr>',
-				'<div class= "panel panel-default">',
-					'<div class="panel-heading">',
-						'<h4>Report</h4>',
-					'</div>',
-					'<div class="panel-body">',
-						'<small>Decisions completed</small>',
-						
-						'<div class="progress">',
+  // The progress bar in here are meaning less ?
+  // remove them
+  var display_section = $([
+        '<div>',
+        '<strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong>',
+        '<hr>',
+        
+        '<div class="jumbotron">',
+          '<h2>Welcome to the Decision Dashboard</h2>',
+          '<img src="http://blog.rameshganapathy.com/wp-content/uploads/2014/03/calvin-knowledge-is-paralyzing.gif" alt="Comic"/>',
+        '</div>',
+        '<hr>',
+        '<div class= "panel panel-default">',
+          '<div class="panel-heading">',
+            '<h4>Report</h4>',
+          '</div>',
+          '<div class="panel-body">',
+            '<small>Decisions completed</small>',
+            
+            '<div class="progress">',
                                 '<div id="completed_length" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100" style="width: 5%">',
                                 '</div>',
                         '</div>',
-						'<small>Decisions in progress</small>',
-						'<div class="progress">',
+            '<small>Decisions in progress</small>',
+            '<div class="progress">',
                                 '<div id="inprogress_length" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100" style="width: 5%">',
                                 '</div>',
                             '</div>',
-					'</div>',
-				'</div>',
-				
-				'<div class="list-group" id="inprogress_list">',
-				'</div>',
-				'<div class="list-group" id="completed_list">',
-				'</div>',
-				'</div>'
-	].join('\n'));
-	
-	display_section.appendTo('#content');
+          '</div>',
+        '</div>',
+        
+        '<div class="list-group" id="inprogress_list">',
+        '</div>',
+        '<div class="list-group" id="completed_list">',
+        '</div>',
+        '</div>'
+  ].join('\n'));
+  
+  display_section.appendTo('#content');
 
-	// Update the navbar portion with decisions
-	decisionListByCategory(function(inprogress, completed) {
+  // Update the navbar portion with decisions
+  decisionListByCategory(function(inprogress, completed) {
 
-		$("#inprogress_list").html("<a class=\"list-group-item active\">Decisions In Progress</a>");
-		$("#completed_list").html("<a class=\"list-group-item active\">Decisions Completed</a>");
+    $("#inprogress_list").html("<a class=\"list-group-item active\">Decisions In Progress</a>");
+    $("#completed_list").html("<a class=\"list-group-item active\">Decisions Completed</a>");
 
-		for(var i in inprogress) {
-			dname = inprogress[i]["name"];
-			did   = inprogress[i]["decision_id"];
-			$("#inprogress_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
-		}
+    for(var i in inprogress) {
+      dname = inprogress[i]["name"];
+      did   = inprogress[i]["decision_id"];
+      $("#inprogress_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+    }
 
-		for(var i in completed) {
-			dname = completed[i]["name"];
-			did   = completed[i]["decision_id"];
-			$("#completed_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
-		}
+    for(var i in completed) {
+      dname = completed[i]["name"];
+      did   = completed[i]["decision_id"];
+      $("#completed_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+    }
 
-		// Set progressbar lengths
-		totalLength = inprogress.length + completed.length;
-		inprogress_progress = ((inprogress.length / totalLength) * 100); 
-		completed_progress  = ((completed.length  / totalLength) * 100);
-		$("#inprogress_length").width(inprogress_progress + "%");
-		$("#completed_length").width(completed_progress + "%");
+    // Set progressbar lengths
+    totalLength = inprogress.length + completed.length;
+    inprogress_progress = ((inprogress.length / totalLength) * 100); 
+    completed_progress  = ((completed.length  / totalLength) * 100);
+    $("#inprogress_length").width(inprogress_progress + "%");
+    $("#completed_length").width(completed_progress + "%");
 
-	});
-	
-					
+  });
+  
+          
 }
 
 /**** Edit Profile ****/
@@ -326,42 +316,42 @@ function buildHome() {
   }
 
   function updateUser() {
-	$('#error').hide();
-	
-	if(document.getElementById('password').value != document.getElementById('password2').value) {
-		$('#error').html('<b>Error:</b> Passwords do not match!');
-		$('#error').show();
-	}
-	else {
-		if(document.getElementById('password').value == "") {
-			new_info = {
-				"email":document.getElementById('username').value,
-				"name_first":document.getElementById('firstname').value,
-				"name_last":document.getElementById('lastname').value
-				}
-		}
-		else {
-			new_info = {
-					"email":document.getElementById('username').value,
-					"pw_hash":document.getElementById('password').value,
-					"name_first":document.getElementById('firstname').value,
-					"name_last":document.getElementById('lastname').value
-					}
-		}
-		
-		get_text("/whoami", function (result) {
-			put_text("/person/"+result['person_id'], JSON.stringify(new_info), function (result) {
-				//alert(JSON.stringify(result));
-				document.getElementById('password').value = "";
-				document.getElementById('password2').value = "";
-				$('#success').html('<b>Update successful!</b>');
-				$('#success').show();
-				updateUserText();
-			});
-		});
-	}
-	
-	return false;
+  $('#error').hide();
+  
+  if(document.getElementById('password').value != document.getElementById('password2').value) {
+    $('#error').html('<b>Error:</b> Passwords do not match!');
+    $('#error').show();
+  }
+  else {
+    if(document.getElementById('password').value == "") {
+      new_info = {
+        "email":document.getElementById('username').value,
+        "name_first":document.getElementById('firstname').value,
+        "name_last":document.getElementById('lastname').value
+        }
+    }
+    else {
+      new_info = {
+          "email":document.getElementById('username').value,
+          "pw_hash":document.getElementById('password').value,
+          "name_first":document.getElementById('firstname').value,
+          "name_last":document.getElementById('lastname').value
+          }
+    }
+    
+    get_text("/whoami", function (result) {
+      put_text("/person/"+result['person_id'], JSON.stringify(new_info), function (result) {
+        //alert(JSON.stringify(result));
+        document.getElementById('password').value = "";
+        document.getElementById('password2').value = "";
+        $('#success').html('<b>Update successful!</b>');
+        $('#success').show();
+        updateUserText();
+      });
+    });
+  }
+  
+  return false;
   }
 
 /**** Add User ****/
@@ -399,7 +389,7 @@ function buildHome() {
 
   }
 
-  function addUserSubmitform(){		
+  function addUserSubmitform(){   
     $("#signup_successful").hide()
     $("#signup_error").hide()
 
@@ -1067,83 +1057,83 @@ function buildHome() {
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
       var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-	  var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper) 
-		
-	  var status_table = $([
-	  
-		'<table class="table table-bordered" id="s_table">',
-			'<thead class = "thead-inverse">',
-			'<tr>',
-			'<th>Name</th>',
-			'<th>Email</th>',
-			'<th>Ballot status</th>',
-			'<th>Email</th>',
-			'</tr>',
-			'</thead>',
-		'</table>'
-		].join('\n'));
-	
-	wrapper.append(status_table)
-	$('#s_table').hide()
+    var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper) 
+    
+    var status_table = $([
+    
+    '<table class="table table-bordered" id="s_table">',
+      '<thead class = "thead-inverse">',
+      '<tr>',
+      '<th>Name</th>',
+      '<th>Email</th>',
+      '<th>Ballot status</th>',
+      '<th>Email</th>',
+      '</tr>',
+      '</thead>',
+    '</table>'
+    ].join('\n'));
+  
+    wrapper.append(status_table)
+    $('#s_table').hide()
 
     getStatus(decisionID)
     }
-	
-	function getStatus(decisionID){
-		get_text("/decision/"+ decisionID + "/ballots", function (result) {
-			console.log(result)
-			var vote_status= ""
-			var totalBallots = 0
-			if(result.ballots != null){
-			$('#s_table').show()
-			//get the total ballot for current stage
-			totalBallots = result.ballots.length
-			getTotalBallots(decisionID,totalBallots)
-			
-			for(var i = 0; i < result.ballots.length; i++){
-				if(result.ballots[i].rating != null && result.ballots[i].rating.length > 0 && result.ballots[i].rating.length!= "undefined" ){
-					vote_status = "Voted"
-				}else{
-					vote_status = "Note Voted"
-				}
-				console.log(result.ballots[i].url)
-				var url = result.ballots[i].url
-				
-				$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');				
-	
-				
-			}
-			}else{
-				getTotalBallots(decisionID,totalBallots)
-			}
-		})
-	}
-	
-	function getTotalBallots(decisionID, ballots){
-		get_text("/decision/"+ decisionID + "/info", function (result) {
-                        var stageBallots = $([
-                                '<ul class="list-group" id="stage_ballot">',
-                                '<li class="list-group-item active">',
-                                'Total ballots: '+ ballots ,
-                                '</li>',
-                                '</ul>'].join("\n"));
-                        stageBallots.appendTo('#totalBallots');
-                        if(result.decision.stage == 1) {
-                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: In Development </li>');
-                        } else if(result.decision.stage == 2) {
-                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Voting in progress </li>');
-                        } else {
-                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Completed </li>');
-                        }
-        })
-		
-	}
-	
-	function resendEmail(url){
-		get_text(url + "/invite", function(result){
-			console.log(result)
-		})
-	}
+  
+    function getStatus(decisionID){
+      get_text("/decision/"+ decisionID + "/ballots", function (result) {
+        console.log(result)
+        var vote_status= ""
+        var totalBallots = 0
+        if(result.ballots != null){
+        $('#s_table').show()
+        //get the total ballot for current stage
+        totalBallots = result.ballots.length
+        getTotalBallots(decisionID,totalBallots)
+        
+        for(var i = 0; i < result.ballots.length; i++){
+          if(result.ballots[i].rating != null && result.ballots[i].rating.length > 0 && result.ballots[i].rating.length!= "undefined" ){
+            vote_status = "Voted"
+          }else{
+            vote_status = "Note Voted"
+          }
+          console.log(result.ballots[i].url)
+          var url = result.ballots[i].url
+          
+          $("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
+    
+          
+        }
+        }else{
+          getTotalBallots(decisionID,totalBallots)
+        }
+      })
+    }
+    
+    function getTotalBallots(decisionID, ballots){
+      get_text("/decision/"+ decisionID + "/info", function (result) {
+                          var stageBallots = $([
+                                  '<ul class="list-group" id="stage_ballot">',
+                                  '<li class="list-group-item active">',
+                                  'Total ballots: '+ ballots ,
+                                  '</li>',
+                                  '</ul>'].join("\n"));
+                          stageBallots.appendTo('#totalBallots');
+                          if(result.decision.stage == 1) {
+                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: In Development </li>');
+                          } else if(result.decision.stage == 2) {
+                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Voting in progress </li>');
+                          } else {
+                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Completed </li>');
+                          }
+          })
+      
+    }
+    
+    function resendEmail(url){
+      get_text(url + "/invite", function(result){
+        console.log(result)
+      })
+    }
 
   /**** Decision Invite ****/
     function buildDecisionInvite(decisionID){
@@ -1216,7 +1206,7 @@ function buildHome() {
         "email":document.getElementById("i_email").value 
         };
         post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
-          console.log(result);	
+          console.log(result);  
           buildDecisionInvite(id)
           $('#invitation_sent').html('Invitation sent Successfully!');
           $('#invitation_sent').show()
