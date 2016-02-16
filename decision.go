@@ -18,7 +18,7 @@ type Decision struct {
 	Stage                   int    `db:"stage" json:"stage" binding:"required"`
 	Criterion_Vote_Style    string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
 	Alternative_Vote_Style  string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
-	Client_Settings         string `db:"client_settings" json:"client_settings" binding:"required"`
+	Client_Settings         string `db:"client_settings" json:"client_settings"`
 	Display_Name            string `db:"display_name" json:"display_name"`
 	Criteria_Instruction    string `db:"criteria_instruction" json:"criteria_instruction"`
 	Alternative_Instruction string `db:"alternative_instruction" json:"alternative_instruction"`

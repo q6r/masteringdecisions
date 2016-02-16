@@ -346,19 +346,19 @@ function main(body)
 
 
 						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 0, 0)") { //RED
-							alt_votes[i].push("2");
+							alt_votes[i].push("1");
 						}
             if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 165, 0)") { //ORANGE
-							alt_votes[i].push("4");
+							alt_votes[i].push("2");
 						}
 						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(255, 255, 0)") { //YELLOW
-							alt_votes[i].push("6");
+							alt_votes[i].push("3");
 						}
             if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(173, 255, 47)") { //GREENYELLOW
-							alt_votes[i].push("8");
+							alt_votes[i].push("4");
 						}
 						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(0, 128, 0)") { //GREEN
-							alt_votes[i].push("10");
+							alt_votes[i].push("5");
 						}
 						if( $("#alt"+i+"crit"+j+"_color").css("background-color") == "rgb(128, 128, 128)") { //GREY
 							alt_missing = true;

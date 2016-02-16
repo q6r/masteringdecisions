@@ -487,7 +487,10 @@ function buildHome() {
           "stage":+1,
           "criterion_vote_style":"s", //sliders
           "alternative_vote_style":"3", //3-color
-          "client_settings":"c"
+          "client_settings":"",
+          "display_name":$("#name").val(),
+          "criteria_instruction":"",
+          "alternative_instruction":""
         }
         post_text("/decision", JSON.stringify(new_decision), function(result){
           updateLeftNav();
@@ -519,6 +522,7 @@ function buildHome() {
       $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
       $('#error').hide();
       $('<div>').addClass('clearfix').appendTo(form);
+      
       $('<div class="form-group">').append(
         $('<label for="name">Name</label>'),
         $('<input type="text" />').addClass('form-control')
@@ -529,6 +533,14 @@ function buildHome() {
       .appendTo(form);
       
       $('<div class="form-group">').append(
+        $('<label for="displayName">Display Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'displayName')
+        .attr('placeholder', 'Display Name')
+        .attr('id', 'displayName'))
+      .appendTo(form);
+      
+      $('<div class="form-group">').append(
         $('<label for="description">Description</label>'),
         $('<textarea>').addClass('form-control')
           .attr('rows','3')
@@ -536,6 +548,24 @@ function buildHome() {
           .attr('placeholder', 'Decision Description')
           .attr('id', 'description')
           .attr('required', '')) //Backend rejects code if this is null :(
+      .appendTo(form);
+      
+      $('<div class="form-group">').append(
+        $('<label for="critInstructions">Criteria Instructions</label>'),
+        $('<textarea>').addClass('form-control')
+          .attr('rows','3')
+          .attr('name', 'critInstructions')
+          .attr('placeholder', 'Criteria Instructions')
+          .attr('id', 'critInstructions'))
+      .appendTo(form);
+      
+      $('<div class="form-group">').append(
+        $('<label for="altInstructions">Alternative Instructions</label>'),
+        $('<textarea>').addClass('form-control')
+          .attr('rows','3')
+          .attr('name', 'altInstructions')
+          .attr('placeholder', 'Alternative Instructions')
+          .attr('id', 'altInstructions'))
       .appendTo(form);
       
       $('<div class="form-group">').append(
@@ -565,10 +595,13 @@ function buildHome() {
       
       get_text("/decision/"+decisionID+"/info", function (result) {
         $('#name').val(result['decision']['name']);
+        $('#displayName').val(result['decision']['display_name']);
         $('#description').val(result['decision']['description']);
         $('#stage').val(result['decision']['stage']);
         $('#critStyle').val(result['decision']['criterion_vote_style']);
         $('#altStyle').val(result['decision']['alternative_vote_style']);
+        $('#critInstructions').val(result['decision']['criteria_instruction']);
+        $('#altInstructions').val(result['decision']['alternative_instruction']);
       });
   }
 
@@ -610,7 +643,10 @@ function buildHome() {
           "stage":+$("#stage").val(),
           "criterion_vote_style":$("#critStyle").val(),
           "alternative_vote_style":$("#altStyle").val(),
-          "client_settings":"c"
+          "client_settings":"",
+          "display_name":$('#displayName').val(),
+          "criteria_instruction":$('#critInstructions').val(),
+          "alternative_instruction":$('#altInstructions').val()
         }
 
         put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){
@@ -661,12 +697,22 @@ function buildHome() {
     function showAddCriteria(decisionID) {
       $('#critForm').html("");
       $('<h3>Add New Criterion</h3>').appendTo('#critForm');
+      
+        $('<div class="form-group">').append(
+          $('<label for="critOrder">Order</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critOrder')
+          .attr('placeholder', 'Order')
+          .attr('id', 'critOrder'))
+        .appendTo('#critForm');
+        
         $('<div class="form-group">').append(
           $('<label for="critName">Name</label>'),
           $('<input type="text" />').addClass('form-control')
           .attr('name', 'critName')
           .attr('placeholder', 'Criterion Name')
-          .attr('id', 'critName'))
+          .attr('id', 'critName')
+          .attr('required', ''))
         .appendTo('#critForm');
         
         $('<div class="form-group">').append(
@@ -685,11 +731,20 @@ function buildHome() {
       $('#critForm').html("");
       $('<h3>Edit Criterion</h3>').appendTo('#critForm');
         $('<div class="form-group">').append(
+          $('<label for="critOrder">Order</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'critOrder')
+          .attr('placeholder', 'Order')
+          .attr('id', 'critOrder'))
+        .appendTo('#critForm');
+        
+        $('<div class="form-group">').append(
           $('<label for="critName">Name</label>'),
           $('<input type="text" />').addClass('form-control')
           .attr('name', 'critName')
           .attr('placeholder', 'Criterion Name')
-          .attr('id', 'critName'))
+          .attr('id', 'critName')
+          .attr('required', ''))
         .appendTo('#critForm');
         
         $('<div class="form-group">').append(
@@ -705,6 +760,7 @@ function buildHome() {
         $('<button>').addClass('btn btn-primary').attr('onclick', 'editCriteria('+decisionID+', ' + criterionID + ');').text('Update Criteria').attr('style','float: right').appendTo('#critForm');
         $('<div>').addClass('clearfix').appendTo('#critForm'); //added to fix display issue
         get_text("/decision/"+decisionID+"/criterion/"+criterionID+"/info", function (result) {
+          $('#critOrder').val(result['criterion']['order']);
           $('#critName').val(result['criterion']['name']);
           $('#critDesc').val(result['criterion']['description']);
         });
@@ -717,6 +773,7 @@ function buildHome() {
       var new_crit = {
         "name":$("#critName").val(),
         "description":$("#critDesc").val(),
+        "order":+$('#critOrder').val()
       }
 
       post_text("/decision/" + decisionID + '/criterion', JSON.stringify(new_crit), function(result){
@@ -734,6 +791,7 @@ function buildHome() {
       var crit = {
         "name":$("#critName").val(),
         "description":$("#critDesc").val(),
+        "order":+$('#critOrder').val()
       }
 
       put_text("/decision/" + decisionID + '/criterion/' + criterionID, JSON.stringify(crit), function(result){
@@ -771,14 +829,16 @@ function buildHome() {
       
       get_text("/decision/"+decisionID+"/criterions", function (results) {
           var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#critList');
-          table.append('<tr><th>Name</th><th>Description</th><th></th></tr>');
+          table.append('<tr><th></th><th>Name</th><th>Description</th><th></th></tr>');
           
           if(results["criterions"].length < 1) $('#critList').hide();
           else $('#critList').show();
           
           for(var i in results["criterions"]) {
             c = results["criterions"][i];
-            table.append('<tr><td>' + c['name'] + '</td><td>'
+            table.append('<tr><td>'
+              + c['order'] + '</td><td>'
+              + c['name'] + '</td><td>'
               + c['description'] + '</td><td>'
               + '<div style="width:45px; float:right;"><a onclick="showEditCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
               + '<a onclick="deleteCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
@@ -823,11 +883,20 @@ function buildHome() {
       $('<h3>Add New Alternative</h3>').appendTo('#altForm');
       
         $('<div class="form-group">').append(
+          $('<label for="altOrder">Order</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altOrder')
+          .attr('placeholder', 'Alternative Order')
+          .attr('id', 'altOrder'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
           $('<label for="altName">Name</label>'),
           $('<input type="text" />').addClass('form-control')
           .attr('name', 'altName')
           .attr('placeholder', 'Alternative Name')
-          .attr('id', 'altName'))
+          .attr('id', 'altName')
+          .attr('required', ''))
         .appendTo('#altForm');
         
         $('<div class="form-group">').append(
@@ -855,11 +924,20 @@ function buildHome() {
       $('<h3>Edit Alternative</h3>').appendTo('#altForm');
       
         $('<div class="form-group">').append(
+          $('<label for="altOrder">Order</label>'),
+          $('<input type="text" />').addClass('form-control')
+          .attr('name', 'altOrder')
+          .attr('placeholder', 'Alternative Order')
+          .attr('id', 'altOrder'))
+        .appendTo('#altForm');
+        
+        $('<div class="form-group">').append(
           $('<label for="altName">Name</label>'),
           $('<input type="text" />').addClass('form-control')
           .attr('name', 'altName')
           .attr('placeholder', 'Alternative Name')
-          .attr('id', 'altName'))
+          .attr('id', 'altName')
+          .attr('required', ''))
         .appendTo('#altForm');
         
         $('<div class="form-group">').append(
@@ -884,6 +962,7 @@ function buildHome() {
         $('<div>').addClass('clearfix').appendTo('#altForm'); //added to fix display issue
         
         get_text("/decision/"+decisionID+"/alternative/"+alternativeID+"/info", function (result) {
+          $('#altOrder').val(result['alternative']['order']);
           $('#altName').val(result['alternative']['name']);
           $('#altDesc').val(result['alternative']['description']);
           $('#altCost').val(result['alternative']['cost']);
@@ -897,7 +976,8 @@ function buildHome() {
       var new_alt = {
         "name":$("#altName").val(),
         "description":$("#altDesc").val(),
-        "cost":+$("#altCost").val()
+        "cost":+$("#altCost").val(),
+        "order":+$("#altOrder").val()
       }
 
       post_text("/decision/" + decisionID + '/alternative', JSON.stringify(new_alt), function(result){
@@ -915,7 +995,8 @@ function buildHome() {
       var alt = {
         "name":$("#altName").val(),
         "description":$("#altDesc").val(),
-        "cost":+$("#altCost").val()
+        "cost":+$("#altCost").val(),
+        "order":+$("#altOrder").val()
       }
 
       put_text("/decision/" + decisionID + '/alternative/' + alternativeID, JSON.stringify(alt), function(result){
@@ -953,14 +1034,16 @@ function buildHome() {
       
       get_text("/decision/"+decisionID+"/alternatives", function (results) {
           var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#altList');
-          table.append('<tr><th>Name</th><th>Description</th><th>Cost</th><th></th></tr>');
+          table.append('<tr><th></th><th>Name</th><th>Description</th><th>Cost</th><th></th></tr>');
           
           if(results["alternatives"].length < 1) $('#altList').hide();
           else $('#altList').show();
           
           for(var i in results["alternatives"]) {
             a = results["alternatives"][i];
-            table.append('<tr><td>' + a['name'] + '</td><td>'
+            table.append('<tr><td>'
+              + a['order'] + '</td><td>'
+              + a['name'] + '</td><td>'
               + a['description'] + '</td><td>'
               + a['cost'] + '</td><td>'
               + '<div style="width:45px; float:right;"><a onclick="showEditAlternative('+ decisionID + ',' + a['alternative_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
