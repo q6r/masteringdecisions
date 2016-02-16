@@ -11,14 +11,17 @@ import (
 
 // Decision represent a decision owned by Person_ID
 type Decision struct {
-	Decision_ID            int    `db:"decision_id" json:"decision_id"`
-	Person_ID              int    `db:"person_id" json:"person_id" binding:"required"`
-	Name                   string `db:"name" json:"name" binding:"required"`
-	Description            string `db:"description" json:"description" binding:"required"`
-	Stage                  int    `db:"stage" json:"stage" binding:"required"`
-	Criterion_Vote_Style   string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
-	Alternative_Vote_Style string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
-	Client_Settings        string `db:"client_settings" json:"client_settings" binding:"required"`
+	Decision_ID             int    `db:"decision_id" json:"decision_id"`
+	Person_ID               int    `db:"person_id" json:"person_id" binding:"required"`
+	Name                    string `db:"name" json:"name" binding:"required"`
+	Description             string `db:"description" json:"description" binding:"required"`
+	Stage                   int    `db:"stage" json:"stage" binding:"required"`
+	Criterion_Vote_Style    string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
+	Alternative_Vote_Style  string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
+	Client_Settings         string `db:"client_settings" json:"client_settings" binding:"required"`
+	Display_Name            string `db:"display_name" json:"display_name"`
+	Criteria_Instruction    string `db:"criteria_instruction" json:"criteria_instruction"`
+	Alternative_Instruction string `db:"alternative_instruction" json:"alternative_instruction"`
 }
 
 // HDecisionBallotsList returns a list of ballots beloning
@@ -179,14 +182,17 @@ func HDecisionUpdate(c *gin.Context) {
 	}
 
 	new_decision := Decision{
-		Decision_ID:            did,
-		Person_ID:              json.Person_ID,
-		Name:                   json.Name,
-		Description:            json.Description,
-		Stage:                  json.Stage,
-		Criterion_Vote_Style:   json.Criterion_Vote_Style,
-		Alternative_Vote_Style: json.Alternative_Vote_Style,
-		Client_Settings:        json.Client_Settings,
+		Decision_ID:             did,
+		Person_ID:               json.Person_ID,
+		Name:                    json.Name,
+		Description:             json.Description,
+		Stage:                   json.Stage,
+		Criterion_Vote_Style:    json.Criterion_Vote_Style,
+		Alternative_Vote_Style:  json.Alternative_Vote_Style,
+		Client_Settings:         json.Client_Settings,
+		Display_Name:            json.Display_Name,
+		Criteria_Instruction:    json.Criteria_Instruction,
+		Alternative_Instruction: json.Alternative_Instruction,
 	}
 	_, err = dbmap.Update(&new_decision)
 	if err != nil {
