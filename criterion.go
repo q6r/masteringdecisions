@@ -15,6 +15,7 @@ type Criterion struct {
 	Decision_ID  int    `db:"decision_id" json:"decision_id"` // inherited
 	Name         string `db:"name" json:"name" binding:"required"`
 	Description  string `db:"description" json:"description"`
+	Order        int    `db:"order" json:"order"`
 }
 
 // HCriterionInfo get the information of a specific
@@ -137,6 +138,7 @@ func HCriterionUpdate(c *gin.Context) {
 		Decision_ID:  did,
 		Name:         json.Name,
 		Description:  json.Description,
+		Order:        json.Order,
 	}
 	_, err = dbmap.Update(&new_criterion)
 	if err != nil {

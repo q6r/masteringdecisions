@@ -16,6 +16,7 @@ type Alternative struct {
 	Name           string  `db:"name" json:"name" binding:"required"`
 	Description    string  `db:"description" json:"description"`
 	Cost           float32 `db:"cost" json:"cost"`
+	Order          int     `db:"order" json:"order"`
 }
 
 // HAlternativeCreate create a ballot that belongs
@@ -98,6 +99,7 @@ func HAlternativeUpdate(c *gin.Context) {
 		Name:           json.Name,
 		Description:    json.Description,
 		Cost:           json.Cost,
+		Order:          json.Order,
 	}
 	_, err = dbmap.Update(&new_alternative)
 	if err != nil {
