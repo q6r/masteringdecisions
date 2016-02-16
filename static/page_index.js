@@ -37,13 +37,13 @@ function updateLeftNav() {
     for(var i in inprogress) {
       dname = inprogress[i]["name"];
       did   = inprogress[i]["decision_id"];
-      $("#userMenu3").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+      $("#userMenu3").append("<li><a onclick=\"buildDecisionHome("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
     }
 
     for(var i in completed) {
       dname = completed[i]["name"];
       did   = completed[i]["decision_id"];
-      $("#userMenu4").append("<li><a onclick=\"buildEditDecision("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
+      $("#userMenu4").append("<li><a onclick=\"buildDecisionHome("+did+")\"><i class=\"glyphicon glyphicon-list-alt\"></i> "+dname+" </a></li>");
     }
 
   });
@@ -232,13 +232,13 @@ function buildHome() {
     for(var i in inprogress) {
       dname = inprogress[i]["name"];
       did   = inprogress[i]["decision_id"];
-      $("#inprogress_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+      $("#inprogress_list").append("<a  onclick=\"buildDecisionHome("+did+")\" class=\"list-group-item\">" + dname + "</a>");
     }
 
     for(var i in completed) {
       dname = completed[i]["name"];
       did   = completed[i]["decision_id"];
-      $("#completed_list").append("<a  onclick=\"buildEditDecision("+did+")\" class=\"list-group-item\">" + dname + "</a>");
+      $("#completed_list").append("<a  onclick=\"buildDecisionHome("+did+")\" class=\"list-group-item\">" + dname + "</a>");
     }
 
     // Set progressbar lengths
@@ -492,19 +492,52 @@ function buildHome() {
   }
 
 /**** Edit Decision ****/
-  function buildEditDecision(decisionID) {
+  function buildDecisionHome(decisionID) {
     $('title').html('Edit Decision');
     clearContent();
     
     $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
     
     var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-    $('<li class="active"><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+    $('<li class="active"><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+    $('<li><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
     $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
     $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
     $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
     $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
     
+    buildEditDecision(decisionID);
+    //hide the ones we don't want to show
+    $('#displayNameDiv').hide();
+    $('#critStyleDiv').hide();
+    $('#altStyleDiv').hide();
+    $('#critInstructionsDiv').hide();
+    $('#altInstructionsDiv').hide();
+  }
+  
+  function buildCustomizeDecision(decisionID) {
+    $('title').html('Edit Decision');
+    clearContent();
+    
+    $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+    
+    var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+    $('<li><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+    $('<li class="active"><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
+    $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
+    $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
+    $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
+    $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
+    
+    buildEditDecision(decisionID);
+    //hide the ones we don't want to show
+    $('#nameDiv').hide();
+    $('#descriptionDiv').hide();
+    $('#stageDiv').hide();
+    $('#deleteDecisionBtn').hide();
+  }
+
+  function buildEditDecision(decisionID) {
     var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
     var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo(wrapper);
       $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
@@ -513,7 +546,7 @@ function buildHome() {
       $('#error').hide();
       $('<div>').addClass('clearfix').appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="nameDiv" class="form-group">').append(
         $('<label for="name">Name</label>'),
         $('<input type="text" />').addClass('form-control')
         .attr('name', 'name')
@@ -522,7 +555,7 @@ function buildHome() {
         .attr('required', ''))
       .appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="displayNameDiv" class="form-group">').append(
         $('<label for="displayName">Display Name</label>'),
         $('<input type="text" />').addClass('form-control')
         .attr('name', 'displayName')
@@ -530,7 +563,7 @@ function buildHome() {
         .attr('id', 'displayName'))
       .appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="descriptionDiv" class="form-group">').append(
         $('<label for="description">Description</label>'),
         $('<textarea>').addClass('form-control')
           .attr('rows','3')
@@ -540,7 +573,7 @@ function buildHome() {
           .attr('required', '')) //Backend rejects code if this is null :(
       .appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="critInstructionsDiv" class="form-group">').append(
         $('<label for="critInstructions">Criteria Instructions</label>'),
         $('<textarea>').addClass('form-control')
           .attr('rows','3')
@@ -549,7 +582,7 @@ function buildHome() {
           .attr('id', 'critInstructions'))
       .appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="altInstructionsDiv" class="form-group">').append(
         $('<label for="altInstructions">Alternative Instructions</label>'),
         $('<textarea>').addClass('form-control')
           .attr('rows','3')
@@ -558,30 +591,30 @@ function buildHome() {
           .attr('id', 'altInstructions'))
       .appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="critStyleDiv" class="form-group">').append(
         '<label for="critStyle">Criteria Style</label>' +
           '<select id="critStyle" class="form-control">' +
             '<option value="s">Sliders</option>' +
             '<option value="b">Buttons</option>' +
           '</select>').appendTo(form);
           
-      $('<div class="form-group">').append(
+      $('<div id="altStyleDiv" class="form-group">').append(
         '<label for="altStyle">Alternative Style</label>' +
           '<select id="altStyle" class="form-control">' +
             '<option value="3">3 Color</option>' +
             '<option value="5">5 Color</option>' +
           '</select>').appendTo(form);
       
-      $('<div class="form-group">').append(
+      $('<div id="stageDiv" class="form-group">').append(
         '<label for="stage">Current Stage</label>' +
           '<select id="stage" class="form-control">' +
             '<option value="1">In Development</option>' +
             '<option value="2">Voting in Progress</option>' +
             '<option value="3">Completed</option>' +
           '</select>').appendTo(form);
-
+      
       $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
-      $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
+      $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('id', 'deleteDecisionBtn').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
       
       get_text("/decision/"+decisionID+"/info", function (result) {
         $('#name').val(result['decision']['name']);
@@ -660,7 +693,8 @@ function buildHome() {
       $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
       
       var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
       $('<li class="active"><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
       $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
@@ -844,7 +878,8 @@ function buildHome() {
       $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
       
       var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
       $('<li class="active"><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
       $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
@@ -1050,7 +1085,8 @@ function buildHome() {
       $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
       
       var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
       $('<li class="active"><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
@@ -1144,7 +1180,8 @@ function buildHome() {
       $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
       
       var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-      $('<li><a onclick="buildEditDecision('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildDecisionHome('+decisionID+')">Decision</a></li>').appendTo(ul);
+      $('<li><a onclick="buildCustomizeDecision('+decisionID+')">Customize</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditCriteria('+decisionID+')">Criteria</a></li>').appendTo(ul);
       $('<li><a onclick="buildEditAlternative('+decisionID+')">Alternatives</a></li>').appendTo(ul);
       $('<li><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
