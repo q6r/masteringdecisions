@@ -1037,45 +1037,23 @@ function buildHome() {
 	}
 	
 	function getTotalBallots(decisionID, ballots){
-		var dballots = 0
-		var vballots = 0
-		var cballots = 0
 		get_text("/decision/"+ decisionID + "/info", function (result) {
-			
-			console.log(result)
-			var decisionName = result.decision.name
-			if(result.decision.stage == 1){
-				dballots = ballots
-			}else if(result.decision.stage == 2){
-				vballots = ballots
-			}else{
-				cballots = ballots
-			}
-			
-			var stageBallots = $([
-			
-			'<ul class="list-group">',
-			'<li class="list-group-item active">',
-			'Total ballots: '+ decisionName ,
-			'</li>',
-			'<li class="list-group-item">',
-			'<span class="badge">'+dballots+ '</span>',
-			'In Development',
-			'</li>',
-			'<li class="list-group-item">',
-			'<span class="badge">'+vballots+'</span>',
-			'Voting in Progress',
-			'</li>',
-			'</li>',
-			'<li class="list-group-item">',
-			'<span class="badge">'+cballots+'</span>',
-			'Completed',
-			'</li>',
-			'</ul>'
-			
-			].join('\n'));
-			stageBallots.appendTo('#totalBallots')
-		})
+                        var stageBallots = $([
+                                '<ul class="list-group" id="stage_ballot">',
+                                '<li class="list-group-item active">',
+                                'Total ballots: '+ ballots ,
+                                '</li>',
+                                '</ul>'].join("\n"));
+                        stageBallots.appendTo('#totalBallots');
+                        if(result.decision.stage == 1) {
+                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: In Development </li>');
+                        } else if(result.decision.stage == 2) {
+                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Voting in progress </li>');
+                        } else {
+                                $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Completed </li>');
+                        }
+        })
+		
 	}
 	
 	function resendEmail(url){
