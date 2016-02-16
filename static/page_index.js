@@ -546,7 +546,7 @@ function buildHome() {
           '</select>').appendTo(form);
           
       $('<div class="form-group">').append(
-        '<label for="altStyle">Criteria Style</label>' +
+        '<label for="altStyle">Alternative Style</label>' +
           '<select id="altStyle" class="form-control">' +
             '<option value="3">3 Color</option>' +
             '<option value="5">5 Color</option>' +
