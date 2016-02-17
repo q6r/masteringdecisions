@@ -22,7 +22,7 @@ type Decision struct {
 	Display_Name            string `db:"display_name" json:"display_name"`
 	Criteria_Instruction    string `db:"criteria_instruction" json:"criteria_instruction"`
 	Alternative_Instruction string `db:"alternative_instruction" json:"alternative_instruction"`
-	Image_Path              string `db:"image_path" json:"image_path"`
+	Image                   string `db:"image" json:"image"`
 }
 
 // HDecisionBallotsList returns a list of ballots beloning
@@ -227,16 +227,6 @@ func HDecisionCreate(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
-
-	/*
-		// Create the image file if requested
-		file, header, err := c.Request.FormFile("image")
-		filename := header.Filename
-		out, err := os.Create("static/"+decision.Name+decision.Person_ID+".png")
-		if err != nil {
-
-		}
-	*/
 
 	result := gin.H{"decision": decision}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.Decision_ID))
