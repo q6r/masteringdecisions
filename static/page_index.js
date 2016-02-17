@@ -681,10 +681,6 @@ function buildHome() {
     }
   }
 
-  /*
-    TO DO: Disable editing while Voting is in progress
-  */
-
   /**** Decision Criteria ****/
     function buildEditCriteria(decisionID) {
       $('title').html('Edit Decision');
@@ -720,35 +716,37 @@ function buildHome() {
     
     function showAddCriteria(decisionID) {
       $('#critForm').html("");
-      $('<h3>Add New Criterion</h3>').appendTo('#critForm');
-      
-        $('<div class="form-group">').append(
-          $('<label for="critOrder">Order</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'critOrder')
-          .attr('placeholder', 'Order')
-          .attr('id', 'critOrder'))
-        .appendTo('#critForm');
+      ifDecisionInDevelopment(decisionID, function() {
+        $('<h3>Add New Criterion</h3>').appendTo('#critForm');
         
-        $('<div class="form-group">').append(
-          $('<label for="critName">Name</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'critName')
-          .attr('placeholder', 'Criterion Name')
-          .attr('id', 'critName')
-          .attr('required', ''))
-        .appendTo('#critForm');
-        
-        $('<div class="form-group">').append(
-          $('<label for="critDesc">Description</label>'),
-          $('<textarea>').addClass('form-control')
-            .attr('rows','3')
-            .attr('name', 'critDesc')
-            .attr('placeholder', 'Criterion Description')
-            .attr('id', 'critDesc'))
-        .appendTo('#critForm');
-        
-        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo('#critForm');
+          $('<div class="form-group">').append(
+            $('<label for="critOrder">Order</label>'),
+            $('<input type="text" />').addClass('form-control')
+            .attr('name', 'critOrder')
+            .attr('placeholder', 'Order')
+            .attr('id', 'critOrder'))
+          .appendTo('#critForm');
+          
+          $('<div class="form-group">').append(
+            $('<label for="critName">Name</label>'),
+            $('<input type="text" />').addClass('form-control')
+            .attr('name', 'critName')
+            .attr('placeholder', 'Criterion Name')
+            .attr('id', 'critName')
+            .attr('required', ''))
+          .appendTo('#critForm');
+          
+          $('<div class="form-group">').append(
+            $('<label for="critDesc">Description</label>'),
+            $('<textarea>').addClass('form-control')
+              .attr('rows','3')
+              .attr('name', 'critDesc')
+              .attr('placeholder', 'Criterion Description')
+              .attr('id', 'critDesc'))
+              .appendTo('#critForm');
+
+          $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo('#critForm');
+      });
     }
     
     function showEditCriteria(decisionID, criterionID) {
@@ -867,6 +865,10 @@ function buildHome() {
               + '<div style="width:45px; float:right;"><a onclick="showEditCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
               + '<a onclick="deleteCriteria('+ decisionID + ',' + c['criterion_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
           }
+          
+          //Hide dangerous icons if not in development
+          $('.glyphicon.text-Danger').hide();
+          ifDecisionInDevelopment(decisionID, function() {$('.glyphicon.text-Danger').show();});
         });
     }
 
@@ -905,43 +907,45 @@ function buildHome() {
     
     function showAddAlternative(decisionID) {
       $('#altForm').html("");
-      $('<h3>Add New Alternative</h3>').appendTo('#altForm');
-      
-        $('<div class="form-group">').append(
-          $('<label for="altOrder">Order</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'altOrder')
-          .attr('placeholder', 'Alternative Order')
-          .attr('id', 'altOrder'))
-        .appendTo('#altForm');
+      ifDecisionInDevelopment(decisionID, function() {
+        $('<h3>Add New Alternative</h3>').appendTo('#altForm');
         
-        $('<div class="form-group">').append(
-          $('<label for="altName">Name</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'altName')
-          .attr('placeholder', 'Alternative Name')
-          .attr('id', 'altName')
-          .attr('required', ''))
-        .appendTo('#altForm');
-        
-        $('<div class="form-group">').append(
-          $('<label for="altDesc">Description</label>'),
-          $('<textarea>').addClass('form-control')
-            .attr('rows','3')
-            .attr('name', 'altDesc')
-            .attr('placeholder', 'Alternative Description')
-            .attr('id', 'altDesc'))
-        .appendTo('#altForm');
-        
-        $('<div class="form-group">').append(
-          $('<label for="altCost">Cost</label>'),
-          $('<input type="text" />').addClass('form-control')
-          .attr('name', 'altCost')
-          .attr('placeholder', 'Alternative Cost')
-          .attr('id', 'altCost'))
-        .appendTo('#altForm');
-        
-        $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addAlternative('+decisionID+');').text('Add Alternative').appendTo('#altForm');
+          $('<div class="form-group">').append(
+            $('<label for="altOrder">Order</label>'),
+            $('<input type="text" />').addClass('form-control')
+            .attr('name', 'altOrder')
+            .attr('placeholder', 'Alternative Order')
+            .attr('id', 'altOrder'))
+          .appendTo('#altForm');
+          
+          $('<div class="form-group">').append(
+            $('<label for="altName">Name</label>'),
+            $('<input type="text" />').addClass('form-control')
+            .attr('name', 'altName')
+            .attr('placeholder', 'Alternative Name')
+            .attr('id', 'altName')
+            .attr('required', ''))
+          .appendTo('#altForm');
+          
+          $('<div class="form-group">').append(
+            $('<label for="altDesc">Description</label>'),
+            $('<textarea>').addClass('form-control')
+              .attr('rows','3')
+              .attr('name', 'altDesc')
+              .attr('placeholder', 'Alternative Description')
+              .attr('id', 'altDesc'))
+          .appendTo('#altForm');
+          
+          $('<div class="form-group">').append(
+            $('<label for="altCost">Cost</label>'),
+            $('<input type="text" />').addClass('form-control')
+            .attr('name', 'altCost')
+            .attr('placeholder', 'Alternative Cost')
+            .attr('id', 'altCost'))
+          .appendTo('#altForm');
+          
+          $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addAlternative('+decisionID+');').text('Add Alternative').appendTo('#altForm');
+      });
     }
     
     function showEditAlternative(decisionID, alternativeID) {
@@ -1074,6 +1078,10 @@ function buildHome() {
               + '<div style="width:45px; float:right;"><a onclick="showEditAlternative('+ decisionID + ',' + a['alternative_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
               + '<a onclick="deleteAlternative('+ decisionID + ',' + a['alternative_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
           }
+          
+          //Hide dangerous icons if not in development
+          $('.glyphicon.text-Danger').hide();
+          ifDecisionInDevelopment(decisionID, function() {$('.glyphicon.text-Danger').show();});
         });
     }
 
@@ -1250,4 +1258,10 @@ function buildHome() {
         })
       }
     }
-  
+    
+    //Runs cb if true
+    function ifDecisionInDevelopment(decisionID, cb) {
+      get_text("/decision/"+decisionID+"/info", function (result) {
+        if(+result['decision']['stage']==1) cb();
+      });
+    }
