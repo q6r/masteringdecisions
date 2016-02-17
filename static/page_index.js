@@ -484,7 +484,7 @@ function buildHome() {
         }
         post_text("/decision", JSON.stringify(new_decision), function(result){
           updateLeftNav();
-          buildEditDecision(result['decision']['decision_id']);
+          buildDecisionHome(result['decision']['decision_id']);
         });
       });
     }
