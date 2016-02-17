@@ -364,8 +364,6 @@ func HBallotAllInfo(c *gin.Context) {
 // Save inserts a ballot into the database
 func (b *Ballot) Save() error {
 
-	b.SetupSecret()
-
 	// Check if decision exists or not
 	var d Decision
 	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", b.Decision_ID)
@@ -376,13 +374,18 @@ func (b *Ballot) Save() error {
 	if err = dbmap.Insert(b); err != nil {
 		return fmt.Errorf("Unable to insert ballot %#v to database", b)
 	}
-	return nil
-}
 
-// SetupSecret sets up the secret for a ballot
-// it's unique :<
-func (b *Ballot) SetupSecret() {
-	b.Secret = HashPassword(fmt.Sprintf("b_%d_d_%d",
-		b.Ballot_ID,
-		b.Decision_ID))
+	// Now recreate the hash correctly for
+	// the current ballot after knowing
+	// the id
+	if err := dbmap.SelectOne(b, "select * from ballot where ballot_id=(select max(ballot_id) from ballot) and email=$1", b.Email); err != nil {
+		return fmt.Errorf("Unable to set secret on ballot %#v to database", err)
+	}
+
+	b.Secret = HashPassword(fmt.Sprintf("b_%d_d_%d", b.Ballot_ID, b.Decision_ID))
+	if _, err = dbmap.Update(b); err != nil {
+		return fmt.Errorf("Unable to update ballot %#v to database", b)
+	}
+
+	return nil
 }
