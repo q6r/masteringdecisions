@@ -30,12 +30,11 @@ function main(body)
 		var voter_name;
 		var page;
 		var crit_vote_style;
+		var crit_instructions;
+		var alt_instructions;		
+
 
 		var decision = get_decision(decision_id);
-
-		//Check for undefined ids here.
-
-		//gather information
 
 		if(decision == null || decision["error"] != null || decision["error"] != undefined) {
 			alert("Unable to get decision information");
@@ -68,8 +67,11 @@ function main(body)
 		decision_desc = decision.description;
 		decision_stage = decision.stage;
 		crit_vote_style = decision.criterion_vote_style;
-    alt_vote_style = decision.alternative_vote_style;
+    		alt_vote_style = decision.alternative_vote_style;
 		voter_name = ballot.name;
+		crit_instructions = decision.criteria_instruction;
+		alt_instructions = decision.alternative_instruction;
+		
 
 		for(var i=0; i<criterion.length; i++) {
 			criterion_names[i] = criterion[i].name;
@@ -109,10 +111,7 @@ function main(body)
 			+"<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">"
 			+"<h3>Welcome, "+voter_name+"! </h3>"
 			+"<p class=\"lead\">"+decision_desc+"</p>"
-			+"<p>How important are each of this decision's criterion to you?</p>"
-			+"<p>Please rate each one between 1 (not at all important) and 10 (vital)</p>"
-			+"<p>Keep in mind you can use the same rating as many times as you like.</p>"
-			+"<p>Click on a criterion name to view its description</p>"
+			+"<div id='crit_inst'>"+crit_instructions+"</div>"
 			+"</div>"
 			+"</div>"
 			+"<form class=\"form-horizontal\" role=\"form\">";
@@ -163,11 +162,8 @@ function main(body)
 			page+="</form>"
 			+"</div>"
 			+"<div class=\"container\" id=\"alternative_table\">"
+			+"<div id='alt_inst'>"+alt_instructions+"</div>"
 			+"<div class=\"row\">"
-			+"<p>For each alternative below, rate how you feel each criterion will impact it.</p>"
-			+"<p>Red represents least beneficial, yellow represents neutral, and green represents most beneficial</p>"
-			+"<p>Feel free to use the same color as many times (or as few times) as you like!</p>"
-			+"<p>Click on an alternative name to view its description</p>"
 			+"<table class=\"table\">"
 			+"<thead>"
 			+"<tr>"
@@ -238,6 +234,7 @@ function main(body)
 						
 			page+="</tbody>"
 			+"</table>"
+			+"</div>"
 			+"</div>"
 			+"</div>"
 			+"<div id=\"ballotbottom\" class=\"container\">"

@@ -16,6 +16,21 @@
 
 		}
 
+		#alt_inst {
+			max-width:500px;
+			text-align:center;
+			margin:auto;
+
+		}
+		
+		#crit_inst {
+			max-width:500px;
+			text-align:center;
+			margin:auto;
+
+		}	
+
+
 		#bottomRow {
 			text-align:center;
 		}
@@ -103,3 +118,4 @@
 			text-align:center;
 			cursor:pointer;
 		}
+	
