@@ -363,7 +363,7 @@ function buildHome() {
     //build the sign up form
     var signupForm = $('<form id="myform" onsubmit="return false"></form>')
     $('<div id= "signup_successful" class = "alert alert-success"></div>').appendTo("#content")
-    $('<div id="signup_error" class="alert alert-danger" style="display: none;"></div>').appendTo("#content")
+    $('<div id="signup_error" class="alert alert-danger"></div>').appendTo("#content")
     
     var email = $('<label> Email<input type="text" name ="email" id="emailInput" required="required" placeholder ="Email" class="form-control"/> </label></br>')
           .appendTo('body');
@@ -418,10 +418,15 @@ function buildHome() {
       };
       
       post_text("/person", JSON.stringify(new_signup), function(person){
-        console.log("success")
-        buildAddUser()
-        $("#signup_successful").html("Sign up successful!")
-        $("#signup_successful").show()
+        if(person['error']) {
+          $('#signup_error').html('<b>Error:</b> ' + person['error']);
+          $('#signup_error').show()
+        }
+        if(person['person']) {
+          buildAddUser();
+          $("#signup_successful").html("Sign up successful!")
+          $("#signup_successful").show()
+        }
       })
     }
   }
