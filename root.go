@@ -56,3 +56,13 @@ func HRootDecision(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{})
 	}
 }
+
+// HRootResults is the main decision page
+func HRootResults(c *gin.Context) {
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
+			gin.H{"scriptname": "page_results.js", "body": gin.H{}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{})
+	}
+}

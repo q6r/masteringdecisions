@@ -62,6 +62,7 @@ func main() {
 	routes.GET("/logout.html", HRootLogout)
 	routes.GET("/ballot.html", HRootBallot)
 	routes.GET("/decision/:decision_id", HRootDecision)
+	routes.GET("/results.html", HRootResults)
 
 	// Person
 	////////////////
