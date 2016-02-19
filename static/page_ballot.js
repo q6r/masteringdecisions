@@ -560,7 +560,7 @@ function get_decision(decision_id) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision_id+"/info",
+		url: base_url+"/decision/"+decision_id+"/info",
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
@@ -579,7 +579,7 @@ function get_ballot(decision_id, ballot_id) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision_id+"/ballot/"+ballot_id+"/info",
+		url: base_url+"/decision/"+decision_id+"/ballot/"+ballot_id+"/info",
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
@@ -598,7 +598,7 @@ function get_criterion(decision) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision["decision_id"]+"/criterions",
+		url: base_url+"/decision/"+decision["decision_id"]+"/criterions",
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
@@ -617,7 +617,7 @@ function get_alternatives(decision) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision["decision_id"]+"/alternatives",
+		url: base_url+"/decision/"+decision["decision_id"]+"/alternatives",
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
@@ -636,7 +636,7 @@ function vote_criterion(decision_id, ballot_id, criterion_id, vote) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision_id+"/ballot/"+ballot_id+"/criterion/"+criterion_id+"/vote/"+vote,
+		url: base_url+"/decision/"+decision_id+"/ballot/"+ballot_id+"/criterion/"+criterion_id+"/vote/"+vote,
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
@@ -655,7 +655,7 @@ function rate_alternative(decision_id, ballot_id, alt_id, crit_id, vote) {
 	var result = null;
 	$.ajax({
 		type: "GET",
-		url: "http://localhost:9999/decision/"+decision_id+"/ballot/"+ballot_id+"/alternative/"+alt_id+"/criterion/"+crit_id+"/vote/"+vote,
+		url: base_url+"/decision/"+decision_id+"/ballot/"+ballot_id+"/alternative/"+alt_id+"/criterion/"+crit_id+"/vote/"+vote,
 		contentType: 'application/json; charset=utf-8',
 		async: false,
 		success: function (r) {
