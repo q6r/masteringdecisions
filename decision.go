@@ -11,18 +11,18 @@ import (
 
 // Decision represent a decision owned by Person_ID
 type Decision struct {
-	Decision_ID             int    `db:"decision_id" json:"decision_id"`
-	Person_ID               int    `db:"person_id" json:"person_id" binding:"required"`
-	Name                    string `db:"name" json:"name" binding:"required"`
-	Description             string `db:"description" json:"description" binding:"required"`
-	Stage                   int    `db:"stage" json:"stage" binding:"required"`
-	Criterion_Vote_Style    string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
-	Alternative_Vote_Style  string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
-	Client_Settings         string `db:"client_settings" json:"client_settings"`
-	Display_Name            string `db:"display_name" json:"display_name"`
-	Criteria_Instruction    string `db:"criteria_instruction" json:"criteria_instruction"`
-	Alternative_Instruction string `db:"alternative_instruction" json:"alternative_instruction"`
-	Image                   string `db:"image" json:"image"`
+	DecisionID             int    `db:"decision_id" json:"decision_id"`
+	PersonID               int    `db:"person_id" json:"person_id" binding:"required"`
+	Name                   string `db:"name" json:"name" binding:"required"`
+	Description            string `db:"description" json:"description" binding:"required"`
+	Stage                  int    `db:"stage" json:"stage" binding:"required"`
+	CriterionVoteStyle     string `db:"criterion_vote_style" json:"criterion_vote_style" binding:"required"`
+	AlternativeVoteStyle   string `db:"alternative_vote_style" json:"alternative_vote_style" binding:"required"`
+	ClientSettings         string `db:"client_settings" json:"client_settings"`
+	DisplayName            string `db:"display_name" json:"display_name"`
+	CriteriaInstruction    string `db:"criteria_instruction" json:"criteria_instruction"`
+	AlternativeInstruction string `db:"alternative_instruction" json:"alternative_instruction"`
+	Image                  string `db:"image" json:"image"`
 }
 
 // HDecisionBallotsList returns a list of ballots beloning
@@ -43,19 +43,19 @@ func HDecisionBallotsList(c *gin.Context) {
 		var ai BallotAllInfo
 		ai.Name = b.Name
 		ai.Email = b.Email
-		ai.URL_Decision = fmt.Sprintf("/decision/%s/ballot/%d", did, b.Ballot_ID)
+		ai.URLDecision = fmt.Sprintf("/decision/%s/ballot/%d", did, b.BallotID)
 		// Get the votes for this ballot
-		_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", b.Ballot_ID)
+		_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", b.BallotID)
 		if err != nil {
 			c.JSON(http.StatusForbidden,
-				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.BallotID)})
 			return
 		}
 		// Get the ratings for this ballot
-		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM rating where ballot_id=$1", b.Ballot_ID)
+		_, err = dbmap.Select(&ai.Ratings, "SELECT * FROM rating where ballot_id=$1", b.BallotID)
 		if err != nil {
 			c.JSON(http.StatusForbidden,
-				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.Ballot_ID)})
+				gin.H{"error": fmt.Sprintf("Unable to find votes for ballot %v", b.BallotID)})
 			return
 		}
 		ais = append(ais, ai)
@@ -122,12 +122,12 @@ func HDecisionsList(c *gin.Context) {
 
 	type Link struct {
 		Name string `json:"name"`
-		Url  string `json:"url"`
+		URL  string `json:"url"`
 	}
 
 	var links []Link
 	for _, d := range decisions {
-		l := Link{Name: d.Name, Url: fmt.Sprintf("/decision/%d", d.Decision_ID)}
+		l := Link{Name: d.Name, URL: fmt.Sprintf("/decision/%d", d.DecisionID)}
 		links = append(links, l)
 	}
 
@@ -182,29 +182,29 @@ func HDecisionUpdate(c *gin.Context) {
 		return
 	}
 
-	new_decision := Decision{
-		Decision_ID:             did,
-		Person_ID:               json.Person_ID,
-		Name:                    json.Name,
-		Description:             json.Description,
-		Stage:                   json.Stage,
-		Criterion_Vote_Style:    json.Criterion_Vote_Style,
-		Alternative_Vote_Style:  json.Alternative_Vote_Style,
-		Client_Settings:         json.Client_Settings,
-		Display_Name:            json.Display_Name,
-		Criteria_Instruction:    json.Criteria_Instruction,
-		Alternative_Instruction: json.Alternative_Instruction,
+	newDecision := Decision{
+		DecisionID:             did,
+		PersonID:               json.PersonID,
+		Name:                   json.Name,
+		Description:            json.Description,
+		Stage:                  json.Stage,
+		CriterionVoteStyle:     json.CriterionVoteStyle,
+		AlternativeVoteStyle:   json.AlternativeVoteStyle,
+		ClientSettings:         json.ClientSettings,
+		DisplayName:            json.DisplayName,
+		CriteriaInstruction:    json.CriteriaInstruction,
+		AlternativeInstruction: json.AlternativeInstruction,
 		Image: json.Image,
 	}
 
-	_, err = dbmap.Update(&new_decision)
+	_, err = dbmap.Update(&newDecision)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update decision %d", did)})
 		return
 	}
 
-	result := gin.H{"decision": new_decision}
+	result := gin.H{"decision": newDecision}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "decision_update.js", "body": result})
@@ -231,7 +231,7 @@ func HDecisionCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"decision": decision}
-	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.Decision_ID))
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.DecisionID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "decision_create.js", "body": result})
@@ -248,7 +248,7 @@ func HDecisionDelete(c *gin.Context) {
 		return
 	}
 
-	d := &Decision{Decision_ID: id}
+	d := &Decision{DecisionID: id}
 	err = d.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -268,7 +268,7 @@ func HDecisionDelete(c *gin.Context) {
 // and remove it's dependencies such as ballots
 // when destroying ballots they'll destroy their votes..etc
 func (d *Decision) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.Decision_ID)
+	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.DecisionID)
 	if err != nil {
 		return fmt.Errorf("Unable to delete decision %#v from database", d)
 	}
@@ -276,7 +276,7 @@ func (d *Decision) Destroy() error {
 	// Remove the ballots of this decision
 	// removes the votes
 	var ballots []Ballot
-	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.Decision_ID)
+	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.DecisionID)
 	if err != nil {
 		return fmt.Errorf("Unable to find ballot for decision %#v", d)
 	}
@@ -290,7 +290,7 @@ func (d *Decision) Destroy() error {
 	// Remove criterions
 	// Does not remove anything..
 	var cris []Criterion
-	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.Decision_ID)
+	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.DecisionID)
 	if err != nil {
 		return fmt.Errorf("Unable to find criterion for decision %#v", d)
 	}
@@ -303,7 +303,7 @@ func (d *Decision) Destroy() error {
 
 	// Removing the alternatives remove the votes related to it
 	var alts []Alternative
-	_, err = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.Decision_ID)
+	_, err = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.DecisionID)
 	if err != nil {
 		return fmt.Errorf("Unable to find alternatives for decision %#v", d)
 	}
@@ -325,21 +325,21 @@ func (d *Decision) Save() error {
 	// See if there's a person that this decision belongs to
 	// otherwise we quit
 	var p Person
-	err := dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", d.Person_ID)
+	err := dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", d.PersonID)
 	if err != nil {
-		return fmt.Errorf("person %d does not exist, can't create a decision without an owner", d.Person_ID)
+		return fmt.Errorf("person %d does not exist, can't create a decision without an owner", d.PersonID)
 	}
 
 	// If someone else other than us owns the same
 	// decision then abort
 	var ds []Decision
-	_, err = dbmap.Select(&ds, "select * from decision where decision_id=$1", d.Decision_ID)
+	_, err = dbmap.Select(&ds, "select * from decision where decision_id=$1", d.DecisionID)
 	if err != nil {
 		return err
 	}
 	for _, i := range ds {
-		if i.Person_ID != d.Person_ID {
-			return fmt.Errorf("decision %d already owned by person %d", d.Decision_ID, i.Person_ID)
+		if i.PersonID != d.PersonID {
+			return fmt.Errorf("decision %d already owned by person %d", d.DecisionID, i.PersonID)
 		}
 	}
 

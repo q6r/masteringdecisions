@@ -34,14 +34,14 @@ func TestHPersonCreate(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200)
 
 	frisby.Create("Test HPersonCreate (fails)").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(403)
 
@@ -56,7 +56,7 @@ func TestHPersonsList(t *testing.T) {
 		frisby.Create("Test HPersonCreate").
 			Post("http://localhost:9999/person").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Person{Name_First: "a", Name_Last: "b", Email: fmt.Sprintf("abcd%d@abcd.com", i), PW_hash: "c"}).
+			SetJson(Person{NameFirst: "a", NameLast: "b", Email: fmt.Sprintf("abcd%d@abcd.com", i), PWHash: "c"}).
 			Send().
 			ExpectStatus(200)
 
@@ -77,7 +77,7 @@ func TestHPersonUpdate(t *testing.T) {
 	frisby.Create("Create a person").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -90,7 +90,7 @@ func TestHPersonUpdate(t *testing.T) {
 		frisby.Create("Update this person").
 			Put(fmt.Sprintf("http://localhost:9999/person/%d", pid)).
 			SetHeader("Content-Type", "application/json").
-			SetJson(Person{Name_First: "newa", Name_Last: "newb", Email: "newe@abcd.com", PW_hash: "pwd"}).
+			SetJson(Person{NameFirst: "newa", NameLast: "newb", Email: "newe@abcd.com", PWHash: "pwd"}).
 			Send().
 			ExpectStatus(200).
 			ExpectJson("person.email", "newe@abcd.com").
@@ -108,7 +108,7 @@ func TestHPersonInfo(t *testing.T) {
 	frisby.Create("Create a person").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -133,7 +133,7 @@ func TestHPersonDecisions(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -152,8 +152,8 @@ func TestHPersonDecisions(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200)
 
@@ -174,14 +174,14 @@ func TestHPersonDelete(t *testing.T) {
 	frisby.Create("Test HPersonDelete (fails)").
 		Delete("http://localhost:9999/person/1").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(403)
 
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -193,7 +193,7 @@ func TestHPersonDelete(t *testing.T) {
 		frisby.Create("Test HPersonDelete").
 			Delete(fmt.Sprintf("http://localhost:9999/person/%d", pid)).
 			SetHeader("Content-Type", "application/json").
-			SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+			SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 			Send().
 			ExpectStatus(200)
 
@@ -212,7 +212,7 @@ func TestHDecisionCreate(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -225,8 +225,8 @@ func TestHDecisionCreate(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200)
 	})
@@ -241,7 +241,7 @@ func TestHDecisionInfo(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -254,8 +254,8 @@ func TestHDecisionInfo(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -286,7 +286,7 @@ func TestHDecisionCriterionsList(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -299,8 +299,8 @@ func TestHDecisionCriterionsList(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -385,7 +385,7 @@ func TestHDecisionList(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -399,8 +399,8 @@ func TestHDecisionList(t *testing.T) {
 			frisby.Create("Test HDecisionCreate").
 				Post("http://localhost:9999/decision").
 				SetHeader("Content-Type", "application/json").
-				SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-				Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+				SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+				Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 				Send().
 				ExpectStatus(200)
 		}
@@ -423,7 +423,7 @@ func TestHDecisionBallotsList(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -436,8 +436,8 @@ func TestHDecisionBallotsList(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -510,7 +510,7 @@ func TestHDecisionDelete(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -524,8 +524,8 @@ func TestHDecisionDelete(t *testing.T) {
 			frisby.Create("Test HDecisionCreate").
 				Post("http://localhost:9999/decision").
 				SetHeader("Content-Type", "application/json").
-				SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-				Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+				SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+				Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 				Send().
 				ExpectStatus(200).
 				AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -573,7 +573,7 @@ func TestHDecisionUpdate(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -586,8 +586,8 @@ func TestHDecisionUpdate(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -600,8 +600,8 @@ func TestHDecisionUpdate(t *testing.T) {
 			frisby.Create("Test HDecisionUpdate").
 				Put(fmt.Sprintf("http://localhost:9999/decision/%d", did)).
 				SetHeader("Content-Type", "application/json").
-				SetJson(Decision{Person_ID: pid, Name: "t2", Description: "desc2",
-				Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+				SetJson(Decision{PersonID: pid, Name: "t2", Description: "desc2",
+				Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 				Send().
 				ExpectStatus(200).
 				ExpectJson("decision.name", "t2").
@@ -622,7 +622,7 @@ func TestHRatings(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -635,8 +635,8 @@ func TestHRatings(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -734,7 +734,7 @@ func TestHAlternativeStar(t *testing.T) {
 	frisby.Create("Test HPersonCreate").
 		Post("http://localhost:9999/person").
 		SetHeader("Content-Type", "application/json").
-		SetJson(Person{Name_First: "a", Name_Last: "b", Email: "abcd@abcd.com", PW_hash: "c"}).
+		SetJson(Person{NameFirst: "a", NameLast: "b", Email: "abcd@abcd.com", PWHash: "c"}).
 		Send().
 		ExpectStatus(200).
 		AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {
@@ -747,8 +747,8 @@ func TestHAlternativeStar(t *testing.T) {
 		frisby.Create("Test HDecisionCreate").
 			Post("http://localhost:9999/decision").
 			SetHeader("Content-Type", "application/json").
-			SetJson(Decision{Person_ID: pid, Name: "t1", Description: "desc",
-			Stage: 1, Alternative_Vote_Style: "alt", Criterion_Vote_Style: "crit", Client_Settings: "clis"}).
+			SetJson(Decision{PersonID: pid, Name: "t1", Description: "desc",
+			Stage: 1, AlternativeVoteStyle: "alt", CriterionVoteStyle: "crit", ClientSettings: "clis"}).
 			Send().
 			ExpectStatus(200).
 			AfterJson(func(F *frisby.Frisby, json *simplejson.Json, err error) {

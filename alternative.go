@@ -11,12 +11,12 @@ import (
 
 // Alternative represent an alternative in a decision
 type Alternative struct {
-	Alternative_ID int     `db:"alternative_id" json:"alternative_id"`
-	Decision_ID    int     `db:"decision_id" json:"decision_id"`
-	Name           string  `db:"name" json:"name" binding:"required"`
-	Description    string  `db:"description" json:"description"`
-	Cost           float32 `db:"cost" json:"cost"`
-	Order          int     `db:"order" json:"order"`
+	AlternativeID int     `db:"alternative_id" json:"alternative_id"`
+	DecisionID    int     `db:"decision_id" json:"decision_id"`
+	Name          string  `db:"name" json:"name" binding:"required"`
+	Description   string  `db:"description" json:"description"`
+	Cost          float32 `db:"cost" json:"cost"`
+	Order         int     `db:"order" json:"order"`
 }
 
 // HAlternativeCreate create a ballot that belongs
@@ -33,7 +33,7 @@ func HAlternativeCreate(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "invalid alternative object"})
 		return
 	}
-	alt.Decision_ID = did
+	alt.DecisionID = did
 	err = alt.Save()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -41,7 +41,7 @@ func HAlternativeCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"alternative": alt}
-	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/alternative/%d", alt.Decision_ID, alt.Alternative_ID))
+	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/alternative/%d", alt.DecisionID, alt.AlternativeID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "alternative_create.js", "body": result})
 	} else {
@@ -53,9 +53,9 @@ func HAlternativeCreate(c *gin.Context) {
 func (alt *Alternative) Save() error {
 	// Check if decision exists or not
 	var d Decision
-	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", alt.Decision_ID)
+	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", alt.DecisionID)
 	if err != nil {
-		return fmt.Errorf("Decision %d does not exists, can't create alternative without a decision", alt.Decision_ID)
+		return fmt.Errorf("Decision %d does not exists, can't create alternative without a decision", alt.DecisionID)
 	}
 
 	if err := dbmap.Insert(alt); err != nil {
@@ -93,22 +93,22 @@ func HAlternativeUpdate(c *gin.Context) {
 		return
 	}
 
-	new_alternative := Alternative{
-		Alternative_ID: aid,
-		Decision_ID:    did,
-		Name:           json.Name,
-		Description:    json.Description,
-		Cost:           json.Cost,
-		Order:          json.Order,
+	newAlternative := Alternative{
+		AlternativeID: aid,
+		DecisionID:    did,
+		Name:          json.Name,
+		Description:   json.Description,
+		Cost:          json.Cost,
+		Order:         json.Order,
 	}
-	_, err = dbmap.Update(&new_alternative)
+	_, err = dbmap.Update(&newAlternative)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update alternative %d for decision %d", aid, did)})
 		return
 	}
 
-	result := gin.H{"alternative": new_alternative}
+	result := gin.H{"alternative": newAlternative}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "alternative_update.js", "body": result})
@@ -132,7 +132,7 @@ func HAlternativeDelete(c *gin.Context) {
 		return
 	}
 
-	alt := &Alternative{Alternative_ID: aid, Decision_ID: did}
+	alt := &Alternative{AlternativeID: aid, DecisionID: did}
 	err = alt.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden,
@@ -175,14 +175,14 @@ func HAlternativeInfo(c *gin.Context) {
 
 // Destroy an alternative
 func (alt *Alternative) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM alternative WHERE alternative_id=$1", alt.Alternative_ID)
+	_, err := dbmap.Exec("DELETE FROM alternative WHERE alternative_id=$1", alt.AlternativeID)
 	if err != nil {
 		return fmt.Errorf("Unable to delete alternative %#v from database", alt)
 	}
 
 	// Remove votes beloning to this alternative
 	var votes []Vote
-	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE alternative_id=$1", alt.Alternative_ID)
+	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE alternative_id=$1", alt.AlternativeID)
 	if err != nil {
 		return fmt.Errorf("Unable to find votes for alternative %#v", alt)
 	}

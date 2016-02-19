@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-// HashedPassword PBKDF2 for encrypting passwords
+// HashPassword PBKDF2 for encrypting passwords
 func HashPassword(password string) string {
 	salt := []byte{0x11, 0x22, 0x33, 0x44}
 	hashed := pbkdf2.Key([]byte(password), salt, 4096, sha256.Size, sha256.New)

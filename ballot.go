@@ -13,19 +13,21 @@ import (
 // Ballot represent a ballot that belong
 // in a decision
 type Ballot struct {
-	Ballot_ID   int    `db:"ballot_id" json:"ballot_id"`
-	Decision_ID int    `db:"decision_id" json:"decision_id"`
-	Secret      string `db:"secret" json:"secret"`
-	Name        string `db:"name" json:"name" binding:"required"`
-	Email       string `db:"email" json:"email" binding:"required"`
+	BallotID   int    `db:"ballot_id" json:"ballot_id"`
+	DecisionID int    `db:"decision_id" json:"decision_id"`
+	Secret     string `db:"secret" json:"secret"`
+	Name       string `db:"name" json:"name" binding:"required"`
+	Email      string `db:"email" json:"email" binding:"required"`
 }
 
+// BallotAllInfo is a struct to hold
+// all necessary information of a ballot
 type BallotAllInfo struct {
-	Name         string   `json:"name"`
-	Email        string   `json:"email"`
-	URL_Decision string   `json:"url"`
-	Votes        []Vote   `json:"votes"`
-	Ratings      []Rating `json:"rating"`
+	Name        string   `json:"name"`
+	Email       string   `json:"email"`
+	URLDecision string   `json:"url"`
+	Votes       []Vote   `json:"votes"`
+	Ratings     []Rating `json:"rating"`
 }
 
 // HBallotCreate create a ballot that belongs
@@ -42,7 +44,7 @@ func HBallotCreate(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "invalid ballot object"})
 		return
 	}
-	b.Decision_ID = did // inherited
+	b.DecisionID = did // inherited
 
 	err = b.Save()
 	if err != nil {
@@ -51,7 +53,7 @@ func HBallotCreate(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": b}
-	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.Ballot_ID))
+	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.BallotID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": result})
 	} else {
@@ -61,7 +63,7 @@ func HBallotCreate(c *gin.Context) {
 	// Send invitation
 	title := fmt.Sprintf("%s's ballot", b.Name)
 	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
-		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
+		b.Name, b.DecisionID, b.BallotID, b.Secret)
 
 	// Non-blocking can improve error handling
 	// but must block
@@ -85,7 +87,7 @@ func HBallotInvite(c *gin.Context) {
 
 	title := fmt.Sprintf("%s's ballot", b.Name)
 	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
-		b.Name, b.Decision_ID, b.Ballot_ID, b.Secret)
+		b.Name, b.DecisionID, b.BallotID, b.Secret)
 
 	err = Send(body, title, b.Email)
 	if err != nil {
@@ -126,21 +128,21 @@ func HBallotUpdate(c *gin.Context) {
 
 	secret := HashPassword(fmt.Sprintf("b_%d_d_%d", bid, did))
 
-	new_ballot := Ballot{
-		Ballot_ID:   bid,
-		Decision_ID: did,
-		Secret:      secret,
-		Name:        json.Name,
-		Email:       json.Email,
+	newBallot := Ballot{
+		BallotID:   bid,
+		DecisionID: did,
+		Secret:     secret,
+		Name:       json.Name,
+		Email:      json.Email,
 	}
-	_, err = dbmap.Update(&new_ballot)
+	_, err = dbmap.Update(&newBallot)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update ballot %d for decision %d", bid, did)})
 		return
 	}
 
-	result := gin.H{"ballot": new_ballot}
+	result := gin.H{"ballot": newBallot}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "ballot_update.js", "body": result})
@@ -164,7 +166,7 @@ func HBallotDelete(c *gin.Context) {
 		return
 	}
 
-	b := &Ballot{Ballot_ID: bid, Decision_ID: did}
+	b := &Ballot{BallotID: bid, DecisionID: did}
 	err = b.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -207,14 +209,14 @@ func HBallotInfo(c *gin.Context) {
 // it also removes the dependencies of a ballots
 // such as votes
 func (b *Ballot) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.Ballot_ID)
+	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.BallotID)
 	if err != nil {
 		return fmt.Errorf("Unable to delete ballot %#v from database", b)
 	}
 
 	// Remove votes beloning to this ballot
 	var votes []Vote
-	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.Ballot_ID)
+	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.BallotID)
 	if err != nil {
 		return fmt.Errorf("Unable to find votes for ballot %#v", b)
 	}
@@ -257,12 +259,12 @@ func HBallotLogin(c *gin.Context) {
 	}
 
 	// Set the cookies
-	ballot_id_str := strconv.Itoa(ballot.Ballot_ID)
+	ballotIDStr := strconv.Itoa(ballot.BallotID)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "unable to parse ballot_id"})
 		return
 	}
-	decision_id_str := strconv.Itoa(ballot.Decision_ID)
+	decisionIDStr := strconv.Itoa(ballot.DecisionID)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "unable to parse ballot_id"})
 		return
@@ -271,12 +273,12 @@ func HBallotLogin(c *gin.Context) {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 	bcookie := http.Cookie{
 		Name:    "ballot_id",
-		Value:   ballot_id_str,
+		Value:   ballotIDStr,
 		Path:    "/",
 		Expires: expiration}
 	dcookie := http.Cookie{
 		Name:    "decision_id",
-		Value:   decision_id_str,
+		Value:   decisionIDStr,
 		Path:    "/",
 		Expires: expiration}
 	http.SetCookie(c.Writer, &bcookie)
@@ -285,6 +287,8 @@ func HBallotLogin(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "http://localhost:9999/ballot.html")
 }
 
+// HBallotWhoami returns the current
+// logged in ballot
 func HBallotWhoami(c *gin.Context) {
 	bcookie, err := c.Request.Cookie("ballot_id")
 	if err != nil {
@@ -308,7 +312,7 @@ func HBallotWhoami(c *gin.Context) {
 		return
 	}
 
-	result := gin.H{"ballot": Ballot{Ballot_ID: bval, Decision_ID: dval}}
+	result := gin.H{"ballot": Ballot{BallotID: bval, DecisionID: dval}}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "ballot_whoami.js", "body": result})
@@ -318,7 +322,7 @@ func HBallotWhoami(c *gin.Context) {
 
 }
 
-// HBallotBallotAllInfo show all of the information related to a ballot
+// HBallotAllInfo show all of the information related to a ballot
 func HBallotAllInfo(c *gin.Context) {
 	did := c.Param("decision_id")
 	bid := c.Param("ballot_id")
@@ -335,7 +339,7 @@ func HBallotAllInfo(c *gin.Context) {
 	var ai BallotAllInfo
 	ai.Name = ballot.Name
 	ai.Email = ballot.Email
-	ai.URL_Decision = fmt.Sprintf("/decision/%s", did)
+	ai.URLDecision = fmt.Sprintf("/decision/%s", did)
 
 	// Get the votes for this ballot
 	_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", bid)
@@ -368,9 +372,9 @@ func (b *Ballot) Save() error {
 
 	// Check if decision exists or not
 	var d Decision
-	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", b.Decision_ID)
+	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", b.DecisionID)
 	if err != nil {
-		return fmt.Errorf("Decision %d does not exists, can't create ballot without a decision", b.Decision_ID)
+		return fmt.Errorf("Decision %d does not exists, can't create ballot without a decision", b.DecisionID)
 	}
 
 	if err = dbmap.Insert(b); err != nil {
@@ -384,7 +388,7 @@ func (b *Ballot) Save() error {
 		return fmt.Errorf("Unable to set secret on ballot %#v to database", err)
 	}
 
-	b.Secret = HashPassword(fmt.Sprintf("b_%d_d_%d", b.Ballot_ID, b.Decision_ID))
+	b.Secret = HashPassword(fmt.Sprintf("b_%d_d_%d", b.BallotID, b.DecisionID))
 	if _, err = dbmap.Update(b); err != nil {
 		return fmt.Errorf("Unable to update ballot %#v to database", b)
 	}

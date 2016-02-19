@@ -147,12 +147,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	http_port, err := conf.Int("http_port")
+	httpPort, err := conf.Int("http_port")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	err = routes.Run(fmt.Sprintf(":%d", http_port))
+	err = routes.Run(fmt.Sprintf(":%d", httpPort))
 	if err != nil {
 		log.Fatalln(err)
 	}

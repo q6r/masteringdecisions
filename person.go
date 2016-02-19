@@ -11,11 +11,11 @@ import (
 
 // Person represent a person in the database
 type Person struct {
-	Person_ID  int    `db:"person_id" json:"person_id"`
-	Email      string `db:"email" json:"email" binding:"required"`
-	PW_hash    string `db:"pw_hash" json:"pw_hash" binding:"required"`
-	Name_First string `db:"name_first" json:"name_first" binding:"required"`
-	Name_Last  string `db:"name_last" json:"name_last" binding:"required"`
+	PersonID  int    `db:"person_id" json:"person_id"`
+	Email     string `db:"email" json:"email" binding:"required"`
+	PWHash    string `db:"pw_hash" json:"pw_hash" binding:"required"`
+	NameFirst string `db:"name_first" json:"name_first" binding:"required"`
+	NameLast  string `db:"name_last" json:"name_last" binding:"required"`
 }
 
 // HPersonsList returns a list of persons as json object
@@ -28,7 +28,7 @@ func HPersonsList(c *gin.Context) {
 	}
 
 	for i := range persons {
-		persons[i].PW_hash = "<hidden>"
+		persons[i].PWHash = "<hidden>"
 	}
 
 	result := gin.H{"persons": persons}
@@ -58,11 +58,11 @@ func HPersonUpdate(c *gin.Context) {
 	// PersonEasy represent a person in the database
 	// with no password requirement
 	type PersonEasy struct {
-		Person_ID  int    `db:"person_id" json:"person_id"`
-		Email      string `db:"email" json:"email" binding:"required"`
-		PW_hash    string `db:"pw_hash" json:"pw_hash"`
-		Name_First string `db:"name_first" json:"name_first" binding:"required"`
-		Name_Last  string `db:"name_last" json:"name_last" binding:"required"`
+		PersonID  int    `db:"person_id" json:"person_id"`
+		Email     string `db:"email" json:"email" binding:"required"`
+		PWHash    string `db:"pw_hash" json:"pw_hash"`
+		NameFirst string `db:"name_first" json:"name_first" binding:"required"`
+		NameLast  string `db:"name_last" json:"name_last" binding:"required"`
 	}
 
 	var json PersonEasy
@@ -74,7 +74,7 @@ func HPersonUpdate(c *gin.Context) {
 	}
 
 	// disallow duplicate emails
-	n, err := dbmap.SelectInt("select count(*) from person where email=$1 and person_id<>$2", json.Email, p.Person_ID)
+	n, err := dbmap.SelectInt("select count(*) from person where email=$1 and person_id<>$2", json.Email, p.PersonID)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to check person database for duplicate email")})
@@ -86,29 +86,29 @@ func HPersonUpdate(c *gin.Context) {
 		return
 	}
 
-	var new_hash string
-	if json.PW_hash != "" {
-		new_hash = HashPassword(json.PW_hash)
+	var newHash string
+	if json.PWHash != "" {
+		newHash = HashPassword(json.PWHash)
 	} else {
-		new_hash = p.PW_hash
+		newHash = p.PWHash
 	}
 
-	new_person := Person{
-		Person_ID:  pid,
-		Email:      json.Email,
-		PW_hash:    new_hash,
-		Name_First: json.Name_First,
-		Name_Last:  json.Name_Last,
+	newPerson := Person{
+		PersonID:  pid,
+		Email:     json.Email,
+		PWHash:    newHash,
+		NameFirst: json.NameFirst,
+		NameLast:  json.NameLast,
 	}
-	_, err = dbmap.Update(&new_person)
+	_, err = dbmap.Update(&newPerson)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update person %d", pid)})
 		return
 	}
 
-	new_person.PW_hash = "<hidden>"
-	result := gin.H{"person": new_person}
+	newPerson.PWHash = "<hidden>"
+	result := gin.H{"person": newPerson}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_update.js", "body": result})
 	} else {
@@ -126,7 +126,7 @@ func HPersonCreate(c *gin.Context) {
 	}
 
 	// Encrypt the plaintext before saving
-	person.PW_hash = HashPassword(person.PW_hash)
+	person.PWHash = HashPassword(person.PWHash)
 
 	err = person.Save()
 	if err != nil {
@@ -134,9 +134,9 @@ func HPersonCreate(c *gin.Context) {
 		return
 	}
 
-	person.PW_hash = "<hidden>"
+	person.PWHash = "<hidden>"
 	result := gin.H{"person": person}
-	c.Writer.Header().Set("Location", fmt.Sprintf("/person/%d", person.Person_ID))
+	c.Writer.Header().Set("Location", fmt.Sprintf("/person/%d", person.PersonID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": result})
 	} else {
@@ -152,7 +152,7 @@ func HPersonDelete(c *gin.Context) {
 		return
 	}
 
-	p := &Person{Person_ID: id}
+	p := &Person{PersonID: id}
 	err = p.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -178,7 +178,7 @@ func HPersonInfo(c *gin.Context) {
 		return
 	}
 
-	person.PW_hash = "<hidden>"
+	person.PWHash = "<hidden>"
 
 	result := gin.H{"person": person}
 	c.JSON(http.StatusOK, result)
@@ -214,7 +214,7 @@ func (p *Person) Destroy() error {
 
 	// Remove the person's decisions
 	var decisions []Decision
-	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.Person_ID)
+	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.PersonID)
 	if err != nil {
 		return fmt.Errorf("Unable to find decisions for person %#v", p)
 	}
@@ -243,7 +243,7 @@ func (p *Person) Save() error {
 
 	if err := dbmap.Insert(p); err != nil {
 		return fmt.Errorf("Unable to insert person %d into database:%#v",
-			p.Person_ID, err)
+			p.PersonID, err)
 	}
 	return nil
 }

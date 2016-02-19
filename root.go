@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// HRootHome is the main index page
 func HRootHome(c *gin.Context) {
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -16,6 +17,7 @@ func HRootHome(c *gin.Context) {
 	}
 }
 
+// HRootLogin is the main login page
 func HRootLogin(c *gin.Context) {
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -25,6 +27,7 @@ func HRootLogin(c *gin.Context) {
 	}
 }
 
+// HRootLogout is the main logout page
 func HRootLogout(c *gin.Context) {
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -34,6 +37,7 @@ func HRootLogout(c *gin.Context) {
 	}
 }
 
+// HRootBallot is the main ballot page
 func HRootBallot(c *gin.Context) {
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
@@ -43,6 +47,7 @@ func HRootBallot(c *gin.Context) {
 	}
 }
 
+// HRootDecision is the main decision page
 func HRootDecision(c *gin.Context) {
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",

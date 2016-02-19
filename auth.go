@@ -35,7 +35,7 @@ func HAuthLogin(c *gin.Context) {
 	}
 
 	extra := map[string]string{"email": ar.Email,
-		"person_id": strconv.Itoa(p.Person_ID)}
+		"person_id": strconv.Itoa(p.PersonID)}
 	err = ginAuth.Login(c, extra)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Unable to login"})
@@ -51,11 +51,16 @@ func HAuthLogout(c *gin.Context) {
 	ginAuth.Logout(c)
 }
 
+// HAuthUnauthenticated is a function called when authentication
+// failed, it's a middleware, if this is reached the next route
+// is aborted
 func HAuthUnauthenticated(c *gin.Context) {
 	c.JSON(http.StatusForbidden, gin.H{"error": "unauthenticated"})
 	c.Abort()
 }
 
+// HAuthAuthenticated is called when a route
+// is authenticated, in this case we just reach the route
 func HAuthAuthenticated(c *gin.Context) {
 
 }
@@ -70,12 +75,12 @@ func HAuthWhoAmI(c *gin.Context) {
 		return
 	}
 	cookie := got.(map[string]string)
-	person_id, err := strconv.Atoi(cookie["person_id"])
+	personID, err := strconv.Atoi(cookie["person_id"])
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "unable to convert number"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"person_id": person_id})
+	c.JSON(http.StatusOK, gin.H{"person_id": personID})
 }
 
 // AuthAsAll is a middleware to be used

@@ -11,11 +11,11 @@ import (
 
 // Criterion represent a criterion for a decision
 type Criterion struct {
-	Criterion_ID int    `db:"criterion_id" json:"criterion_id"`
-	Decision_ID  int    `db:"decision_id" json:"decision_id"` // inherited
-	Name         string `db:"name" json:"name" binding:"required"`
-	Description  string `db:"description" json:"description"`
-	Order        int    `db:"order" json:"order"`
+	CriterionID int    `db:"criterion_id" json:"criterion_id"`
+	DecisionID  int    `db:"decision_id" json:"decision_id"` // inherited
+	Name        string `db:"name" json:"name" binding:"required"`
+	Description string `db:"description" json:"description"`
+	Order       int    `db:"order" json:"order"`
 }
 
 // HCriterionInfo get the information of a specific
@@ -55,7 +55,7 @@ func HCriterionDelete(c *gin.Context) {
 		return
 	}
 
-	cri := &Criterion{Criterion_ID: cid, Decision_ID: did}
+	cri := &Criterion{CriterionID: cid, DecisionID: did}
 	err = cri.Destroy()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -85,7 +85,7 @@ func HCriterionCreate(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid criterion object"})
 		return
 	}
-	cri.Decision_ID = did // inherited
+	cri.DecisionID = did // inherited
 
 	err = cri.Save()
 	if err != nil {
@@ -95,7 +95,7 @@ func HCriterionCreate(c *gin.Context) {
 
 	result := gin.H{"criterion": cri}
 	c.Writer.Header().Set("Location",
-		fmt.Sprintf("/decision/%d/criterion/%d", did, cri.Criterion_ID))
+		fmt.Sprintf("/decision/%d/criterion/%d", did, cri.CriterionID))
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "criterion_create.js", "body": result})
@@ -133,21 +133,21 @@ func HCriterionUpdate(c *gin.Context) {
 		return
 	}
 
-	new_criterion := Criterion{
-		Criterion_ID: cid,
-		Decision_ID:  did,
-		Name:         json.Name,
-		Description:  json.Description,
-		Order:        json.Order,
+	newCriterion := Criterion{
+		CriterionID: cid,
+		DecisionID:  did,
+		Name:        json.Name,
+		Description: json.Description,
+		Order:       json.Order,
 	}
-	_, err = dbmap.Update(&new_criterion)
+	_, err = dbmap.Update(&newCriterion)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to update criterion %d for decision %d", cid, did)})
 		return
 	}
 
-	result := gin.H{"criterion": new_criterion}
+	result := gin.H{"criterion": newCriterion}
 	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
 		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
 			gin.H{"scriptname": "criterion_update.js", "body": result})
@@ -159,7 +159,7 @@ func HCriterionUpdate(c *gin.Context) {
 // Destroy removes a criterion from a decision
 func (cri *Criterion) Destroy() error {
 	_, err := dbmap.Exec("DELETE FROM criterion WHERE criterion_id=$1 and decision_id=$2",
-		cri.Criterion_ID, cri.Decision_ID)
+		cri.CriterionID, cri.DecisionID)
 	if err != nil {
 		return fmt.Errorf("Unable to delete criterion %#v from database", cri)
 	}
@@ -172,9 +172,9 @@ func (cri *Criterion) Destroy() error {
 func (cri *Criterion) Save() error {
 	// See if there's a decision this belongs to
 	var d Decision
-	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", cri.Decision_ID)
+	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", cri.DecisionID)
 	if err != nil {
-		return fmt.Errorf("decision %d does not exist, criterion should belong to an existing decision", cri.Decision_ID)
+		return fmt.Errorf("decision %d does not exist, criterion should belong to an existing decision", cri.DecisionID)
 	}
 
 	if err := dbmap.Insert(cri); err != nil {
