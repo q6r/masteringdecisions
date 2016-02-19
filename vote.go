@@ -240,14 +240,3 @@ func (v *Vote) Save() error {
 
 	return nil
 }
-
-// FindVotesByKeys find votes by keys
-func FindVotesByKeys(criterion_id, ballot_id int) (Vote, error) {
-	var vote Vote
-	err := dbmap.SelectOne(&vote, "select * from vote where criterion_id=$1 and ballot_id=$2", criterion_id, ballot_id)
-	if err != nil {
-		return Vote{},
-			fmt.Errorf("Unable to find vote for criterion_id=%v ballot_id=%v", criterion_id, ballot_id)
-	}
-	return vote, nil
-}

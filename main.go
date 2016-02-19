@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -20,7 +21,12 @@ func main() {
 	}
 
 	dbmap = InitDatabase(conf)
-	defer dbmap.Db.Close()
+	defer func() {
+		err := dbmap.Db.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
 
 	routes := gin.Default()
 
@@ -133,8 +139,15 @@ func main() {
 	err = ginAuth.LoadConfig()
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
 
-	routes.Run(":9999")
+	http_port, err := conf.Int("http_port")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = routes.Run(fmt.Sprintf(":%d", http_port))
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
