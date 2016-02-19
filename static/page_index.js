@@ -1220,8 +1220,8 @@ function buildHome() {
         }else{
           getBallotStage(decisionID)
         }
-		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+voted+'</span>Voted ballots </li>');
-		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+not_voted+'</span>Not_voted ballots </li>');
+		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+voted+'</span>Voted </li>');
+		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+not_voted+'</span>Not Voted</li>');
 		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+totalBallots+'</span><b>Total ballots</b> </li>');
       })
     }
