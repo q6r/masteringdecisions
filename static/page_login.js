@@ -44,8 +44,9 @@ function login() {
   $('#status').hide();
 
   new_login = {
-    "email":document.getElementById('username').value,
-    "password":document.getElementById('password').value}
+    "email": $('#username').val(),
+    "password": $('#password').val()
+  };
 
   post_text("/login", JSON.stringify(new_login), function (result) {
     if(result['status'] == "logged in") {
@@ -65,6 +66,7 @@ function login() {
     }
   });
 
+  $('#password').val('');
   //Avoid refreshing
   return false;
 }
