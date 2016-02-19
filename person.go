@@ -73,6 +73,19 @@ func HPersonUpdate(c *gin.Context) {
 		return
 	}
 
+	// disallow duplicate emails
+	n, err := dbmap.SelectInt("select count(*) from person where email=$1 and person_id<>$2", json.Email, p.Person_ID)
+	if err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to check person database for duplicate email")})
+		return
+	}
+	if n != 0 {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Email %s already exists.", json.Email)})
+		return
+	}
+
 	var new_hash string
 	if json.PW_hash != "" {
 		new_hash = HashPassword(json.PW_hash)
