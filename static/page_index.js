@@ -1152,24 +1152,38 @@ function buildHome() {
       $('<li class="active"><a onclick="buildDecisionStatus('+decisionID+')">Status</a></li>').appendTo(ul);
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
-      var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+      var wrapper = $('<div>').addClass('tabbedContent').attr('id','b_wrapper').appendTo('#content');
     var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper) 
-    
+	
+	//display total counts for ballot status
+	  var stageBallots = $([
+                                  '<ul class="list-group" id="stage_ballot">',
+                                  '<li class="list-group-item active" id="stage_li">',
+                                  '</li>',
+                                  '</ul>'].join("\n"));
+                          stageBallots.appendTo('#totalBallots');
+						  
+    //display info of different ballots
     var status_table = $([
     
-    '<table class="table table-bordered" id="s_table">',
-      '<thead class = "thead-inverse">',
-      '<tr>',
-      '<th>Name</th>',
-      '<th>Email</th>',
-      '<th>Ballot status</th>',
-      '<th>Email</th>',
-      '</tr>',
-      '</thead>',
-    '</table>'
+    '<table class="table table-striped" id="s_table">',
+	  '<tbody id="s_body">',
+	  '<tr>',
+	  '<th>Name</th>',
+	  '<th>Email</th>',
+	  '<th>Ballot status</th>',
+	  '<th>Action</th>',
+	  '<th></th>',
+	  '<th></th>',
+	  '</tr>',      
+	  '</tbody>',
+	  '</table>',
     ].join('\n'));
   
-    wrapper.append(status_table)
+    
+	var tableWrapper = $('<div>').attr('id','t_wrapper')
+	tableWrapper.append(status_table)
+	wrapper.append(tableWrapper)
     $('#s_table').hide()
 
     getStatus(decisionID)
@@ -1180,46 +1194,47 @@ function buildHome() {
         console.log(result)
         var vote_status= ""
         var totalBallots = 0
+		var voted = 0
+		var not_voted = 0
         if(result.ballots != null){
         $('#s_table').show()
         //get the total ballot for current stage
         totalBallots = result.ballots.length
-        getTotalBallots(decisionID,totalBallots)
+        getBallotStage(decisionID)
         
         for(var i = 0; i < result.ballots.length; i++){
           if(result.ballots[i].rating != null && result.ballots[i].rating.length > 0 && result.ballots[i].rating.length!= "undefined" ){
             vote_status = "Voted"
+			voted = voted + 1
           }else{
             vote_status = "Note Voted"
+			not_voted = not_voted + 1
           }
-          console.log(result.ballots[i].url)
+          
           var url = result.ballots[i].url
           
-          $("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
-    
+          //$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
+		  $("#s_body").append('<tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend Email</a>'+'</td><td><a onclick=\'buildEditBallotForm('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\''+url+'\',' + decisionID +')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');       
           
         }
         }else{
-          getTotalBallots(decisionID,totalBallots)
+          getBallotStage(decisionID)
         }
+		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+voted+'</span>Voted ballots </li>');
+		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+not_voted+'</span>Not_voted ballots </li>');
+		$("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+totalBallots+'</span><b>Total ballots</b> </li>');
       })
     }
     
-    function getTotalBallots(decisionID, ballots){
+    function getBallotStage(decisionID){
       get_text("/decision/"+ decisionID + "/info", function (result) {
-                          var stageBallots = $([
-                                  '<ul class="list-group" id="stage_ballot">',
-                                  '<li class="list-group-item active">',
-                                  'Total ballots: '+ ballots ,
-                                  '</li>',
-                                  '</ul>'].join("\n"));
-                          stageBallots.appendTo('#totalBallots');
+                          
                           if(result.decision.stage == 1) {
-                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: In Development </li>');
+                                  $("#stage_li").append('Current Stage: In Development ');
                           } else if(result.decision.stage == 2) {
-                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Voting in progress </li>');
+                                  $("#stage_li").append('Current Stage: Voting in progress ');
                           } else {
-                                  $("#stage_ballot").append('<li class="list-group-item"><span class="badge">'+ballots+'</span>Stage: Completed </li>');
+                                  $("#stage_li").append('Current Stage: Completed ');
                           }
           })
       
@@ -1230,6 +1245,72 @@ function buildHome() {
         console.log(result)
       })
     }
+	
+	function deleteBallot(url,decisionID){
+		confirmYesNo(
+          "Delete Ballot",
+          "Are you sure you want to delete this ballot?",
+          function() {
+            delete_text(url, function (result) {
+              if(result['result'] == "deleted") {
+                $('#success').html('Deleted Successfully');
+                $('#success').show();
+              }
+              buildDecisionStatus(decisionID)
+            });
+          },
+          function() { /* Do nothing */}
+		);
+	}
+	
+	function editBallot(decisionID, url){
+	
+		var ballot = {
+        "name":$("#ballotName").val(),
+        "email":$("#ballotEmail").val(),
+       }
+	  
+		put_text(url, JSON.stringify(ballot), function(result){
+        //$('#success').html('Updated Successfully');
+        //$('#success').show();
+        buildDecisionStatus(decisionID)
+      });
+	  
+	}
+	
+	function cancelEdit(decisionID){
+		buildDecisionStatus(decisionID)
+	}
+	
+	function buildEditBallotForm(decisionID, ballot){
+	  //edit ballot form
+	  $('#s_table').empty()
+	  var form = $([
+        '<form class ="form-signin" onsubmit = "return false" id="editBallotForm">',
+        
+        '<label for="bal_dec_id" >Decision Name: </label>',
+        '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="bName"></input>',
+        '<br />',
+
+        '<label for="bal_name">Name</label>',
+        '<input type="text" id="ballotName" class= "form-control" required="required" placeholder="Name"></input>',
+        '<br />',
+        '<label for="bal_email">Email</label>',
+        '<input type="email" id="ballotEmail" class= "form-control" required="required" placeholder="Email"></input>',
+        '<br />',
+        '</form>'
+        ].join('\n'));
+	  form.appendTo('#b_wrapper');
+	  $('<button>').addClass('btn btn-primary').attr('onclick', 'editBallot('+decisionID+',\''+ ballot.url +'\');').attr('style','float: right').append('<span>  Update </span>').appendTo(form);
+	  $('<button>').addClass('btn btn-primary').attr('onclick', 'cancelEdit('+decisionID +')').append('<span> Cancel </span>').appendTo(form);
+	  
+	  get_text("/decision/"+decisionID+"/info", function (result) {
+          $('#bName').val(result.decision.name)
+        })
+	  $('#ballotName').val(ballot.name)
+	  $('#ballotEmail').val(ballot.email)
+	}
+	
 
   /**** Decision Invite ****/
     function buildDecisionInvite(decisionID){
