@@ -759,8 +759,11 @@ function buildHome() {
     }
     
     function showAddCriteria(decisionID) {
+      $('#critForm').hide();
       $('#critForm').html("");
+      $('<p class="text-Danger">Unable to add new criteria when not in development</p>').appendTo('#critForm');
       ifDecisionInDevelopment(decisionID, function() {
+        $('#critForm').html("");
         $('<h3>Add New Criterion</h3>').appendTo('#critForm');
         
           $('<div class="form-group">').append(
@@ -791,6 +794,7 @@ function buildHome() {
 
           $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria('+decisionID+');').text('Add Criteria').appendTo('#critForm');
       });
+      $('#critForm').show();
     }
     
     function showEditCriteria(decisionID, criterionID) {
@@ -950,8 +954,11 @@ function buildHome() {
     }
     
     function showAddAlternative(decisionID) {
+      $('#altForm').hide();
       $('#altForm').html("");
+      $('<p class="text-Danger">Unable to add new alternatives when not in development</p>').appendTo('#altForm');
       ifDecisionInDevelopment(decisionID, function() {
+        $('#altForm').html("");
         $('<h3>Add New Alternative</h3>').appendTo('#altForm');
         
           $('<div class="form-group">').append(
@@ -990,6 +997,7 @@ function buildHome() {
           
           $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addAlternative('+decisionID+');').text('Add Alternative').appendTo('#altForm');
       });
+      $('#altForm').show();
     }
     
     function showEditAlternative(decisionID, alternativeID) {
