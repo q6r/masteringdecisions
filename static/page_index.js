@@ -509,6 +509,7 @@ function buildHome() {
     buildEditDecision(decisionID);
     //hide the ones we don't want to show
     $('#displayNameDiv').hide();
+    $('#imageDiv').hide();
     $('#critStyleDiv').hide();
     $('#altStyleDiv').hide();
     $('#critInstructionsDiv').hide();
@@ -563,6 +564,23 @@ function buildHome() {
         .attr('id', 'displayName'))
       .appendTo(form);
       
+      $('<div id="imageDiv" class="form-group">')
+      .css('padding-bottom', '20px').append(
+        $('<label for="image">Custom Image</label>'),
+        $('<br/><img id="decImg" src="#"/><br/>'),
+        $('<input>')
+          .css('float', 'left')
+          .attr('type', 'file')
+          .attr('id', 'image')
+          .attr('accept', 'image/*')
+          .change(function() {loadImg(this);}),
+        $('<a>')
+          .text('Remove Image')
+          .addClass('text-Danger')
+          .css('float', 'right')
+          .click(function() {$('#decImg').attr('src', '');})
+      ).appendTo(form);
+      $('<div>').addClass('clearFix').appendTo(form);
       $('<div id="descriptionDiv" class="form-group">').append(
         $('<label for="description">Description</label>'),
         $('<textarea>').addClass('form-control')
@@ -619,6 +637,7 @@ function buildHome() {
       get_text("/decision/"+decisionID+"/info", function (result) {
         $('#name').val(result['decision']['name']);
         $('#displayName').val(result['decision']['display_name']);
+        $('#decImg').attr('src', result['decision']['image']);
         $('#description').val(result['decision']['description']);
         $('#stage').val(result['decision']['stage']);
         $('#critStyle').val(result['decision']['criterion_vote_style']);
@@ -626,6 +645,16 @@ function buildHome() {
         $('#critInstructions').val(result['decision']['criteria_instruction']);
         $('#altInstructions').val(result['decision']['alternative_instruction']);
       });
+  }
+  
+  function loadImg(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $('#decImg').attr('src', e.target.result);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
   }
 
   function deleteDecision(decisionID) {
@@ -669,7 +698,8 @@ function buildHome() {
           "client_settings":"",
           "display_name":$('#displayName').val(),
           "criteria_instruction":$('#critInstructions').val(),
-          "alternative_instruction":$('#altInstructions').val()
+          "alternative_instruction":$('#altInstructions').val(),
+          "image":$('#decImg').attr('src')
         }
 
         put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){

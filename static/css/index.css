@@ -22,3 +22,7 @@ a:hover {cursor: pointer; cursor: hand;}
 .jumbotron {
   padding:10px !important; /*override default padding*/
 }
+
+#decImg {
+  max-width:500px;
+}
