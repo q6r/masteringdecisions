@@ -1,6 +1,5 @@
 var base_url = "http://localhost:9999";
 
-/* This version also returns on 403! */
 get_text = function(url, cb) {
   var request = new XMLHttpRequest();
   request.open('GET', base_url+url, true);
@@ -15,7 +14,6 @@ get_text = function(url, cb) {
   request.send();
 }
 
-/* This version also returns on 403 */
 post_text = function(url, data, cb) {
   var request = new XMLHttpRequest();
   request.open('POST', base_url+url, true);
@@ -30,7 +28,6 @@ post_text = function(url, data, cb) {
   request.send(data);
 }
 
-/* This version also returns on 403 */
 put_text = function(url, data, cb) {
 	var request = new XMLHttpRequest();
 	request.open('PUT', base_url+url, true);
@@ -45,7 +42,6 @@ put_text = function(url, data, cb) {
 	request.send(data);
 }
 
-/* This version also returns on 403! */
 delete_text = function(url, cb) {
   var request = new XMLHttpRequest();
   request.open('DELETE', base_url+url, true);
@@ -59,7 +55,6 @@ delete_text = function(url, cb) {
 
   request.send();
 }
-
 
 function assert(condition, message) {
   if (!condition) {
@@ -107,4 +102,14 @@ function loggedIn(cb) {
 function isEmail(email) {
   var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return regex.test(email);
+}
+
+function getParameterByName(name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, "\\$&");
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
