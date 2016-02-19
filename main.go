@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/astaxie/beego/config"
 	"github.com/gin-gonic/gin"
@@ -29,19 +28,6 @@ func main() {
 	}()
 
 	routes := gin.Default()
-
-	// Debug routes
-	/////////////////
-	if gin.Mode() == "debug" {
-		routes.GET("/clean", func(c *gin.Context) {
-			err := dbmap.TruncateTables()
-			if err != nil {
-				c.JSON(http.StatusForbidden, gin.H{"error": err})
-				return
-			}
-			c.JSON(http.StatusOK, gin.H{"result": "cleaned"})
-		})
-	}
 
 	// Templates
 	////////////////
