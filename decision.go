@@ -194,8 +194,9 @@ func HDecisionUpdate(c *gin.Context) {
 		Display_Name:            json.Display_Name,
 		Criteria_Instruction:    json.Criteria_Instruction,
 		Alternative_Instruction: json.Alternative_Instruction,
-    Image:                   json.Image,
+		Image: json.Image,
 	}
+
 	_, err = dbmap.Update(&new_decision)
 	if err != nil {
 		c.JSON(http.StatusForbidden,

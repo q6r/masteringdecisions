@@ -124,8 +124,8 @@ func HBallotUpdate(c *gin.Context) {
 		return
 	}
 
-  var secret string = HashPassword(fmt.Sprintf("b_%d_d_%d", bid, did))
-  
+	secret := HashPassword(fmt.Sprintf("b_%d_d_%d", bid, did))
+
 	new_ballot := Ballot{
 		Ballot_ID:   bid,
 		Decision_ID: did,
