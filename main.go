@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/astaxie/beego/config"
 	"github.com/gin-gonic/gin"
@@ -29,10 +31,28 @@ func main() {
 
 	routes := gin.Default()
 
+	// Debug Mode only clean route
+	// used for testing purposes
+	if gin.Mode() == "debug" {
+		routes.GET("/clean", func(c *gin.Context) {
+			err := dbmap.TruncateTables()
+			if err != nil {
+				c.JSON(http.StatusForbidden, gin.H{"error": err})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"result": "cleaned"})
+		})
+	}
+
+	// enable logging into a file
+	err = enableLoggerFile(routes, conf.String("logfile"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// Templates
 	////////////////
 	routes.LoadHTMLGlob("templates/*")
-	//routes.LoadHTMLGlob("static/*")
 	routes.Static("static/", "static/")
 
 	// Roots of pages for the frontend
@@ -136,4 +156,23 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+// enableLoggerFile enables logging to a file path
+// empty logFilePath to disable logging to a file
+func enableLoggerFile(routes *gin.Engine, logFilePath string) error {
+	// Don't want logger
+	if logFilePath == "" {
+		return nil
+	}
+
+	logFile, err := os.OpenFile(logFilePath,
+		os.O_RDWR|os.O_APPEND|os.O_CREATE, 0660)
+	if err != nil {
+		return err
+	}
+
+	routes.Use(gin.LoggerWithWriter(logFile))
+
+	return nil
 }
