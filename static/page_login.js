@@ -36,7 +36,7 @@ function buildPage() {
           rememberMe.append('Remember Me');
         rememberMe.appendTo(cbBox);
       cbBox.appendTo(form);
-      $('<a>').attr('href', '#').text('Forgot Password?').appendTo(cbBox);
+      $('<a>').click(function() {alert("Please email the admin to request a password reset.");}).text('Forgot Password?').appendTo(cbBox);
       $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
 }
 

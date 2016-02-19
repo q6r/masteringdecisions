@@ -267,6 +267,8 @@ function buildHome() {
       
       $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
       $('#success').hide();
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+      $('#error').hide();
       
       $('<input type="text" />').addClass('form-control')
         .attr('name', 'username')
@@ -288,8 +290,8 @@ function buildHome() {
       
       $('<h3>').addClass('form-signin-heading').text('Password').appendTo(form);
       
-      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
-      $('#error').hide();
+      $('<div>').attr('id','passwordError').addClass('alert alert-danger').appendTo(form);
+      $('#passwordError').hide();
       
       $('<input type="password" />').addClass('form-control')
         .attr('name', 'password')
@@ -316,11 +318,13 @@ function buildHome() {
   }
 
   function updateUser() {
+  $('#success').hide();
   $('#error').hide();
+  $('#passwordError').hide();
   
   if(document.getElementById('password').value != document.getElementById('password2').value) {
-    $('#error').html('<b>Error:</b> Passwords do not match!');
-    $('#error').show();
+    $('#passwordError').html('<b>Error:</b> Passwords do not match!');
+    $('#passwordError').show();
   }
   else {
     if(document.getElementById('password').value == "") {
@@ -341,12 +345,17 @@ function buildHome() {
     
     get_text("/whoami", function (result) {
       put_text("/person/"+result['person_id'], JSON.stringify(new_info), function (result) {
-        //alert(JSON.stringify(result));
-        document.getElementById('password').value = "";
-        document.getElementById('password2').value = "";
-        $('#success').html('<b>Update successful!</b>');
-        $('#success').show();
-        updateUserText();
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }
+        else if(result['person']) {
+          document.getElementById('password').value = "";
+          document.getElementById('password2').value = "";
+          $('#success').html('<b>Update successful!</b>');
+          $('#success').show();
+          updateUserText();
+        }
       });
     });
   }
