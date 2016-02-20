@@ -29,7 +29,12 @@
 			margin:auto;
 
 		}	
+		
+		#decision_image {
 
+			max-width:600px;
+			
+		}	
 
 		#bottomRow {
 			text-align:center;
