@@ -32,6 +32,7 @@ function main(body)
 		var crit_vote_style;
 		var crit_instructions;
 		var alt_instructions;		
+		var dec_img;
 
 
 		var decision = get_decision(decision_id);
@@ -71,7 +72,7 @@ function main(body)
 		voter_name = ballot.name;
 		crit_instructions = decision.criteria_instruction;
 		alt_instructions = decision.alternative_instruction;
-		
+		dec_img = decision.image;
 
 		for(var i=0; i<criterion.length; i++) {
 			criterion_names[i] = criterion[i].name;
@@ -109,6 +110,7 @@ function main(body)
 			+"<div id=\"ballotbody\" class=\"container\">"
 			+"<div class=\"row\">"
 			+"<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">"
+			+"<img id=\"decision_image\" src=\""+dec_img+"\"></img>"
 			+"<h3>Welcome, "+voter_name+"! </h3>"
 			+"<p class=\"lead\">"+decision_desc+"</p>"
 			+"<div id='crit_inst' class='partone'>"+crit_instructions+"</div>"
