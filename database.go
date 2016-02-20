@@ -15,10 +15,11 @@ import (
 // forigen key restriction is not handled in here but they're
 // handled in each objects Save and Destroy methods
 func InitDatabase(conf config.Configer) *gorp.DbMap {
-	dbsrc := fmt.Sprintf("user=%s dbname=%s sslmode=%s",
+	dbsrc := fmt.Sprintf("user=%s dbname=%s sslmode=%s password=%s",
 		conf.String("database::user"),
 		conf.String("database::name"),
-		conf.String("database::sslmode"))
+		conf.String("database::sslmode"),
+		conf.String("database::password"))
 
 	db, err := sql.Open("postgres", dbsrc)
 	if err != nil {
