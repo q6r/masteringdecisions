@@ -1207,7 +1207,7 @@ function buildHome() {
             vote_status = "Voted"
 			voted = voted + 1
           }else{
-            vote_status = "Note Voted"
+            vote_status = "Not Voted"
 			not_voted = not_voted + 1
           }
           
