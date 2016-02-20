@@ -35,8 +35,7 @@ func InitDatabase(conf config.Configer) *gorp.DbMap {
 	dbmap.AddTableWithName(Vote{}, "vote")
 	dbmap.AddTableWithName(Rating{}, "rating")
 
-	err = dbmap.CreateTablesIfNotExists()
-	if err != nil {
+	if err = dbmap.CreateTablesIfNotExists(); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -45,6 +44,7 @@ func InitDatabase(conf config.Configer) *gorp.DbMap {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	hashed := HashPassword(conf.String("admin::password"))
 	_, err = dbmap.Exec("INSERT INTO person VALUES(0,$1,$2,$3,$4)",
 		conf.String("admin::email"),

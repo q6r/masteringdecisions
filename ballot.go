@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,11 +53,7 @@ func HBallotCreate(c *gin.Context) {
 
 	result := gin.H{"ballot": b}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.BallotID))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "ballot_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "ballot_create.js", result)
 
 	// Send invitation
 	title := fmt.Sprintf("%s's ballot", b.Name)
@@ -143,12 +138,7 @@ func HBallotUpdate(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": newBallot}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "ballot_update.js", result)
 }
 
 // HBallotDelete deletes a ballot from a decision
@@ -174,12 +164,7 @@ func HBallotDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "ballot_deleted.js", result)
 }
 
 // HBallotInfo gets the information for a specific
@@ -196,34 +181,31 @@ func HBallotInfo(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": ballot}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_info.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
-
+	ServeResult(c, "ballot_info.js", result)
 }
 
 // Destroy removes a ballot from the database
 // it also removes the dependencies of a ballots
 // such as votes
 func (b *Ballot) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM ballot WHERE ballot_id=$1", b.BallotID)
-	if err != nil {
+	if _, err := dbmap.Delete(b); err != nil {
 		return fmt.Errorf("Unable to delete ballot %#v from database", b)
 	}
 
 	// Remove votes beloning to this ballot
 	var votes []Vote
-	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.BallotID)
-	if err != nil {
-		return fmt.Errorf("Unable to find votes for ballot %#v", b)
+	_, _ = dbmap.Select(&votes, "SELECT * FROM vote WHERE ballot_id=$1", b.BallotID)
+	for _, v := range votes {
+		if err := v.Destroy(); err != nil {
+			return err
+		}
 	}
 
-	for _, v := range votes {
-		err = v.Destroy()
-		if err != nil {
+	// Remove ratings belonging to this ballot
+	var ratings []Rating
+	_, _ = dbmap.Select(&ratings, "SELECT * FROM rating WHERE ballot_id=$1", b.BallotID)
+	for _, r := range ratings {
+		if err := r.Destroy(); err != nil {
 			return err
 		}
 	}
@@ -313,13 +295,7 @@ func HBallotWhoami(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": Ballot{BallotID: bval, DecisionID: dval}}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballot_whoami.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
-
+	ServeResult(c, "ballot_whoami.js", result)
 }
 
 // HBallotAllInfo show all of the information related to a ballot
@@ -358,13 +334,7 @@ func HBallotAllInfo(c *gin.Context) {
 	}
 
 	result := gin.H{"ballot": ai}
-
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "ballots_all_info.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "ballots_all_info.js", result)
 }
 
 // Save inserts a ballot into the database

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -60,12 +59,7 @@ func HVoteCreate(c *gin.Context) {
 	result := gin.H{"vote": v}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/ballot/%d/alternative/%d/criterion/%d/vote/",
 		b.DecisionID, bid, aid, cid))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "vote_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "vote_create.js", result)
 }
 
 // HVoteUpdate updates a vote
@@ -108,12 +102,7 @@ func HVoteUpdate(c *gin.Context) {
 
 	newVote := Vote{AlternativeID: aid, CriterionID: cid, BallotID: bid, Weight: weight}
 	result := gin.H{"vote": newVote}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "vote_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "vote_update.js", result)
 }
 
 // HVoteDelete deletes a vote by a ballot
@@ -144,12 +133,7 @@ func HVoteDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "vote_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "vote_deleted.js", result)
 }
 
 // HVotesBallotList list all votes made by a ballot
@@ -168,12 +152,7 @@ func HVotesBallotList(c *gin.Context) {
 	}
 
 	result := gin.H{"votes": vs}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "vote_ballot_list.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "vote_ballot_list.js", result)
 }
 
 // Destroy removes a vote from the database
@@ -194,7 +173,7 @@ func (v *Vote) Destroy() error {
 func (v *Vote) Save() error {
 
 	// No duplicate votes
-	n, err := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2 and alternative_id=$3",
+	n, _ := dbmap.SelectInt("select count(*) from vote where ballot_id=$1 and criterion_id=$2 and alternative_id=$3",
 		v.BallotID, v.CriterionID, v.AlternativeID)
 	if n >= 1 {
 		return fmt.Errorf("vote %#v already exists", v)
@@ -202,7 +181,7 @@ func (v *Vote) Save() error {
 
 	// See if there's a criterion that this vote belongs to
 	var cri Criterion
-	err = dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1",
+	err := dbmap.SelectOne(&cri, "select * from criterion where criterion_id=$1",
 		v.CriterionID)
 	if err != nil {
 		return fmt.Errorf("criterion %d does not exist, can't create a vote without an owner", v.CriterionID)
@@ -230,8 +209,7 @@ func (v *Vote) Save() error {
 		return fmt.Errorf("criterion belongs to decision %d while ballot belongs to decision %d", cri.DecisionID, b.DecisionID)
 	}
 
-	err = dbmap.Insert(v)
-	if err != nil {
+	if err = dbmap.Insert(v); err != nil {
 		return fmt.Errorf("Unable to insert vote %#v to database", v)
 	}
 

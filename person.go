@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,11 +31,7 @@ func HPersonsList(c *gin.Context) {
 	}
 
 	result := gin.H{"persons": persons}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "persons_list.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "persons_list.js", result)
 }
 
 // HPersonUpdate updates a perosn
@@ -47,13 +42,13 @@ func HPersonUpdate(c *gin.Context) {
 		return
 	}
 
-	var p Person
-	err = dbmap.SelectOne(&p, "SELECT * FROM person WHERE person_id=$1", pid)
+	pobj, err := dbmap.Get(Person{}, pid)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("person %d not found", pid)})
 		return
 	}
+	p := pobj.(*Person)
 
 	// PersonEasy represent a person in the database
 	// with no password requirement
@@ -109,11 +104,7 @@ func HPersonUpdate(c *gin.Context) {
 
 	newPerson.PWHash = "<hidden>"
 	result := gin.H{"person": newPerson}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "person_update.js", result)
 }
 
 // HPersonCreate creates a person in the database
@@ -137,11 +128,7 @@ func HPersonCreate(c *gin.Context) {
 	person.PWHash = "<hidden>"
 	result := gin.H{"person": person}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/person/%d", person.PersonID))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "person_create.js", result)
 }
 
 // HPersonDelete deletes a person from the database
@@ -153,34 +140,29 @@ func HPersonDelete(c *gin.Context) {
 	}
 
 	p := &Person{PersonID: id}
-	err = p.Destroy()
-	if err != nil {
+	if err = p.Destroy(); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "person_deleted.js", result)
 }
 
 // HPersonInfo return information for a person
 func HPersonInfo(c *gin.Context) {
-	id := c.Param("person_id")
+	pid := c.Param("person_id")
 
-	var person Person
-	err := dbmap.SelectOne(&person, "select * from person where person_id=$1", id)
+	pobj, err := dbmap.Get(Person{}, pid)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "not found"})
 		return
 	}
+	p := pobj.(*Person)
 
-	person.PWHash = "<hidden>"
+	p.PWHash = "<hidden>"
 
-	result := gin.H{"person": person}
+	result := gin.H{"person": p}
 	c.JSON(http.StatusOK, result)
 }
 
@@ -195,11 +177,7 @@ func HPersonDecisions(c *gin.Context) {
 	}
 
 	result := gin.H{"decisions": decisions}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "person_decisions.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "person_decisions.js", result)
 }
 
 // Destroy a person from the database and remove its dependencies
@@ -214,14 +192,9 @@ func (p *Person) Destroy() error {
 
 	// Remove the person's decisions
 	var decisions []Decision
-	_, err = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.PersonID)
-	if err != nil {
-		return fmt.Errorf("Unable to find decisions for person %#v", p)
-	}
-
+	_, _ = dbmap.Select(&decisions, "SELECT * from decision WHERE person_id=$1", p.PersonID)
 	for _, d := range decisions {
-		err := d.Destroy()
-		if err != nil {
+		if err := d.Destroy(); err != nil {
 			return err
 		}
 	}
@@ -245,5 +218,6 @@ func (p *Person) Save() error {
 		return fmt.Errorf("Unable to insert person %d into database:%#v",
 			p.PersonID, err)
 	}
+
 	return nil
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,12 +61,7 @@ func HDecisionBallotsList(c *gin.Context) {
 	}
 
 	result := gin.H{"ballots": ais}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "decision_ballots.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_ballots.js", result)
 }
 
 // HDecisionAlternativesList returns a list of alternatives beloning
@@ -83,11 +77,7 @@ func HDecisionAlternativesList(c *gin.Context) {
 	}
 
 	result := gin.H{"alternatives": alts}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_alternatives.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_alternatives.js", result)
 }
 
 // HDecisionCriterionsList returns a list of criterions beloning
@@ -103,11 +93,7 @@ func HDecisionCriterionsList(c *gin.Context) {
 	}
 
 	result := gin.H{"criterions": cris}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_criterions.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_criterions.js", result)
 }
 
 // HDecisionsList returns a list of all decision defined
@@ -132,11 +118,7 @@ func HDecisionsList(c *gin.Context) {
 	}
 
 	result := gin.H{"decisions": links}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decisions_list.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decisions_list.js", result)
 }
 
 // HDecisionInfo returns a decision information
@@ -151,11 +133,7 @@ func HDecisionInfo(c *gin.Context) {
 	}
 
 	result := gin.H{"decision": decision}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "decision_info.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_info.js", result)
 }
 
 // HDecisionUpdate updates a decision
@@ -205,12 +183,7 @@ func HDecisionUpdate(c *gin.Context) {
 	}
 
 	result := gin.H{"decision": newDecision}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "decision_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_update.js", result)
 }
 
 // HDecisionCreate creates a decision beloning to a specific
@@ -232,12 +205,7 @@ func HDecisionCreate(c *gin.Context) {
 
 	result := gin.H{"decision": decision}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d", decision.DecisionID))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "decision_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_create.js", result)
 }
 
 // HDecisionDelete deletes a decision from database
@@ -256,30 +224,21 @@ func HDecisionDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "decision_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "decision_deleted.js", result)
 }
 
 // Destroy a decision from the database
 // and remove it's dependencies such as ballots
 // when destroying ballots they'll destroy their votes..etc
 func (d *Decision) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM decision WHERE decision_id=$1", d.DecisionID)
-	if err != nil {
+	if _, err := dbmap.Delete(d); err != nil {
 		return fmt.Errorf("Unable to delete decision %#v from database", d)
 	}
 
 	// Remove the ballots of this decision
 	// removes the votes
 	var ballots []Ballot
-	_, err = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.DecisionID)
-	if err != nil {
-		return fmt.Errorf("Unable to find ballot for decision %#v", d)
-	}
+	_, _ = dbmap.Select(&ballots, "SELECT * FROM ballot WHERE decision_id=$1", d.DecisionID)
 	for _, b := range ballots {
 		err := b.Destroy()
 		if err != nil {
@@ -290,10 +249,7 @@ func (d *Decision) Destroy() error {
 	// Remove criterions
 	// Does not remove anything..
 	var cris []Criterion
-	_, err = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.DecisionID)
-	if err != nil {
-		return fmt.Errorf("Unable to find criterion for decision %#v", d)
-	}
+	_, _ = dbmap.Select(&cris, "select * from criterion where decision_id=$1", d.DecisionID)
 	for _, cri := range cris {
 		err := cri.Destroy()
 		if err != nil {
@@ -303,10 +259,7 @@ func (d *Decision) Destroy() error {
 
 	// Removing the alternatives remove the votes related to it
 	var alts []Alternative
-	_, err = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.DecisionID)
-	if err != nil {
-		return fmt.Errorf("Unable to find alternatives for decision %#v", d)
-	}
+	_, _ = dbmap.Select(&alts, "select * from alternative where decision_id=$1", d.DecisionID)
 	for _, alt := range alts {
 		err := alt.Destroy()
 		if err != nil {
@@ -330,21 +283,16 @@ func (d *Decision) Save() error {
 		return fmt.Errorf("person %d does not exist, can't create a decision without an owner", d.PersonID)
 	}
 
-	// If someone else other than us owns the same
-	// decision then abort
+	// Check ownership of decisions
 	var ds []Decision
-	_, err = dbmap.Select(&ds, "select * from decision where decision_id=$1", d.DecisionID)
-	if err != nil {
-		return err
-	}
+	_, _ = dbmap.Select(&ds, "select * from decision where decision_id=$1", d.DecisionID)
 	for _, i := range ds {
 		if i.PersonID != d.PersonID {
 			return fmt.Errorf("decision %d already owned by person %d", d.DecisionID, i.PersonID)
 		}
 	}
 
-	err = dbmap.Insert(d)
-	if err != nil {
+	if err = dbmap.Insert(d); err != nil {
 		return fmt.Errorf("Unable to insert decision %#v to database", d)
 	}
 	return nil

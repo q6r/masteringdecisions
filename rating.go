@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -57,13 +56,7 @@ func HRatingCreate(c *gin.Context) {
 	c.Writer.Header().Set("Location",
 		fmt.Sprintf("/decision/%d/ballot/%d/criterion/%d/vote/",
 			b.DecisionID, bid, cid))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "rating_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
-
+	ServeResult(c, "rating_create.js", result)
 }
 
 // HRatingBallots shows all the ratings on a criterion
@@ -85,12 +78,7 @@ func HRatingBallots(c *gin.Context) {
 	}
 
 	result := gin.H{"ratings": rs}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "rating_ballot_list.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "rating_ballot_list.js", result)
 }
 
 // HRatingDelete delete a specific rating on an criterion
@@ -116,12 +104,7 @@ func HRatingDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "rating_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "rating_deleted.js", result)
 }
 
 // HRatingUpdate update a specific rating on a criterion
@@ -161,25 +144,20 @@ func HRatingUpdate(c *gin.Context) {
 
 	newRating := Rating{CriterionID: cid, BallotID: bid, Rating: rating}
 	result := gin.H{"rating": newRating}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "rating_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "rating_update.js", result)
 }
 
 // Save saves a rating in the database
 func (w *Rating) Save() error {
 
 	// No duplicate ratings
-	n, err := dbmap.SelectInt("select count(*) from rating where ballot_id=$1 and criterion_id=$2", w.BallotID, w.CriterionID)
+	n, _ := dbmap.SelectInt("select count(*) from rating where ballot_id=$1 and criterion_id=$2", w.BallotID, w.CriterionID)
 	if n >= 1 {
 		return fmt.Errorf("rating %#v already exists", w)
 	}
 
 	var b Ballot
-	err = dbmap.SelectOne(&b, "select * from ballot where ballot_id=$1", w.BallotID)
+	err := dbmap.SelectOne(&b, "select * from ballot where ballot_id=$1", w.BallotID)
 	if err != nil {
 		return fmt.Errorf("ballot %d does not exists, can't create a rating without an owner", w.BallotID)
 	}
@@ -196,8 +174,7 @@ func (w *Rating) Save() error {
 		return fmt.Errorf("The criterion and ballot don't belong to this decision")
 	}
 
-	err = dbmap.Insert(w)
-	if err != nil {
+	if err = dbmap.Insert(w); err != nil {
 		return fmt.Errorf("unable to insert rating %#v to database", w)
 	}
 

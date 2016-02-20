@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,12 +32,7 @@ func HCriterionInfo(c *gin.Context) {
 	}
 
 	result := gin.H{"criterion": cri}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "criterion_info.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "criterion_info.js", result)
 }
 
 // HCriterionDelete deletes a criterion from a decision
@@ -63,12 +57,7 @@ func HCriterionDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "criterion_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "criterion_deleted.js", result)
 }
 
 // HCriterionCreate creates a criterion for a decision
@@ -96,12 +85,7 @@ func HCriterionCreate(c *gin.Context) {
 	result := gin.H{"criterion": cri}
 	c.Writer.Header().Set("Location",
 		fmt.Sprintf("/decision/%d/criterion/%d", did, cri.CriterionID))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "criterion_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "criterion_create.js", result)
 }
 
 // HCriterionUpdate updates a criterion
@@ -148,12 +132,7 @@ func HCriterionUpdate(c *gin.Context) {
 	}
 
 	result := gin.H{"criterion": newCriterion}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "criterion_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "criterion_update.js", result)
 }
 
 // Destroy removes a criterion from a decision
@@ -171,8 +150,7 @@ func (cri *Criterion) Destroy() error {
 // Restrictions decision should exist
 func (cri *Criterion) Save() error {
 	// See if there's a decision this belongs to
-	var d Decision
-	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", cri.DecisionID)
+	_, err := dbmap.Get(Decision{}, cri.DecisionID)
 	if err != nil {
 		return fmt.Errorf("decision %d does not exist, criterion should belong to an existing decision", cri.DecisionID)
 	}

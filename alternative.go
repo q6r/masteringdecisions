@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,25 +41,20 @@ func HAlternativeCreate(c *gin.Context) {
 
 	result := gin.H{"alternative": alt}
 	c.Writer.Header().Set("Location", fmt.Sprintf("/decision/%d/alternative/%d", alt.DecisionID, alt.AlternativeID))
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl", gin.H{"scriptname": "alternative_create.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "alternative_create.js", result)
 }
 
 // Save inserts a ballot into the database
 func (alt *Alternative) Save() error {
 	// Check if decision exists or not
-	var d Decision
-	err := dbmap.SelectOne(&d, "select * from decision where decision_id=$1", alt.DecisionID)
-	if err != nil {
+	if _, err := dbmap.Get(Decision{}, alt.DecisionID); err != nil {
 		return fmt.Errorf("Decision %d does not exists, can't create alternative without a decision", alt.DecisionID)
 	}
 
 	if err := dbmap.Insert(alt); err != nil {
 		return fmt.Errorf("Unable to insert alternative %#v to database", alt)
 	}
+
 	return nil
 }
 
@@ -109,12 +103,7 @@ func HAlternativeUpdate(c *gin.Context) {
 	}
 
 	result := gin.H{"alternative": newAlternative}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "alternative_update.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "alternative_update.js", result)
 }
 
 // HAlternativeDelete deletes an alternative from a decision
@@ -141,12 +130,7 @@ func HAlternativeDelete(c *gin.Context) {
 	}
 
 	result := gin.H{"result": "deleted"}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "alternative_deleted.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
+	ServeResult(c, "alternative_deleted.js", result)
 }
 
 // HAlternativeInfo gets the information for a specific
@@ -164,31 +148,20 @@ func HAlternativeInfo(c *gin.Context) {
 	}
 
 	result := gin.H{"alternative": alt}
-	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
-		c.HTML(http.StatusOK, "htmlwrapper.tmpl",
-			gin.H{"scriptname": "alternative_info.js", "body": result})
-	} else {
-		c.JSON(http.StatusOK, result)
-	}
-
+	ServeResult(c, "alternative_info.js", result)
 }
 
 // Destroy an alternative
 func (alt *Alternative) Destroy() error {
-	_, err := dbmap.Exec("DELETE FROM alternative WHERE alternative_id=$1", alt.AlternativeID)
-	if err != nil {
+	if _, err := dbmap.Delete(alt); err != nil {
 		return fmt.Errorf("Unable to delete alternative %#v from database", alt)
 	}
 
 	// Remove votes beloning to this alternative
 	var votes []Vote
-	_, err = dbmap.Select(&votes, "SELECT * FROM vote WHERE alternative_id=$1", alt.AlternativeID)
-	if err != nil {
-		return fmt.Errorf("Unable to find votes for alternative %#v", alt)
-	}
+	_, _ = dbmap.Select(&votes, "SELECT * FROM vote WHERE alternative_id=$1", alt.AlternativeID)
 	for _, v := range votes {
-		err = v.Destroy()
-		if err != nil {
+		if err := v.Destroy(); err != nil {
 			return err
 		}
 	}
