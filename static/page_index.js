@@ -1348,7 +1348,7 @@ function buildHome() {
         '</form>'
         ].join('\n'));
         
-        $('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'buildEditDecision('+decisionID+');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
+        $('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'buildDecisionHome('+decisionID+');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
         $('<button>').addClass('btn btn-primary').attr('id','invite_submit').attr('onclick', 'sendInvite('+decisionID+');').attr('style','float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
         
       
