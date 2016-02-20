@@ -484,6 +484,11 @@ function buildHome() {
     }
     else {
       get_text("/whoami", function (result) {
+        if(result['person_id'] == 0) {
+          $('#error').html('<b>Error:</b> The admin account cannot have decisons!');
+          $('#error').show();
+          return;
+        }
         var new_decision = {
           "person_id":+result['person_id'],
           "name":$("#name").val(),
@@ -494,11 +499,18 @@ function buildHome() {
           "client_settings":"",
           "display_name":$("#name").val(),
           "criteria_instruction":"",
-          "alternative_instruction":""
+          "alternative_instruction":"",
+          "image": ""
         }
         post_text("/decision", JSON.stringify(new_decision), function(result){
-          updateLeftNav();
-          buildDecisionHome(result['decision']['decision_id']);
+          if(result['error']) {
+            $('#error').html('<b>Error:</b> ' + result['error']);
+            $('#error').show();
+          }
+          else if(result['decision']) {
+            updateLeftNav();
+            buildDecisionHome(result['decision']['decision_id']);
+          }
         });
       });
     }
@@ -677,11 +689,15 @@ function buildHome() {
         "Are you sure you want to delete this decision and all associated ballots?",
         function() {
           delete_text("/decision/"+decisionID, function (result) {
-            if(result['result'] == "deleted")
+            if(result['result'] != "deleted") {
               alert("Decision Deleted!");
-            //redirect
-            updateLeftNav();
-            buildHome();
+              $('#error').html('<b>Error:</b> Something went wrong!');
+              $('#error').show();
+            }
+            else {
+              updateLeftNav();
+              buildHome();
+            }
           });
         },
         function() { /* Do nothing */}
