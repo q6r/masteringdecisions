@@ -1189,6 +1189,7 @@ function buildHome() {
 	  '<th>Email</th>',
 	  '<th>Ballot status</th>',
 	  '<th>Action</th>',
+	  '<th>Reset</th>',
 	  '<th></th>',
 	  '<th></th>',
 	  '</tr>',      
@@ -1230,7 +1231,7 @@ function buildHome() {
           var url = result.ballots[i].url
           
           //$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
-		  $("#s_body").append('<tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend Email</a>'+'</td><td><a onclick=\'buildEditBallotForm('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\''+url+'\',' + decisionID +')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');       
+		  $("#s_body").append('<tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend Email</a>'+'</td><td align="center"><a onclick=\'resetVote('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\''+url+'\',' + decisionID +')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');       
           
         }
         }else{
@@ -1296,6 +1297,40 @@ function buildHome() {
 	
 	function cancelEdit(decisionID){
 		buildDecisionStatus(decisionID)
+	}
+	
+	function resetVote(decisionID, ballot){
+		console.log(ballot.votes)
+		confirmYesNo(
+          "Reset Ballot",
+          "Are you sure you want to reset this ballot?",
+          function() {
+			//delete alt rating on each criteria
+			for(i = 0; i < ballot.votes.length; i++){
+			delete_text(ballot.url +"/alternative/"+ballot.votes[i].alternative_id +"/criterion/" + ballot.votes[i].criterion_id +"/vote", function(result){
+				if(result['result'] == "deleted") {
+                $('#success').html('Deleted Successfully');
+                $('#success').show();
+              }
+			});
+			}
+			
+			//delete criterion rating 
+			for(i = 0; i < ballot.rating.length; i++){
+			delete_text(ballot.url +"/criterion/" + ballot.rating[i].criterion_id +"/vote", function(result){
+				if(result['result'] == "deleted") {
+                $('#success').html('Deleted Successfully');
+                $('#success').show();
+              }
+              
+			});
+			}
+			buildDecisionStatus(decisionID)
+			
+          },
+          function() { /* Do nothing */}
+		);
+
 	}
 	
 	function buildEditBallotForm(decisionID, ballot){
