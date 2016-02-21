@@ -244,12 +244,12 @@ function main(body)
 			+"<div id=\"ballotbottom\" class=\"container parttwo\">"
 			+"<div class=\"col-md-6 col-md-offset-3\" id=\"bottomRow\">"
 			+"<div class=\"alert alert-danger\" id=\"errordiv\"></div>"
-			+"<div class=\"alert alert-success\" id=\"successdiv\">Your vote has been received, thanks!</div>"
 			+"<button class=\"btn btn-primary\" id=\"submitbtn\">Submit</button>"
 			+"<button class=\"btn btn-warning\" id=\"clearbtn\">Clear</button>"
 			+"</div>"
 			+"</div>"
 			+"</div>"
+			+"<div class=\"alert alert-success\" id=\"successdiv\">Your vote has been received, thanks!</div>"
 			
 
 			$("body").append(page);
@@ -454,6 +454,7 @@ function main(body)
 					}
 
 					if($("#errordiv").is(":empty")) {
+						$(".parttwo").hide();
 						$("#successdiv").show();
 					}	
 

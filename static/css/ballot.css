@@ -30,6 +30,14 @@
 
 		}	
 		
+		#successdiv {
+
+			max-width:500px;
+			text-align:center;
+			margin:auto;
+
+		}
+
 		#decision_image {
 
 			max-width:600px;
