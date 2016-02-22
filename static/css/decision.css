@@ -1,0 +1,67 @@
+body {
+  background: #eee !important;
+}
+
+th,td {
+  text-align:center !important;
+}
+
+.step1, .step4{
+  background:#333;
+  color:#fff;
+  font-size: 24px;
+  text-align:center;
+}
+
+.step2{
+  background:#999;
+  color:#fff;
+  font-size: 24px;
+  text-align:center;
+}
+
+.row3 {
+  font-weight:bold;
+}
+
+/* Applies to all criterion headers */
+.critHeaders {
+  color:#fff;
+  font-size: 18px;
+  font-weight:bold;
+  text-align:center;
+}
+
+/* Colors of criterion headers */
+.crit0 {background:#0000ff;}
+.crit1 {background:#8080ff;}
+.crit2 {background:#40ff00;}
+.crit3 {background:#00bfff;}
+.crit4 {background:#ff0080;}
+.crit5 {background:#bfff00;}
+.crit6 {background:#ff4000;}
+.crit7 {background:#ff00ff;}
+.crit8 {background:#ff0080;}
+.crit9 {background:#8000ff;}
+.crit10{background:#ff0000;}
+.crit11{background:#80ff00;}
+.crit12{background:#00ff40;}
+.crit13{background:#00ffbf;}
+.crit14{background:#00ffff;}
+.crit15{background:#ff0040;}
+.crit16{background:#00ff00;}
+.crit17{background:#00ff80;}
+.crit18{background:#ffbf00;}
+.crit19{background:#bf00ff;}
+.crit20{background:#ffff00;}
+.crit21{background:#ff8000;}
+.crit22{background:#ff0000;}
+.crit23{background:#0040ff;}
+.crit24{background:#ff00bf;}
+
+/* Colors of the ratings */
+.alt-R{color:red;}
+.alt-O{color:orange;}
+.alt-Y{color:yellow;}
+.alt-GY{color:greenyellow;}
+.alt-G{color:green;}

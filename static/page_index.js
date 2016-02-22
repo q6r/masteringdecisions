@@ -659,6 +659,9 @@ function buildHome() {
       
       $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision('+decisionID+');').text('Submit').appendTo(form);
       $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('id', 'deleteDecisionBtn').attr('onclick', 'deleteDecision('+decisionID+');').text('Delete Decision').appendTo(form);
+      $('<hr/>').appendTo(form);
+      $('<button>').addClass('btn btn-lg btn-info btn-block').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/decision/'+decisionID+'").attr("target", "_blank")[0].click();').text('View Decision Results').appendTo(form);
+      $('#decisionResultsBtn').hide();
       
       get_text("/decision/"+decisionID+"/info", function (result) {
         $('#name').val(result['decision']['name']);
@@ -670,6 +673,10 @@ function buildHome() {
         $('#altStyle').val(result['decision']['alternative_vote_style']);
         $('#critInstructions').val(result['decision']['criteria_instruction']);
         $('#altInstructions').val(result['decision']['alternative_instruction']);
+        
+        if(result['decision']['stage'] == 3) { //if decision is completed show results Btn
+          $('#decisionResultsBtn').show();
+        }
       });
   }
   
@@ -707,6 +714,7 @@ function buildHome() {
   function updateDecision(decisionID) {
     $('#error').hide();
     $('#success').hide();
+    $('#decisionResultsBtn').hide();
     
     if(document.getElementById('name') == '') {
       $('#error').html('<b>Error:</b> No name set!');
@@ -736,6 +744,10 @@ function buildHome() {
           updateLeftNav();
           $('#success').html('Updated Successfully');
           $('#success').show();
+          
+          if(new_decision['stage'] == 3) {
+            $('#decisionResultsBtn').show();
+          }
         });
       });
     }
