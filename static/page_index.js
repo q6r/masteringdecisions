@@ -28,6 +28,7 @@ function decisionListByCategory(cb) {
   });
 }
 
+//Updates the list of inprogress and completed decisions in the leftNav
 function updateLeftNav() {
     decisionListByCategory(function(inprogress, completed) {
 
@@ -49,6 +50,7 @@ function updateLeftNav() {
   });
 }
 
+//builds the main template for the page
 function buildTemplate() {
   //Add alert box used in scripts
   $('body').append(
@@ -74,8 +76,7 @@ function buildTemplate() {
     '</div>'
   );
 
-
-  //nav section
+  //topnav section
   var nav = $('<nav>').addClass('navbar navbar-inverse navbar-fixed-top').appendTo('body')
   var div_container = $('<div class="container-fluid">').appendTo(nav)
   var div_nav_header = $('<div class="navbar-header">').appendTo(div_container)
@@ -138,7 +139,6 @@ function buildTemplate() {
         '<li class="nav-header"> <a  data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
           '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
               '<li class="active"> <a onclick="buildHome()"><i class="glyphicon glyphicon-home"></i> Home</a></li>',              
-              '<li><a onclick="buildAddUser()"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
               '<li><a onclick="buildManageUsers()"><i class="glyphicon glyphicon-user"></i> Manage Users</a></li>',
               //'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
               '<li><a href="/logout.html"><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
@@ -167,10 +167,12 @@ function buildTemplate() {
   });
 }
 
+//clears the content section of the page
 function clearContent() {
   $('#content').empty();
 }
 
+//Updates the username in the topNav
 function updateUserText() {
   get_text("/whoami", function (result) {
     get_text("/person/"+result['person_id']+"/info", function (result) {
@@ -363,85 +365,7 @@ function buildHome() {
   
   return false;
   }
-
-/**** Add User ****/
-//This feature is duplicated in manage user so we could probably remove it here
-  function buildAddUser(){
-    $('title').html('Add User!');
-    clearContent();
-    
-    $('<strong><i class="glyphicon glyphicon-cog"></i> Add User</strong><hr/>').appendTo('#content');
-    //build the sign up form
-    var signupForm = $('<form id="myform" onsubmit="return false"></form>')
-    $('<div id= "signup_successful" class = "alert alert-success"></div>').appendTo("#content")
-    $('<div id="signup_error" class="alert alert-danger"></div>').appendTo("#content")
-    
-    var email = $('<label> Email<input type="text" name ="email" id="emailInput" required="required" placeholder ="Email" class="form-control"/> </label></br>')
-          .appendTo('body');
-          
-    var pwd = $('<label> Password<input type="password" name ="pw_hash" id="passwordInput" required="required" placeholder="Password" class="form-control"/> </label></br>')
-          .appendTo('body');
-          
-    var firstname = $('<label> First Name<input type="text" name ="name_first" id="firstnameInput" required="required" placeholder="First Name" class="form-control"/> </label></br>')
-          .appendTo('body');
-    
-    var lastname = $('<label>Last Name<input type="text" name="name_last" id="lastnameInput" required="required" placeholder="Last Name" class="form-control" /> </label></br>')
-          .appendTo('body');
-          
-    var submit = $(' <input type="button" onclick="addUserSubmitform()" value="Sign Up" class="btn btn-sm-9 btn-primary" />')
-          .appendTo('body');
-          
-
-    signupForm.append(email,pwd, firstname,lastname,submit);
-    signupForm.appendTo('#content');
-    $("#signup_successful").hide()
-    $("#signup_error").hide()
-    
-
-  }
-
-  function addUserSubmitform(){   
-    $("#signup_successful").hide()
-    $("#signup_error").hide()
-
-    if(document.getElementById("emailInput").value =='') {
-      $('#signup_error').html('<b>Error:</b> No email set!');
-      $('#signup_error').show();
-    }
-    else if(document.getElementById("passwordInput").value =='') {
-      $('#signup_error').html('<b>Error:</b> No password set!');
-      $('#signup_error').show();
-    }else if(document.getElementById("firstnameInput").value==''){
-      $('#signup_error').html('<b>Error:</b> No first name set!');
-      $('#signup_error').show()
-    }else if(document.getElementById("lastnameInput").value==''){
-      $('#signup_error').html('<b>Error:</b> No last name set!');
-      $('#signup_error').show()
-    }else if(!isEmail(document.getElementById("emailInput").value)){
-      $('#signup_error').html('<b>Error:</b> Invalid Email!');
-      $('#signup_error').show()
-    }else{
-      new_signup = {
-      "email":document.getElementById("emailInput").value,
-      "pw_hash":document.getElementById("passwordInput").value,
-      "name_first":document.getElementById("firstnameInput").value,
-      "name_last": document.getElementById("lastnameInput").value 
-      };
-      
-      post_text("/person", JSON.stringify(new_signup), function(person){
-        if(person['error']) {
-          $('#signup_error').html('<b>Error:</b> ' + person['error']);
-          $('#signup_error').show()
-        }
-        if(person['person']) {
-          buildAddUser();
-          $("#signup_successful").html("Sign up successful!")
-          $("#signup_successful").show()
-        }
-      });
-    }
-  }
-  
+ 
 /**** Manage Users ****/
   function buildManageUsers() {
     $('title').html('Manage Users');
@@ -596,11 +520,13 @@ function buildHome() {
         if(person['error']) {
           $('#error').html('<b>Error:</b> ' + person['error']);
           $('#error').show()
-        }
-        if(person['person']) {
+        }else if(person['person']) {
           buildManageUsers();
           $("#successful").html("Sign up successful!")
           $("#successful").show()
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show()
         }
       });
     }
@@ -651,11 +577,13 @@ function buildHome() {
         if(person['error']) {
           $('#error').html('<b>Error:</b> ' + person['error']);
           $('#error').show()
-        }
-        if(person['person']) {
+        }else if(person['person']) {
           buildManageUsers();
           $("#successful").html("Updated successful!")
           $("#successful").show()
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show()
         }
       });
     }
@@ -674,12 +602,10 @@ function buildHome() {
             if(result['error']) {
               $('#signup_error').html('<b>Error:</b> ' + result['error']);
               $('#signup_error').show()
-            }
-            if(result['result'] == "deleted") {
+            }else if(result['result'] == "deleted") {
               $('#success').html('Deleted Successfully');
               $('#success').show();
-            }
-            else {
+            }else {
               $('#error').html('Soemthing went wrong :(');
               $('#error').show();
             }
@@ -784,10 +710,12 @@ function buildHome() {
           if(result['error']) {
             $('#error').html('<b>Error:</b> ' + result['error']);
             $('#error').show();
-          }
-          else if(result['decision']) {
+          }else if(result['decision']) {
             updateLeftNav();
             buildDecisionHome(result['decision']['decision_id']);
+          }else {
+            $('#error').html('<b>Error:</b> Something went wrong :(');
+            $('#error').show()
           }
         });
       });
@@ -1019,12 +947,20 @@ function buildHome() {
         }
 
         put_text("/decision/" + decisionID, JSON.stringify(new_decision), function(result){
-          updateLeftNav();
-          $('#success').html('Updated Successfully');
-          $('#success').show();
-          
-          if(new_decision['stage'] == 3) {
-            $('#decisionResultsBtn').show();
+          if(result['error']) {
+            $('#error').html('<b>Error:</b> ' + result['error']);
+            $('#error').show();
+          }else if(result['decision']) {
+            updateLeftNav();
+            $('#success').html('Updated Successfully');
+            $('#success').show();
+            
+            if(new_decision['stage'] == 3) {
+              $('#decisionResultsBtn').show();
+            }
+          }else {
+            $('#error').html('<b>Error:</b> Something went wrong :(');
+            $('#error').show();
           }
         });
       });
@@ -1153,10 +1089,16 @@ function buildHome() {
       }
 
       post_text("/decision/" + decisionID + '/criterion', JSON.stringify(new_crit), function(result){
-        //$('#success').html('Updated Successfully');
-        //$('#success').show();
-        updateCritList(decisionID);
-        showAddCriteria(decisionID); //clears it
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['criteria']){
+          updateCritList(decisionID);
+          showAddCriteria(decisionID); //clears it
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
       });
     }
 
@@ -1171,10 +1113,16 @@ function buildHome() {
       }
 
       put_text("/decision/" + decisionID + '/criterion/' + criterionID, JSON.stringify(crit), function(result){
-        //$('#success').html('Updated Successfully');
-        //$('#success').show();
-        updateCritList(decisionID);
-        showAddCriteria(decisionID); //clears it
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['criteria']) {
+          updateCritList(decisionID);
+          showAddCriteria(decisionID); //clears it
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
       });
     }
     
@@ -1187,12 +1135,16 @@ function buildHome() {
           "Are you sure you want to delete this criterion?",
           function() {
             delete_text("/decision/"+decisionID+"/criterion/"+criterionID, function (result) {
-              if(result['result'] == "deleted") {
-                //$('#success').html('Deleted Successfully');
-                //$('#success').show();
+              if(result['error']) {
+                $('#error').html('<b>Error:</b> ' + result['error']);
+                $('#error').show()
+              }else if(result['result'] == "deleted") {
+                updateCritList(decisionID);
+                showAddCriteria(decisionID);
+              }else {
+                $('#error').html('<b>Error:</b> Something went wrong :(');
+                $('#error').show();
               }
-              updateCritList(decisionID);
-              showAddCriteria(decisionID);
             });
           },
           function() { /* Do nothing */}
@@ -1368,10 +1320,16 @@ function buildHome() {
       }
 
       post_text("/decision/" + decisionID + '/alternative', JSON.stringify(new_alt), function(result){
-        //$('#success').html('Updated Successfully');
-        //$('#success').show();
-        updateAltList(decisionID);
-        showAddAlternative(decisionID); //clears it
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['alternative']) {
+          updateAltList(decisionID);
+          showAddAlternative(decisionID); //clears it
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
       });
     }
 
@@ -1387,10 +1345,16 @@ function buildHome() {
       }
 
       put_text("/decision/" + decisionID + '/alternative/' + alternativeID, JSON.stringify(alt), function(result){
-        //$('#success').html('Updated Successfully');
-        //$('#success').show();
-        updateAltList(decisionID);
-        showAddAlternative(decisionID); //clears it
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['alternative']) {
+          updateAltList(decisionID);
+          showAddAlternative(decisionID); //clears it
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
       });
     }
     
@@ -1403,12 +1367,16 @@ function buildHome() {
           "Are you sure you want to delete this alternative?",
           function() {
             delete_text("/decision/"+decisionID+"/alternative/"+alternativeID, function (result) {
-              if(result['result'] == "deleted") {
-                //$('#success').html('Deleted Successfully');
-                //$('#success').show();
+              if(result['error']) {
+                $('#error').html('<b>Error:</b> ' + result['error']);
+                $('#error').show()
+              }else if(result['result'] == "deleted") {
+                updateAltList(decisionID);
+                showAddAlternative(decisionID);
+              }else {
+                $('#error').html('<b>Error:</b> Something went wrong :(');
+                $('#error').show();
               }
-              updateAltList(decisionID);
-              showAddAlternative(decisionID);
             });
           },
           function() { /* Do nothing */}
@@ -1459,7 +1427,12 @@ function buildHome() {
       $('<li><a onclick="buildDecisionInvite('+decisionID+')">Invite</a></li>').appendTo(ul);
       
       var wrapper = $('<div>').addClass('tabbedContent').attr('id','b_wrapper').appendTo('#content');
-    var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper) 
+      var ballotsForCurrentStage = $('<div>').attr('id','totalBallots').appendTo(wrapper);
+        
+      $('<div>').attr('id','success').addClass('alert alert-success').appendTo(wrapper);
+      $('#success').hide();
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(wrapper);
+      $('#error').hide();    
 	
 	//display total counts for ballot status
 	  var stageBallots = $([
@@ -1522,7 +1495,7 @@ function buildHome() {
           var url = result.ballots[i].url
           
           //$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
-		  $("#s_body").append('<tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend Email</a>'+'</td><td align="center"><a onclick=\'resetVote('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\''+url+'\',' + decisionID +')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');       
+		  $("#s_body").append('<tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick="resendEmail(\''+url+'\', \'' + result.ballots[i].email + '\');">Resend Email</a>'+'</td><td align="center"><a onclick=\'resetVote('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm('+decisionID+','+ JSON.stringify(result.ballots[i])+ ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\''+url+'\',' + decisionID +')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');       
           
         }
         }else{
@@ -1548,23 +1521,42 @@ function buildHome() {
       
     }
     
-    function resendEmail(url){
+    function resendEmail(url, email){
+      $('#success').hide();
+      $('#error').hide();
+      
       get_text(url + "/invite", function(result){
-        console.log(result)
-      })
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['result'] == "invited") {
+          $('#success').html('Invite resent to ' + email);
+          $('#success').show();
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
+      });
     }
 	
     function deleteBallot(url,decisionID){
+      $('#success').hide();
+      $('#error').hide();
+      
       confirmYesNo(
             "Delete Ballot",
             "Are you sure you want to delete this ballot?",
             function() {
               delete_text(url, function (result) {
-                if(result['result'] == "deleted") {
-                  $('#success').html('Deleted Successfully');
-                  $('#success').show();
+                if(result['error']) {
+                  $('#error').html('<b>Error:</b> ' + result['error']);
+                  $('#error').show()
+                }else if(result['result'] == "deleted") {
+                  buildDecisionStatus(decisionID);
+                }else {
+                  $('#error').html('<b>Error:</b> Something went wrong :(');
+                  $('#error').show();
                 }
-                buildDecisionStatus(decisionID)
               });
             },
             function() { /* Do nothing */}
@@ -1572,18 +1564,25 @@ function buildHome() {
     }
     
     function editBallot(decisionID, url){
-    
+      $('#success').hide();
+      $('#error').hide();
+      
       var ballot = {
           "name":$("#ballotName").val(),
           "email":$("#ballotEmail").val(),
          }
       
       put_text(url, JSON.stringify(ballot), function(result){
-          //$('#success').html('Updated Successfully');
-          //$('#success').show();
-          buildDecisionStatus(decisionID)
-        });
-      
+        if(result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show()
+        }else if(result['ballot']) {
+          buildDecisionStatus(decisionID);
+        }else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
+        }
+      });
     }
     
     function cancelEdit(decisionID){
@@ -1591,37 +1590,49 @@ function buildHome() {
     }
     
     function resetVote(decisionID, ballot){
+      $('#success').hide();
+      $('#error').hide();
+      
       console.log(ballot.votes)
       confirmYesNo(
             "Reset Ballot",
             "Are you sure you want to reset this ballot?",
             function() {
-        //delete alt rating on each criteria
-        for(i = 0; i < ballot.votes.length; i++){
-        delete_text(ballot.url +"/alternative/"+ballot.votes[i].alternative_id +"/criterion/" + ballot.votes[i].criterion_id +"/vote", function(result){
-          if(result['result'] == "deleted") {
-                  $('#success').html('Deleted Successfully');
+              //delete alt rating on each criteria
+              for(i = 0; i < ballot.votes.length; i++){
+              delete_text(ballot.url +"/alternative/"+ballot.votes[i].alternative_id +"/criterion/" + ballot.votes[i].criterion_id +"/vote", function(result){
+                if(result['error']) {
+                  $('#error').html('<b>Error:</b> ' + result['error']);
+                  $('#error').show()
+                }else if(result['result'] == "deleted") {
+                  $('#success').html('Votes cleared!');
                   $('#success').show();
+                }else {
+                  $('#error').html('<b>Error:</b> Something went wrong :(');
+                  $('#error').show();
                 }
-        });
-        }
-        
-        //delete criterion rating 
-        for(i = 0; i < ballot.rating.length; i++){
-        delete_text(ballot.url +"/criterion/" + ballot.rating[i].criterion_id +"/vote", function(result){
-          if(result['result'] == "deleted") {
-                  $('#success').html('Deleted Successfully');
-                  $('#success').show();
-                }
-                
-        });
-        }
-        buildDecisionStatus(decisionID)
-        
+              });
+              }
+              
+              //delete criterion rating 
+              for(i = 0; i < ballot.rating.length; i++){
+                delete_text(ballot.url +"/criterion/" + ballot.rating[i].criterion_id +"/vote", function(result){
+                  if(result['error']) {
+                    $('#error').html('<b>Error:</b> ' + result['error']);
+                    $('#error').show()
+                  }else if(result['result'] == "deleted") {
+                    $('#success').html('Ratings cleared!');
+                    $('#success').show();
+                  }else {
+                    $('#error').html('<b>Error:</b> Something went wrong :(');
+                    $('#error').show();
+                  }  
+                });
+              }
+              buildDecisionStatus(decisionID);
             },
             function() { /* Do nothing */}
       );
-
     }
     
     function buildEditBallotForm(decisionID, ballot){
@@ -1739,17 +1750,23 @@ function buildHome() {
         $('#invitation_error').html('<b>Error:</b> Invalid email!');
         $('#invitation_error').show()
       }else{
-        
         new_invite = {
         "name":document.getElementById("i_name").value,
         "email":document.getElementById("i_email").value 
         };
         post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
-          console.log(result);  
-          buildDecisionInvite(id)
-          $('#invitation_sent').html('Invitation sent Successfully!');
-          $('#invitation_sent').show()
-        })
+          if(result['error']) {
+            $('#invitation_error').html('<b>Error:</b> ' + result['error']);
+            $('#invitation_error').show()
+          }else if(result['ballot']) {
+            buildDecisionInvite(id);
+            $('#invitation_sent').html('Invitation sent Successfully!');
+            $('#invitation_sent').show()
+          }else {
+            $('#invitation_error').html('<b>Error:</b> Something went wrong :(');
+            $('#invitation_error').show();
+          }  
+        });
       }
     }
     
