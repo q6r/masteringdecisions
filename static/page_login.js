@@ -1,10 +1,6 @@
 function main(body) {
   checkLogin();
-
-  //Add CSS
   $.loadCSS('static/css/login.css');
-
-  //Build page
   buildPage();
 }
 
@@ -40,6 +36,7 @@ function buildPage() {
       $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('type', 'submit').text('Submit').appendTo(form);
 }
 
+//If credentials are correct login and redirect, else show error
 function login() {
   $('#status').hide();
 
@@ -50,9 +47,7 @@ function login() {
 
   post_text("/login", JSON.stringify(new_login), function (result) {
     if(result['status'] == "logged in") {
-      //Authenticate and redirect
       get_text("/whoami", function (result) {
-        //redirect
         window.location.replace("/");
       });
     }
@@ -71,6 +66,7 @@ function login() {
   return false;
 }
 
+//If the user is already logged in redirect them to home
 function checkLogin() {
   get_text("/whoami", function (result) {
     if(result['person_id']) {
