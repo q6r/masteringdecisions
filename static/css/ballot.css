@@ -1,134 +1,99 @@
-		#topbar li {
+#topbar li {
+  padding-left:50px;
+  font-size:1.5em;
+  font-weight:bold;
+}	
 
-			padding-left:50px;
-			font-size:1.5em;
-			font-weight:bold;
+#topRow {
+  margin-top:100px;
+  text-align:center;
+}
 
-		}	
+#alt_inst {
+  max-width:500px;
+  text-align:center;
+  margin:auto;
+}
 
-		#ballotbody {
+#crit_inst {
+  max-width:500px;
+  text-align:center;
+  margin:auto;
+}	
 
-		}
+#successdiv {
+  max-width:500px;
+  text-align:center;
+  margin:auto;
+}
 
-		#topRow {
-			margin-top:100px;
-			text-align:center;
+#decision_image {
+  max-width:600px;
+}	
 
-		}
+#bottomRow {
+  text-align:center;
+}
 
-		#alt_inst {
-			max-width:500px;
-			text-align:center;
-			margin:auto;
+#alternative_table {
+  text-align:center;
+}
 
-		}
-		
-		#crit_inst {
-			max-width:500px;
-			text-align:center;
-			margin:auto;
+/*Box colors for rating Alternatives*/
+.vote-red {background-color:red;}
+.vote-orange {background-color:orange;}
+.vote-yellow {background-color:yellow;}
+.vote-greenyellow {background-color:greenyellow;}
+.vote-green {background-color:green;}
 
-		}	
-		
-		#successdiv {
+.alert {
+  display:none;
+}
 
-			max-width:500px;
-			text-align:center;
-			margin:auto;
+.center {
+  text-align:center;
+}
 
-		}
+.slider {
+  margin-top:10px;
+  margin-bottom:30px;
+  max-width:300px;
+  margin-left:auto;
+  margin-right:auto;
+}
 
-		#decision_image {
+.slider-val {
+  margin-left: 10px;
+  padding:5px;
+  border:1px solid gray;
+}
 
-			max-width:600px;
-			
-		}	
+.criterion:hover {
+  cursor:pointer;
+}
 
-		#bottomRow {
-			text-align:center;
-		}
+.alternative:hover {
+  cursor:pointer;
+}
 
-		#alternative_table {
-			text-align:center;
-		}
+.votebtn {
+  height:30px;
+  text-align:center;
+}
 
-		.vote-red {
-			background-color:red;
-		}
+.color_pick {
+  height:20px;
+  width:20px;
+  background-color:gray;
+}
 
-		.vote-orange {
-			background-color:orange;
-		}
+.dropup button {
+  float:left;
+}
 
-		.vote-yellow {
-			background-color:yellow;
-		}
-    
-    .vote-greenyellow {
-			background-color:greenyellow;
-		}
-    
-    .vote-green {
-			background-color:green;
-		}
-
-		.alert {
-			display:none;
-		}
-
-		.center {
-			text-align:center;
-
-		}
-
-		.slider {
-			margin-top:10px;
-			margin-bottom:30px;
-			max-width:300px;
-			margin-left:auto;
-			margin-right:auto;
-
-		}
-
-		.slider-val {
-			margin-left: 10px;
-			padding:5px;
-			border:1px solid gray;
-
-		}
-
-		.criterion:hover {
-
-			cursor:pointer;
-
-		}
-
-		.alternative:hover {
-			
-			cursor:pointer;
-		}
-
-		.votebtn {
-			height:30px;
-			text-align:center;
-			
-		}
-
-
-		.color_pick {
-			height:20px;
-			width:20px;
-			background-color:gray;
-		}
-
-		.dropup button {
-			float:left;
-		}
-
-		.dropup li {
-			margin:10px;
-			border:1px solid gray;
-			text-align:center;
-			cursor:pointer;
-		}
-	
+.dropup li {
+  margin:10px;
+  border:1px solid gray;
+  text-align:center;
+  cursor:pointer;
+}
