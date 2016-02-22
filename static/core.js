@@ -1,45 +1,61 @@
 var base_url = "http://localhost:9999";
 
 get_text = function(url, cb) {
-	$.ajax({
-		type: "GET",
-		url: base_url+url,
-		contentType: 'application/json; charset=utf-8',
-		success: function (r) { cb(r); },
-		error: function (r) { cb(JSON.parse(r.responseText)); }
-	});
+  $.ajax({
+    type: "GET",
+    url: base_url + url,
+    contentType: 'application/json; charset=utf-8',
+    success: function(r) {
+      cb(r);
+    },
+    error: function(r) {
+      cb(JSON.parse(r.responseText));
+    }
+  });
 }
 
 post_text = function(url, data, cb) {
-	$.ajax({
-		type: "POST",
-		data: data,
-		url: base_url+url,
-		contentType: 'application/json; charset=utf-8',
-		success: function (r) { cb(r); },
-		error: function (r) { cb(JSON.parse(r.responseText)); }
-	});
+  $.ajax({
+    type: "POST",
+    data: data,
+    url: base_url + url,
+    contentType: 'application/json; charset=utf-8',
+    success: function(r) {
+      cb(r);
+    },
+    error: function(r) {
+      cb(JSON.parse(r.responseText));
+    }
+  });
 }
 
 put_text = function(url, data, cb) {
-	$.ajax({
-		type: "PUT",
-		data: data,
-		url: base_url+url,
-		contentType: 'application/json; charset=utf-8',
-		success: function (r) { cb(r); },
-		error: function (r) { cb(JSON.parse(r.responseText)); }
-	});
+  $.ajax({
+    type: "PUT",
+    data: data,
+    url: base_url + url,
+    contentType: 'application/json; charset=utf-8',
+    success: function(r) {
+      cb(r);
+    },
+    error: function(r) {
+      cb(JSON.parse(r.responseText));
+    }
+  });
 }
 
 delete_text = function(url, cb) {
-	$.ajax({
-		type: "DELETE",
-		url: base_url+url,
-		contentType: 'application/json; charset=utf-8',
-		success: function (r) { cb(r); },
-		error: function (r) { cb(JSON.parse(r.responseText)); }
-	});
+  $.ajax({
+    type: "DELETE",
+    url: base_url + url,
+    contentType: 'application/json; charset=utf-8',
+    success: function(r) {
+      cb(r);
+    },
+    error: function(r) {
+      cb(JSON.parse(r.responseText));
+    }
+  });
 }
 
 function assert(condition, message) {
@@ -50,36 +66,34 @@ function assert(condition, message) {
 
 function delay() {
   var now = new Date().getTime();
-  while(new Date().getTime() < now + 500){ /* do nothing */ } 
+  while (new Date().getTime() < now + 500) { /* do nothing */ }
 }
 
 jQuery.loadCSS = function(url) {
   if (!$('link[href="' + url + '"]').length)
-      $('head').append('<link rel="stylesheet" type="text/css" href="' + url + '">');
+    $('head').append('<link rel="stylesheet" type="text/css" href="' + url + '">');
 }
 
 function confirmYesNo(title, msg, yesFn, noFn) {
-    var $confirm = $("#modalConfirmYesNo");
-    $confirm.modal('show');
-    $("#lblTitleConfirmYesNo").html(title);
-    $("#lblMsgConfirmYesNo").html(msg);
-    $("#btnYesConfirmYesNo").off('click').click(function () {
-        yesFn();
-        $confirm.modal("hide");
-    });
-    $("#btnNoConfirmYesNo").off('click').click(function () {
-        noFn();
-        $confirm.modal("hide");
-    });
+  var $confirm = $("#modalConfirmYesNo");
+  $confirm.modal('show');
+  $("#lblTitleConfirmYesNo").html(title);
+  $("#lblMsgConfirmYesNo").html(msg);
+  $("#btnYesConfirmYesNo").off('click').click(function() {
+    yesFn();
+    $confirm.modal("hide");
+  });
+  $("#btnNoConfirmYesNo").off('click').click(function() {
+    noFn();
+    $confirm.modal("hide");
+  });
 }
 
 function loggedIn(cb) {
-  get_text("/whoami", function (result) {
-    if(result['error'] == "unauthenticated") {
-      alert('Please Login!');
+  get_text("/whoami", function(result) {
+    if (result['error'] == "unauthenticated") {
       window.location.replace("/login.html");
-    }
-    else {
+    } else {
       cb();
     }
   });
