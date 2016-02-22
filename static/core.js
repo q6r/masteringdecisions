@@ -1,59 +1,45 @@
 var base_url = "http://localhost:9999";
 
 get_text = function(url, cb) {
-  var request = new XMLHttpRequest();
-  request.open('GET', base_url+url, true);
-  request.setRequestHeader("Content-Type", "application/json");
-
-  request.onreadystatechange = function() {
-    if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
-      cb(JSON.parse(request.responseText));
-    }
-  }
-
-  request.send();
+	$.ajax({
+		type: "GET",
+		url: base_url+url,
+		contentType: 'application/json; charset=utf-8',
+		success: function (r) { cb(r); },
+		error: function (r) { cb(JSON.parse(r.responseText)); }
+	});
 }
 
 post_text = function(url, data, cb) {
-  var request = new XMLHttpRequest();
-  request.open('POST', base_url+url, true);
-  request.setRequestHeader("Content-Type", "application/json");
-
-  request.onreadystatechange = function() {
-    if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
-      cb(JSON.parse(request.responseText));
-    }
-  }
-
-  request.send(data);
+	$.ajax({
+		type: "POST",
+		data: data,
+		url: base_url+url,
+		contentType: 'application/json; charset=utf-8',
+		success: function (r) { cb(r); },
+		error: function (r) { cb(JSON.parse(r.responseText)); }
+	});
 }
 
 put_text = function(url, data, cb) {
-	var request = new XMLHttpRequest();
-	request.open('PUT', base_url+url, true);
-	request.setRequestHeader("Content-Type", "application/json");
-
-	request.onreadystatechange = function() {
-		if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
-			cb(JSON.parse(request.responseText));
-		}
-	}
-
-	request.send(data);
+	$.ajax({
+		type: "PUT",
+		data: data,
+		url: base_url+url,
+		contentType: 'application/json; charset=utf-8',
+		success: function (r) { cb(r); },
+		error: function (r) { cb(JSON.parse(r.responseText)); }
+	});
 }
 
 delete_text = function(url, cb) {
-  var request = new XMLHttpRequest();
-  request.open('DELETE', base_url+url, true);
-  request.setRequestHeader("Content-Type", "application/json");
-
-  request.onreadystatechange = function() {
-    if(request.readyState == 4 && (request.status == 200 || request.status == 403)) {
-      cb(JSON.parse(request.responseText));
-    }
-  }
-
-  request.send();
+	$.ajax({
+		type: "DELETE",
+		url: base_url+url,
+		contentType: 'application/json; charset=utf-8',
+		success: function (r) { cb(r); },
+		error: function (r) { cb(JSON.parse(r.responseText)); }
+	});
 }
 
 function assert(condition, message) {
