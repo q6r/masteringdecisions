@@ -143,6 +143,26 @@ func (cri *Criterion) Destroy() error {
 		return fmt.Errorf("Unable to delete criterion %#v from database", cri)
 	}
 
+	// Remove the votes that have a vote for this destroied
+	// criterion and destroy them
+	var votes []Vote
+	_, _ = dbmap.Select(&votes, "select * from vote where criterion_id=$1", cri.CriterionID)
+	for _, vote := range votes {
+		if err := vote.Destroy(); err != nil {
+			return err
+		}
+	}
+
+	// Remove the ratings that have a rate for this destroied
+	// criterion and destroy them
+	var ratings []Rating
+	_, _ = dbmap.Select(&ratings, "select * from rating where criterion_id=$1", cri.CriterionID)
+	for _, rating := range ratings {
+		if err := rating.Destroy(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
