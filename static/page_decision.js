@@ -49,7 +49,7 @@ function buildResultsPage(decisionID) {
       var table = $('<table>').addClass('table table-striped').append('<tbody>').appendTo('body');
       table.append(
         $('<tr>').append(
-          $('<th>'), //blank as it is the names
+          $('<th>').text(' '), //space to fix copy/paste bug
           $('<th>').text('Step 1').attr('colspan', critNames.length).addClass('step1'),
           $('<th>').text('Step 2').attr('colspan', critNames.length * altNames.length).addClass('step2'),
           $('<th>').text('Step 4').attr('colspan', altNames.length).addClass('step4')
