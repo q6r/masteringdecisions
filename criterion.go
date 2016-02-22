@@ -170,8 +170,8 @@ func (cri *Criterion) Destroy() error {
 // Restrictions decision should exist
 func (cri *Criterion) Save() error {
 	// See if there's a decision this belongs to
-	_, err := dbmap.Get(Decision{}, cri.DecisionID)
-	if err != nil {
+	cobj, err := dbmap.Get(Decision{}, cri.DecisionID)
+	if err != nil || cobj == nil {
 		return fmt.Errorf("decision %d does not exist, criterion should belong to an existing decision", cri.DecisionID)
 	}
 

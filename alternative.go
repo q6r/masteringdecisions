@@ -47,7 +47,7 @@ func HAlternativeCreate(c *gin.Context) {
 // Save inserts a ballot into the database
 func (alt *Alternative) Save() error {
 	// Check if decision exists or not
-	if _, err := dbmap.Get(Decision{}, alt.DecisionID); err != nil {
+	if dobj, err := dbmap.Get(Decision{}, alt.DecisionID); err != nil || dobj == nil {
 		return fmt.Errorf("Decision %d does not exists, can't create alternative without a decision", alt.DecisionID)
 	}
 

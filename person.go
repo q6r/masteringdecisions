@@ -43,7 +43,7 @@ func HPersonUpdate(c *gin.Context) {
 	}
 
 	pobj, err := dbmap.Get(Person{}, pid)
-	if err != nil {
+	if err != nil || pobj == nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("person %d not found", pid)})
 		return
@@ -154,7 +154,7 @@ func HPersonInfo(c *gin.Context) {
 	pid := c.Param("person_id")
 
 	pobj, err := dbmap.Get(Person{}, pid)
-	if err != nil {
+	if err != nil || pobj == nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "not found"})
 		return
 	}
