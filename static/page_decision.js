@@ -125,7 +125,7 @@ function buildResultsPage(decisionID) {
           
           for(var j in altIds) {
             if(weights[altIds[j]]) {
-              $('#weights'+i+'-'+altIds[j]).text(Math.round(weights[altIds[j]]*100/weightTotal));
+              $('#weights'+i+'-'+altIds[j]).text((weights[altIds[j]]*100/weightTotal).toFixed(2));
             }
           }
         }
