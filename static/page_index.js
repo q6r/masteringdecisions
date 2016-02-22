@@ -1,7 +1,6 @@
 function main(body) {
   loggedIn(function() {
     $.loadCSS('static/css/index.css');
-    
     buildTemplate();
     buildHome(); 
   });
@@ -161,6 +160,7 @@ function buildTemplate() {
 
   updateUserText();
   
+  //Toggles the arrows to be correct
   $("a").attr("aria-expanded","true");
   $("a").click(function(){
     $(this).find('i#arrow_change').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
@@ -186,8 +186,6 @@ function buildHome() {
   
   clearContent();
 
-  // The progress bar in here are meaning less ?
-  // remove them
   var display_section = $([
         '<div>',
         '<strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong>',
@@ -252,8 +250,6 @@ function buildHome() {
     $("#completed_length").width(completed_progress + "%");
 
   });
-  
-          
 }
 
 /**** Edit Profile ****/
@@ -325,24 +321,24 @@ function buildHome() {
   $('#error').hide();
   $('#passwordError').hide();
   
-  if(document.getElementById('password').value != document.getElementById('password2').value) {
+  if($('#password').val() != $('#password2').val()) {
     $('#passwordError').html('<b>Error:</b> Passwords do not match!');
     $('#passwordError').show();
   }
   else {
-    if(document.getElementById('password').value == "") {
+    if($('#password').val() == "") {
       new_info = {
-        "email":document.getElementById('username').value,
-        "name_first":document.getElementById('firstname').value,
-        "name_last":document.getElementById('lastname').value
+        "email":$('#username').val(),
+        "name_first":$('#firstname').val(),
+        "name_last":$('#lastname').val()
         }
     }
     else {
       new_info = {
-          "email":document.getElementById('username').value,
-          "pw_hash":document.getElementById('password').value,
-          "name_first":document.getElementById('firstname').value,
-          "name_last":document.getElementById('lastname').value
+          "email":$('#username').val(),
+          "pw_hash":$('#password').val(),
+          "name_first":$('#firstname').val(),
+          "name_last":$('#lastname').val()
           }
     }
     
@@ -353,8 +349,8 @@ function buildHome() {
           $('#error').show()
         }
         else if(result['person']) {
-          document.getElementById('password').value = "";
-          document.getElementById('password2').value = "";
+          $('#password').val('');
+          $('#password2').val('');
           $('#success').html('<b>Update successful!</b>');
           $('#success').show();
           updateUserText();
@@ -678,11 +674,11 @@ function buildHome() {
   function createNewDecision() {
     $('#error').hide();
     
-    if(document.getElementById('name') == '') {
+    if($('#name').val() == '') {
       $('#error').html('<b>Error:</b> No name set!');
       $('#error').show();
     }
-    else if(document.getElementById('description') == '') {
+    else if($('#description').val() == '') {
       $('#error').html('<b>Error:</b> No description set!');
       $('#error').show();
     }
@@ -922,11 +918,11 @@ function buildHome() {
     $('#success').hide();
     $('#decisionResultsBtn').hide();
     
-    if(document.getElementById('name') == '') {
+    if($('#name').val() == '') {
       $('#error').html('<b>Error:</b> No name set!');
       $('#error').show();
     }
-    else if(document.getElementById('description') == '') {
+    else if($('#description').val() == '') {
       $('#error').html('<b>Error:</b> No description set!');
       $('#error').show();
     }
@@ -1739,20 +1735,20 @@ function buildHome() {
       $("#invitation_error").hide()
       id = decisionID
       
-      if(document.getElementById("i_name").value =='') {
+      if($('#i_name').val() =='') {
         $('#invitation_error').html('<b>Error:</b> No name set!');
         $('#invitation_error').show();
       }
-      else if(document.getElementById("i_email").value =='') {
+      else if($('#i_email').val() =='') {
         $('#invitation_error').html('<b>Error:</b> No email set!');
         $('#invitation_error').show();
-      }else if(!isEmail(document.getElementById("i_email").value)){
+      }else if(!isEmail($('#i_email').val())){
         $('#invitation_error').html('<b>Error:</b> Invalid email!');
         $('#invitation_error').show()
       }else{
         new_invite = {
-        "name":document.getElementById("i_name").value,
-        "email":document.getElementById("i_email").value 
+        "name":$('#i_name').val(),
+        "email":$('#i_email').val() 
         };
         post_text("/decision/"+id+"/ballot", JSON.stringify(new_invite), function(result) {
           if(result['error']) {
