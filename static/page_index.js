@@ -99,7 +99,7 @@ function buildTemplate() {
     '<li class="dropdown">',
       '<a class="dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span id="userName">' + '</span><span class="caret"></span></a>',
         '<ul id="g-account-menu" class="dropdown-menu" role="menu">',
-          '<li><a onclick="buildEditUser()">Edit Profile</a></li>',
+          '<li><a onclick="buildEditProfile()">Edit Profile</a></li>',
         '</ul>',
     '</li>',
     '<li><a href="/logout.html"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>',
@@ -139,6 +139,7 @@ function buildTemplate() {
           '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
               '<li class="active"> <a onclick="buildHome()"><i class="glyphicon glyphicon-home"></i> Home</a></li>',              
               '<li><a onclick="buildAddUser()"><i class="glyphicon glyphicon-user"></i> New User</a></li>',
+              '<li><a onclick="buildManageUsers()"><i class="glyphicon glyphicon-user"></i> Manage Users</a></li>',
               //'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
               '<li><a href="/logout.html"><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
           '</ul>',
@@ -254,7 +255,7 @@ function buildHome() {
 }
 
 /**** Edit Profile ****/
-  function buildEditUser() {
+  function buildEditProfile() {
     $('title').html('Update User!');
 
     clearContent();
@@ -262,7 +263,7 @@ function buildHome() {
     $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Person</strong><hr/>').appendTo('#content');
     
     var wrapper = $('<div>').css('max-width','500px').appendTo('#content');
-    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateUser()').appendTo(wrapper);
+    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return updateProfile()').appendTo(wrapper);
       $('<h3>').addClass('form-signin-heading').text('Update Details').appendTo(form);
       
       $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
@@ -317,7 +318,7 @@ function buildHome() {
       });
   }
 
-  function updateUser() {
+  function updateProfile() {
   $('#success').hide();
   $('#error').hide();
   $('#passwordError').hide();
@@ -364,6 +365,7 @@ function buildHome() {
   }
 
 /**** Add User ****/
+//This feature is duplicated in manage user so we could probably remove it here
   function buildAddUser(){
     $('title').html('Add User!');
     clearContent();
@@ -436,8 +438,284 @@ function buildHome() {
           $("#signup_successful").html("Sign up successful!")
           $("#signup_successful").show()
         }
-      })
+      });
     }
+  }
+  
+/**** Manage Users ****/
+  function buildManageUsers() {
+    $('title').html('Manage Users');
+    clearContent();
+    
+    $('<strong><i class="glyphicon glyphicon-user"></i> Manage Users</strong><hr/>').appendTo('#content');
+    $('<hr/>').appendTo('#content');
+    
+
+    $('<div id="userList">').appendTo('#content');
+    $('<hr/>').appendTo('#content');
+    
+    var form = $('<form>').addClass('form-signin').attr('onsubmit', 'return false;').appendTo('#content');
+      $('<div>').attr('id','success').addClass('alert alert-success').appendTo(form);
+      $('#success').hide();
+      $('<div>').attr('id','error').addClass('alert alert-danger').appendTo(form);
+      $('#error').hide();  
+      $('<div>').attr('id', 'userForm').appendTo(form);
+    
+    showAddUser();  
+    updateUserList();
+  }
+  
+  function showAddUser() {
+    $('#userForm').html("");
+    $('<h3>Add New User</h3>').appendTo('#userForm');
+
+      $('<div class="form-group">').append(
+        $('<label for="userEmail">Email</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userEmail')
+        .attr('placeholder', 'Email')
+        .attr('id', 'userEmail')
+        .attr('required', ''))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userPassword">Password</label>'),
+        $('<input type="password" />').addClass('form-control')
+        .attr('name', 'userPassword')
+        .attr('placeholder', 'Password')
+        .attr('id', 'userPassword')
+        .attr('required', ''))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userFirst">First Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userFirst')
+        .attr('placeholder', 'First Name')
+        .attr('id', 'userFirst')
+        .attr('required', ''))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userLast">Last Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userLast')
+        .attr('placeholder', 'Last Name')
+        .attr('id', 'userLast')
+        .attr('required', ''))
+      .appendTo('#userForm');
+
+      $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addUser();').text('Add User').appendTo('#userForm');
+  }
+  
+  function showEditUser(userID) {
+    $('#userForm').html("");
+    $('<h3>Add New User</h3>').appendTo('#userForm');
+
+      $('<div class="form-group">').append(
+        $('<label for="userEmail">Email</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userEmail')
+        .attr('placeholder', 'Email')
+        .attr('id', 'userEmail')
+        .attr('required', ''))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userPassword">Password</label>'),
+        $('<input type="password" />').addClass('form-control')
+        .attr('name', 'userPassword')
+        .attr('placeholder', 'Password')
+        .attr('id', 'userPassword'))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userPassword2">Confirm Password</label>'),
+        $('<input type="password" />').addClass('form-control')
+        .attr('name', 'userPassword2')
+        .attr('placeholder', 'Password')
+        .attr('id', 'userPassword2'))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userFirst">First Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userFirst')
+        .attr('placeholder', 'First Name')
+        .attr('id', 'userFirst')
+        .attr('required', ''))
+      .appendTo('#userForm');
+      
+      $('<div class="form-group">').append(
+        $('<label for="userLast">Last Name</label>'),
+        $('<input type="text" />').addClass('form-control')
+        .attr('name', 'userLast')
+        .attr('placeholder', 'Last Name')
+        .attr('id', 'userLast')
+        .attr('required', ''))
+      .appendTo('#userForm');
+
+      $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'editUser(' + userID + ');').text('Submit Changes').appendTo('#userForm');
+
+      get_text("/person/"+userID+"/info", function (result) {
+        $('#userEmail').val(result['person']['email']);
+        $('#userFirst').val(result['person']['name_first']);
+        $('#userLast').val(result['person']['name_last']);
+      });
+  }
+
+  function addUser() {
+    $("#success").hide()
+    $("#error").hide()
+
+    if($('#userEmail').val() =='') {
+      $('#error').html('<b>Error:</b> No email set!');
+      $('#error').show();
+    }
+    else if($('#userPassword').val() =='') {
+      $('#error').html('<b>Error:</b> No password set!');
+      $('#error').show();
+    }else if($('#userFirst').val() ==''){
+      $('#error').html('<b>Error:</b> No first name set!');
+      $('#error').show()
+    }else if($('#userLast').val() ==''){
+      $('#error').html('<b>Error:</b> No last name set!');
+      $('#error').show()
+    }else if(!isEmail($('#userEmail').val())){
+      $('#error').html('<b>Error:</b> Invalid Email!');
+      $('#error').show()
+    }else{
+      new_signup = {
+      "email":$('#userEmail').val(),
+      "pw_hash":$('#userPassword').val(),
+      "name_first":$('#userFirst').val(),
+      "name_last": $('#userLast').val()
+      };
+      
+      post_text("/person", JSON.stringify(new_signup), function(person){
+        if(person['error']) {
+          $('#error').html('<b>Error:</b> ' + person['error']);
+          $('#error').show()
+        }
+        if(person['person']) {
+          buildManageUsers();
+          $("#successful").html("Sign up successful!")
+          $("#successful").show()
+        }
+      });
+    }
+  }
+
+  function editUser(userID) {
+    $("#success").hide()
+    $("#error").hide()
+
+    if($('#userEmail').val() =='') {
+      $('#error').html('<b>Error:</b> No email set!');
+      $('#error').show();
+    }else if($('#userFirst').val() ==''){
+      $('#error').html('<b>Error:</b> No first name set!');
+      $('#error').show();
+    }else if($('#userLast').val() ==''){
+      $('#error').html('<b>Error:</b> No last name set!');
+      $('#error').show();
+    }else if(!isEmail($('#userEmail').val())){
+      $('#error').html('<b>Error:</b> Invalid Email!');
+      $('#error').show();
+    }else if ($('#userPassword').val() != $('#userPassword2').val()) {
+      $('#error').html('<b>Error:</b> Passwords do not match!');
+      $('#error').show();
+      
+      //Clear them
+      $('userPassword').val('');
+      $('userPassword2').val('');
+    }else{
+      //Don't update the Password unless they typed one in
+      if($('userPassword') == '') {
+        user = {
+        "email":$('#userEmail').val(),
+        "name_first":$('#userFirst').val(),
+        "name_last": $('#userLast').val()
+        };
+      }
+      else {
+        user = {
+        "email":$('#userEmail').val(),
+        "pw_hash":$('#userPassword').val(),
+        "name_first":$('#userFirst').val(),
+        "name_last": $('#userLast').val()
+        };
+      }
+      
+      put_text("/person/"+userID, JSON.stringify(user), function(person){
+        if(person['error']) {
+          $('#error').html('<b>Error:</b> ' + person['error']);
+          $('#error').show()
+        }
+        if(person['person']) {
+          buildManageUsers();
+          $("#successful").html("Updated successful!")
+          $("#successful").show()
+        }
+      });
+    }
+  }
+  
+  function deleteUser(userID) {
+    $('#success').hide();
+    $('#error').hide();
+    
+    confirmYesNo(
+        "Delete User",
+        "Are you sure you want to delete this user?",
+        function() {
+          delete_text("/person/"+userID, function (result) {
+            buildManageUsers();
+            if(result['error']) {
+              $('#signup_error').html('<b>Error:</b> ' + result['error']);
+              $('#signup_error').show()
+            }
+            if(result['result'] == "deleted") {
+              $('#success').html('Deleted Successfully');
+              $('#success').show();
+            }
+            else {
+              $('#error').html('Soemthing went wrong :(');
+              $('#error').show();
+            }
+          });
+        },
+        function() { /* Do nothing */}
+    );
+  }
+
+  function updateUserList() {
+    //clear it to repopulate it
+    $('#userList').html("");
+    
+    get_text("/persons", function (results) {
+        var table = $('<table>').append($('<tbody>')).addClass('table table-striped').appendTo('#userList');
+        table.append('<tr><th>Email</th><th>First Name</th><th>Last Name</th><th></th></tr>');
+        
+        for(var i in results["persons"]) {
+          p = results["persons"][i];
+          if(p['person_id'] == 0) { //is admin so hide delete button
+            table.append('<tr><td>'
+              + p['email'] + '</td><td>'
+              + p['name_first'] + '</td><td>'
+              + p['name_last'] + '</td><td>'
+              + '<div style="width:45px; float:right;"><a onclick="showEditUser('+ p['person_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a></div></td></tr>');
+          }
+          else {
+            table.append('<tr><td>'
+              + p['email'] + '</td><td>'
+              + p['name_first'] + '</td><td>'
+              + p['name_last'] + '</td><td>'
+              + '<div style="width:45px; float:right;"><a onclick="showEditUser('+ p['person_id'] + ');"><span class="glyphicon glyphicon-pencil text-Primary"></span></a>'
+              + '<a onclick="deleteUser('+ p['person_id'] + ');"><span class="glyphicon glyphicon-trash text-Danger" style="margin-left:10px;"></span></a></div></td></tr>');
+          }
+        }
+      });
   }
 
 /**** Create Decision ****/
@@ -1276,104 +1554,104 @@ function buildHome() {
       })
     }
 	
-	function deleteBallot(url,decisionID){
-		confirmYesNo(
-          "Delete Ballot",
-          "Are you sure you want to delete this ballot?",
-          function() {
-            delete_text(url, function (result) {
-              if(result['result'] == "deleted") {
-                $('#success').html('Deleted Successfully');
-                $('#success').show();
-              }
-              buildDecisionStatus(decisionID)
-            });
-          },
-          function() { /* Do nothing */}
-		);
-	}
-	
-	function editBallot(decisionID, url){
-	
-		var ballot = {
-        "name":$("#ballotName").val(),
-        "email":$("#ballotEmail").val(),
-       }
-	  
-		put_text(url, JSON.stringify(ballot), function(result){
-        //$('#success').html('Updated Successfully');
-        //$('#success').show();
-        buildDecisionStatus(decisionID)
-      });
-	  
-	}
-	
-	function cancelEdit(decisionID){
-		buildDecisionStatus(decisionID)
-	}
-	
-	function resetVote(decisionID, ballot){
-		console.log(ballot.votes)
-		confirmYesNo(
-          "Reset Ballot",
-          "Are you sure you want to reset this ballot?",
-          function() {
-			//delete alt rating on each criteria
-			for(i = 0; i < ballot.votes.length; i++){
-			delete_text(ballot.url +"/alternative/"+ballot.votes[i].alternative_id +"/criterion/" + ballot.votes[i].criterion_id +"/vote", function(result){
-				if(result['result'] == "deleted") {
-                $('#success').html('Deleted Successfully');
-                $('#success').show();
-              }
-			});
-			}
-			
-			//delete criterion rating 
-			for(i = 0; i < ballot.rating.length; i++){
-			delete_text(ballot.url +"/criterion/" + ballot.rating[i].criterion_id +"/vote", function(result){
-				if(result['result'] == "deleted") {
-                $('#success').html('Deleted Successfully');
-                $('#success').show();
-              }
-              
-			});
-			}
-			buildDecisionStatus(decisionID)
-			
-          },
-          function() { /* Do nothing */}
-		);
-
-	}
-	
-	function buildEditBallotForm(decisionID, ballot){
-	  //edit ballot form
-	  $('#s_table').empty()
-	  var form = $([
-        '<form class ="form-signin" onsubmit = "return false" id="editBallotForm">',
+    function deleteBallot(url,decisionID){
+      confirmYesNo(
+            "Delete Ballot",
+            "Are you sure you want to delete this ballot?",
+            function() {
+              delete_text(url, function (result) {
+                if(result['result'] == "deleted") {
+                  $('#success').html('Deleted Successfully');
+                  $('#success').show();
+                }
+                buildDecisionStatus(decisionID)
+              });
+            },
+            function() { /* Do nothing */}
+      );
+    }
+    
+    function editBallot(decisionID, url){
+    
+      var ballot = {
+          "name":$("#ballotName").val(),
+          "email":$("#ballotEmail").val(),
+         }
+      
+      put_text(url, JSON.stringify(ballot), function(result){
+          //$('#success').html('Updated Successfully');
+          //$('#success').show();
+          buildDecisionStatus(decisionID)
+        });
+      
+    }
+    
+    function cancelEdit(decisionID){
+      buildDecisionStatus(decisionID)
+    }
+    
+    function resetVote(decisionID, ballot){
+      console.log(ballot.votes)
+      confirmYesNo(
+            "Reset Ballot",
+            "Are you sure you want to reset this ballot?",
+            function() {
+        //delete alt rating on each criteria
+        for(i = 0; i < ballot.votes.length; i++){
+        delete_text(ballot.url +"/alternative/"+ballot.votes[i].alternative_id +"/criterion/" + ballot.votes[i].criterion_id +"/vote", function(result){
+          if(result['result'] == "deleted") {
+                  $('#success').html('Deleted Successfully');
+                  $('#success').show();
+                }
+        });
+        }
         
-        '<label for="bal_dec_id" >Decision Name: </label>',
-        '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="bName"></input>',
-        '<br />',
+        //delete criterion rating 
+        for(i = 0; i < ballot.rating.length; i++){
+        delete_text(ballot.url +"/criterion/" + ballot.rating[i].criterion_id +"/vote", function(result){
+          if(result['result'] == "deleted") {
+                  $('#success').html('Deleted Successfully');
+                  $('#success').show();
+                }
+                
+        });
+        }
+        buildDecisionStatus(decisionID)
+        
+            },
+            function() { /* Do nothing */}
+      );
 
-        '<label for="bal_name">Name</label>',
-        '<input type="text" id="ballotName" class= "form-control" required="required" placeholder="Name"></input>',
-        '<br />',
-        '<label for="bal_email">Email</label>',
-        '<input type="email" id="ballotEmail" class= "form-control" required="required" placeholder="Email"></input>',
-        '<br />',
-        '</form>'
-        ].join('\n'));
-	  form.appendTo('#b_wrapper');
-	  $('<button>').addClass('btn btn-primary').attr('onclick', 'editBallot('+decisionID+',\''+ ballot.url +'\');').attr('style','float: right').append('<span>  Update </span>').appendTo(form);
-	  $('<button>').addClass('btn btn-primary').attr('onclick', 'cancelEdit('+decisionID +')').append('<span> Cancel </span>').appendTo(form);
-	  
-	  get_text("/decision/"+decisionID+"/info", function (result) {
-          $('#bName').val(result.decision.name)
-        })
-	  $('#ballotName').val(ballot.name)
-	  $('#ballotEmail').val(ballot.email)
-	}
+    }
+    
+    function buildEditBallotForm(decisionID, ballot){
+      //edit ballot form
+      $('#s_table').empty()
+      var form = $([
+          '<form class ="form-signin" onsubmit = "return false" id="editBallotForm">',
+          
+          '<label for="bal_dec_id" >Decision Name: </label>',
+          '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="bName"></input>',
+          '<br />',
+
+          '<label for="bal_name">Name</label>',
+          '<input type="text" id="ballotName" class= "form-control" required="required" placeholder="Name"></input>',
+          '<br />',
+          '<label for="bal_email">Email</label>',
+          '<input type="email" id="ballotEmail" class= "form-control" required="required" placeholder="Email"></input>',
+          '<br />',
+          '</form>'
+          ].join('\n'));
+      form.appendTo('#b_wrapper');
+      $('<button>').addClass('btn btn-primary').attr('onclick', 'editBallot('+decisionID+',\''+ ballot.url +'\');').attr('style','float: right').append('<span>  Update </span>').appendTo(form);
+      $('<button>').addClass('btn btn-primary').attr('onclick', 'cancelEdit('+decisionID +')').append('<span> Cancel </span>').appendTo(form);
+      
+      get_text("/decision/"+decisionID+"/info", function (result) {
+            $('#bName').val(result.decision.name)
+          })
+      $('#ballotName').val(ballot.name)
+      $('#ballotEmail').val(ballot.email)
+    }
 	
 	//functions to sort the table by ballot status
 	function sortTable(){
