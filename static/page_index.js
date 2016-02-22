@@ -1072,7 +1072,7 @@ function addCriteria(decisionID) {
     if (result['error']) {
       $('#error').html('<b>Error:</b> ' + result['error']);
       $('#error').show()
-    } else if (result['criteria']) {
+    } else if (result['criterion']) {
       updateCritList(decisionID);
       showAddCriteria(decisionID); //clears it
     } else {
