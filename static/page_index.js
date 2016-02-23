@@ -729,8 +729,8 @@ function buildDecisionHome(decisionID) {
   $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   buildEditDecision(decisionID);
   //hide the ones we don't want to show
@@ -753,8 +753,8 @@ function buildCustomizeDecision(decisionID) {
   $('<li class="active"><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   buildEditDecision(decisionID);
   //hide the ones we don't want to show
@@ -975,8 +975,8 @@ function buildEditCriteria(decisionID) {
   $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
   $('<li class="active"><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
   //Table of existing criteria here
@@ -1183,8 +1183,8 @@ function buildEditAlternative(decisionID) {
   $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
   $('<li class="active"><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
   //Table of existing criteria here
@@ -1400,6 +1400,91 @@ function updateAltList(decisionID) {
   });
 }
 
+/**** Decision Invite ****/
+function buildDecisionInvite(decisionID) {
+
+  $('title').html('Invite People');
+  clearContent();
+
+  $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
+
+  var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
+  $('<li><a onclick="buildDecisionHome(' + decisionID + ')">Decision</a></li>').appendTo(ul);
+  $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
+  $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
+  $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
+  $('<li class="active"><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
+
+  var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
+
+  var form = $([
+    '<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
+
+    '<div id= "invitation_sent" class = "alert alert-success"></div>',
+    '<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
+    '<label for="bal_dec_id" >Decision Name: </label>',
+    '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
+    '<br />',
+
+    '<label for="bal_name">Name</label>',
+    '<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
+    '<br />',
+    '<label for="bal_email">Email</label>',
+    '<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
+    '<br />',
+    '</form>'
+  ].join('\n'));
+
+  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'buildDecisionHome(' + decisionID + ');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
+  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
+
+
+  get_text("/decision/" + decisionID + "/info", function(result) {
+    $('#dName').val(result.decision.name)
+  })
+
+  $(wrapper).append(form)
+
+  $("#invitation_sent").hide()
+  $("#invitation_error").hide()
+}
+
+function sendInvite(decisionID) {
+  $("#invitation_sent").hide()
+  $("#invitation_error").hide()
+  id = decisionID
+
+  if ($('#i_name').val() == '') {
+    $('#invitation_error').html('<b>Error:</b> No name set!');
+    $('#invitation_error').show();
+  } else if ($('#i_email').val() == '') {
+    $('#invitation_error').html('<b>Error:</b> No email set!');
+    $('#invitation_error').show();
+  } else if (!isEmail($('#i_email').val())) {
+    $('#invitation_error').html('<b>Error:</b> Invalid email!');
+    $('#invitation_error').show()
+  } else {
+    new_invite = {
+      "name": $('#i_name').val(),
+      "email": $('#i_email').val()
+    };
+    post_text("/decision/" + id + "/ballot", JSON.stringify(new_invite), function(result) {
+      if (result['error']) {
+        $('#invitation_error').html('<b>Error:</b> ' + result['error']);
+        $('#invitation_error').show()
+      } else if (result['ballot']) {
+        buildDecisionInvite(id);
+        $('#invitation_sent').html('Invitation sent Successfully!');
+        $('#invitation_sent').show()
+      } else {
+        $('#invitation_error').html('<b>Error:</b> Something went wrong :(');
+        $('#invitation_error').show();
+      }
+    });
+  }
+}
+
 /**** Decision Status ****/
 function buildDecisionStatus(decisionID) {
   $('title').html('Edit Decision');
@@ -1412,8 +1497,8 @@ function buildDecisionStatus(decisionID) {
   $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
   $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li class="active"><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
+  $('<li class="active"><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   var wrapper = $('<div>').addClass('tabbedContent').attr('id', 'b_wrapper').appendTo('#content');
   var ballotsForCurrentStage = $('<div>').attr('id', 'totalBallots').appendTo(wrapper);
@@ -1679,91 +1764,6 @@ function comparer(index) {  
 
 function getCellValue(row, index) {
   return $(row).children('td').eq(index).html();
-}
-
-/**** Decision Invite ****/
-function buildDecisionInvite(decisionID) {
-
-  $('title').html('Invite People');
-  clearContent();
-
-  $('<strong><i class="glyphicon glyphicon-cog"></i> Edit Decision</strong><hr/>').appendTo('#content');
-
-  var ul = $('<ul>').addClass('nav nav-tabs').appendTo('#content');
-  $('<li><a onclick="buildDecisionHome(' + decisionID + ')">Decision</a></li>').appendTo(ul);
-  $('<li><a onclick="buildCustomizeDecision(' + decisionID + ')">Customize</a></li>').appendTo(ul);
-  $('<li><a onclick="buildEditCriteria(' + decisionID + ')">Criteria</a></li>').appendTo(ul);
-  $('<li><a onclick="buildEditAlternative(' + decisionID + ')">Alternatives</a></li>').appendTo(ul);
-  $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Status</a></li>').appendTo(ul);
-  $('<li class="active"><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
-
-  var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-
-  var form = $([
-    '<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
-
-    '<div id= "invitation_sent" class = "alert alert-success"></div>',
-    '<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
-    '<label for="bal_dec_id" >Decision Name: </label>',
-    '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
-    '<br />',
-
-    '<label for="bal_name">Name</label>',
-    '<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
-    '<br />',
-    '<label for="bal_email">Email</label>',
-    '<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
-    '<br />',
-    '</form>'
-  ].join('\n'));
-
-  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'buildDecisionHome(' + decisionID + ');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
-  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
-
-
-  get_text("/decision/" + decisionID + "/info", function(result) {
-    $('#dName').val(result.decision.name)
-  })
-
-  $(wrapper).append(form)
-
-  $("#invitation_sent").hide()
-  $("#invitation_error").hide()
-}
-
-function sendInvite(decisionID) {
-  $("#invitation_sent").hide()
-  $("#invitation_error").hide()
-  id = decisionID
-
-  if ($('#i_name').val() == '') {
-    $('#invitation_error').html('<b>Error:</b> No name set!');
-    $('#invitation_error').show();
-  } else if ($('#i_email').val() == '') {
-    $('#invitation_error').html('<b>Error:</b> No email set!');
-    $('#invitation_error').show();
-  } else if (!isEmail($('#i_email').val())) {
-    $('#invitation_error').html('<b>Error:</b> Invalid email!');
-    $('#invitation_error').show()
-  } else {
-    new_invite = {
-      "name": $('#i_name').val(),
-      "email": $('#i_email').val()
-    };
-    post_text("/decision/" + id + "/ballot", JSON.stringify(new_invite), function(result) {
-      if (result['error']) {
-        $('#invitation_error').html('<b>Error:</b> ' + result['error']);
-        $('#invitation_error').show()
-      } else if (result['ballot']) {
-        buildDecisionInvite(id);
-        $('#invitation_sent').html('Invitation sent Successfully!');
-        $('#invitation_sent').show()
-      } else {
-        $('#invitation_error').html('<b>Error:</b> Something went wrong :(');
-        $('#invitation_error').show();
-      }
-    });
-  }
 }
 
 //Runs cb if true
