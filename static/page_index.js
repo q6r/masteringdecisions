@@ -762,6 +762,7 @@ function buildCustomizeDecision(decisionID) {
   $('#descriptionDiv').hide();
   $('#stageDiv').hide();
   $('#deleteDecisionBtn').hide();
+  $('#duplicateDecisionBtn').hide();
 }
 
 function buildEditDecision(decisionID) {
@@ -865,6 +866,7 @@ function buildEditDecision(decisionID) {
   $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision(' + decisionID + ');').text('Submit').appendTo(form);
   $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('id', 'deleteDecisionBtn').attr('onclick', 'deleteDecision(' + decisionID + ');').text('Delete Decision').appendTo(form);
   $('<hr/>').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-success btn-block').attr('id', 'duplicateDecisionBtn').attr('onclick', 'duplicateDecision(' + decisionID + ');').text('Duplicate Decision').appendTo(form);
   $('<button>').addClass('btn btn-lg btn-info btn-block').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/decision/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Decision Results').appendTo(form);
   $('#decisionResultsBtn').hide();
 
@@ -908,6 +910,30 @@ function deleteDecision(decisionID) {
         } else {
           updateLeftNav();
           buildHome();
+        }
+      });
+    },
+    function() { /* Do nothing */ }
+  );
+}
+
+function duplicateDecision(decisionID) {
+  confirmYesNo(
+    "Duplicate Decision",
+    "Are you sure you want to duplicate this decision?",
+    function() {
+      get_text("/decision/"+decisionID+"/duplicate", function(result) {
+        if (result['error']) {
+          $('#error').html('<b>Error:</b> ' + result['error']);
+          $('#error').show();
+        } else if (result['decision']) {
+          updateLeftNav();
+          buildDecisionHome(result['decision']['decision_id']);
+          $('#success').html('Successfully duplicated decision (You are in the new decision)');
+          $('#success').show();
+        } else {
+          $('#error').html('<b>Error:</b> Something went wrong :(');
+          $('#error').show();
         }
       });
     },
