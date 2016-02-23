@@ -13,7 +13,7 @@ function main(body) {
     if (result['decision']) {
       if (result['decision']['stage'] == 1 || result['decision']['stage'] ==2 ) {
         $('#title').text('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
-	  }
+      }
       else if (result['decision']['stage'] == 4) {
         $('#title').text(result['decision']['name'] + ' has been locked.');
       } else { //Voting is completed, show results!
@@ -39,17 +39,21 @@ function buildResultsPage(decisionID) {
     }
 
     get_text("/decision/" + decisionID + "/alternatives", function(results) {
-
       var altNames = []; //Array of alt names
       var altIds = [];
+      
+      var key = $('<table>').attr('id', 'keyTable').appendTo('body');
+      key.append($('<tr>').append($('<th>').text('Alternatives Key').attr('colspan', '2')));
+      
       for (i in results["alternatives"]) {
         var a = results["alternatives"][i];
         altNames.push(String.fromCharCode(65 + parseInt(i)));
         altIds.push(a["alternative_id"]);
+        key.append('<tr><td>' + String.fromCharCode(65 + parseInt(i)) + '</td><td>' + a['name'] + '</td></tr>');
       }
-
+      
       //Table and row 1
-      var table = $('<table>').addClass('table table-striped').append('<tbody>').appendTo('body');
+      var table = $('<table>').addClass('table table-striped').attr('id', 'votesTable').append('<tbody>').appendTo('body');
       table.append(
         $('<tr>').append(
           $('<th>').text(' '), //space to fix copy/paste bug
@@ -67,6 +71,9 @@ function buildResultsPage(decisionID) {
       }
       for (j = 0; j < critNames.length; j++) {
         row2.append($('<td>').text(critNames[j]).attr('colspan', altNames.length).addClass('critHeaders crit' + j));
+      }
+      for (j = 0; j < altNames.length; j++) {
+        row2.append($('<td>'));
       }
 
       //Row 3 and all values

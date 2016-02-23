@@ -1025,7 +1025,7 @@ function buildEditCriteria(decisionID) {
 function showAddCriteria(decisionID) {
   $('#critForm').hide();
   $('#critForm').html("");
-  $('<p class="text-Danger">Unable to add new criteria when not in development</p>').appendTo('#critForm');
+  $('<p class="text-Danger">Unable to add new criterion when not in development</p>').appendTo('#critForm');
   ifDecisionInDevelopment(decisionID, function() {
     $('#critForm').html("");
     $('<h3>Add New Criterion</h3>').appendTo('#critForm');

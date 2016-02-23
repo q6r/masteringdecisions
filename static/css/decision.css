@@ -1,9 +1,40 @@
 body {
   background: #eee !important;
+  margin:20px;
 }
 
 th,td {
   text-align:center !important;
+}
+
+#keyTable {
+	font-family: verdana,arial,sans-serif;
+	font-size:18px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+  margin:20px;
+}
+#keyTable th {
+	border-width: 1px;
+	padding: 2px 8px 2px 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+#keyTable td {
+	border-width: 1px;
+	padding: 2px 8px 2px 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+#votesTable {
+	font-family: verdana,arial,sans-serif;
+	color:#333333;
+	border: 2px solid #333;
 }
 
 .step1, .step4{
