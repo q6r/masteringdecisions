@@ -54,6 +54,12 @@ function main(body)
 
 				return;
 			}
+			else if (decision_stage == "4") {
+				$("body")
+				.append("<h1>This decision has been archived.</h1>");
+
+				return;
+			}
 			else {
 
 				//$("body")

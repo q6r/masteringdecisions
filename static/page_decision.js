@@ -11,8 +11,11 @@ function main(body) {
 
   get_text("/decision/" + decisionID + "/info", function(result) {
     if (result['decision']) {
-      if (result['decision']['stage'] != 3) {
+      if (result['decision']['stage'] == 1 || result['decision']['stage'] ==2 ) {
         $('#title').text('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
+	  }
+      else if (result['decision']['stage'] == 4) {
+        $('#title').text(result['decision']['name'] + ' has been archived');
       } else { //Voting is completed, show results!
         buildResultsPage(decisionID);
         $('#title').text('Voting Results For: ' + result['decision']['name']);
