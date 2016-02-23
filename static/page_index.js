@@ -14,7 +14,7 @@ function decisionListByCategory(cb) {
     get_text("/person/" + person['person_id'] + "/decisions", function(decisions) {
       var inprogress = [];
       var completed = [];
-      var archived = [];
+      var locked = [];
       for (var i in decisions["decisions"]) {
         d = decisions["decisions"][i];
         if (d["stage"] < 3) {
@@ -23,17 +23,17 @@ function decisionListByCategory(cb) {
           completed.push(d);
         }
         else {
-          archived.push(d);
+          locked.push(d);
         }
       }
-      cb(inprogress, completed, archived);
+      cb(inprogress, completed, locked);
     });
   });
 }
 
 //Updates the list of inprogress and completed decisions in the leftNav
 function updateLeftNav() {
-  decisionListByCategory(function(inprogress, completed, archived) {
+  decisionListByCategory(function(inprogress, completed, locked) {
 
     $("#userMenu3").html("");
     $("#userMenu4").html("");
@@ -51,9 +51,9 @@ function updateLeftNav() {
       $("#userMenu4").append("<li><a onclick=\"buildDecisionHome(" + did + ")\"><i class=\"glyphicon glyphicon-list-alt\"></i> " + dname + " </a></li>");
     }
     
-    for (var i in archived) {
-      dname = archived[i]["name"];
-      did = archived[i]["decision_id"];
+    for (var i in locked) {
+      dname = locked[i]["name"];
+      did = locked[i]["decision_id"];
       $("#userMenu5").append("<li><a onclick=\"buildDecisionHome(" + did + ")\"><i class=\"glyphicon glyphicon-list-alt\"></i> " + dname + " </a></li>");
     }
 
@@ -144,7 +144,7 @@ function buildTemplate() {
     '<ul class="nav nav-stacked collapse" id="userMenu4" aria-expanded="false" style="height: 0px;">',
     '</ul>',
     '</li>',
-    '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu5" aria-expanded="false" class="collapsed">Archived <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
+    '<li class="nav-header"> <a  data-toggle="collapse" data-target="#userMenu5" aria-expanded="false" class="collapsed">Locked <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
     '<ul class="nav nav-stacked collapse" id="userMenu5" aria-expanded="false" style="height: 0px;">',
     '</ul>',
     '</li>',
@@ -240,7 +240,7 @@ function buildHome() {
   display_section.appendTo('#content');
 
   // Update the navbar portion with decisions
-  decisionListByCategory(function(inprogress, completed, archived) {
+  decisionListByCategory(function(inprogress, completed, locked) {
 
     $("#inprogress_list").html("<a class=\"list-group-item active\">Decisions In Progress</a>");
     $("#completed_list").html("<a class=\"list-group-item active\">Decisions Completed</a>");
@@ -859,7 +859,7 @@ function buildEditDecision(decisionID) {
     '<option value="1">In Development</option>' +
     '<option value="2">Voting in Progress</option>' +
     '<option value="3">Completed</option>' +
-    '<option value="4">Archived</option>' +
+    '<option value="4">Locked</option>' +
     '</select>').appendTo(form);
 
   $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision(' + decisionID + ');').text('Submit').appendTo(form);
@@ -1112,7 +1112,7 @@ function editCriteria(decisionID, criterionID) {
     if (result['error']) {
       $('#error').html('<b>Error:</b> ' + result['error']);
       $('#error').show()
-    } else if (result['criteria']) {
+    } else if (result['criterion']) {
       updateCritList(decisionID);
       showAddCriteria(decisionID); //clears it
     } else {

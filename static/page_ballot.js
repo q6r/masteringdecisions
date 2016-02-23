@@ -90,7 +90,7 @@ function main(body) {
       $("body").append("<h1>Voting for this decision is now closed!</h1>");
       return;
     } else if (decision_stage == "4") {
-      $("body").append("<h1>This decision has been archived.</h1>");
+      $("body").append("<h1>This decision has been locked.</h1>");
       return;
     } else {
       var page = "<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">" + "<div class=\"container\">" + "<a class=\"navbar-brand\">" + decision_name + "</a>" + "</div>" + "</div>" + "<div id=\"ballotbody\" class=\"container\">" + "<div class=\"row\">" + "<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">" + "<img id=\"decision_image\" src=\"" + dec_img + "\"></img>" + "<h3>Welcome, " + voter_name + "! </h3>" + "<p class=\"lead\">" + decision_desc + "</p>" + "<div id='crit_inst' class='partone'>" + crit_instructions + "</div>" + "</div>" + "</div>" + "<form class=\"form-horizontal partone\" role=\"form\">";
