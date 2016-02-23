@@ -138,6 +138,7 @@ ballots, and gather statistics.
 | Get criterion ratings         | /decision/:decision_id/criterion/:criterion_id/votes                                                      | GET    | nothing | array of k1 |
 | Delete a rating on an altern. | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote                                     | DELETE | nothign | r1          |
 | Update criterion rating       | /decision/:decision_id/ballot/:ballot_id/criterion/:criterion_id/vote/:rating                             | PUT    | nothing | k1          |
+| Decision duplicate            | /decision/:decision_id/duplicate                                                                          | GET    | nothing | d2          |
 
 Wants/Gives
 
@@ -205,27 +206,28 @@ permissions.
 This list contains the routes that have permissions on them, anything not
 listed in here is considered to have a `None` permission.
 
-| Action            | URL            | Who is allowed |
-|-------------------|----------------|----------------|
-| Person Creation   | /person        | admin          |
-| Person Delete     | /person/:pid   | admin          |
-| Person Update     | /person/:pid   | all            |
-| Decision Creation | /decision/:did | all            |
-| Decision Delete   | /decision/:did | all            |
-| Decision Update   | /decision/:did | all            |
-| Alt. Creation     |                | all            |
-| Alt. Delete       |                | all            |
-| Alt. Update       |                | all            |
-| Blt. Creation     |                |                |
-| Blt. Delete       |                |                |
-| Blt. Update       |                |                |
-| Crt. Creation     |                |                |
-| Crt. Delete       |                |                |
-| Crt. Update       |                |                |
-| Vt. Delete        |                |                |
-| Vt. Update        |                |                |
-| Rt. Delete        |                |                |
-| Rt. Update        |                |                |
+| Action            | URL                      | Who is allowed |
+|-------------------|--------------------------|----------------|
+| Person Creation   | /person                  | admin          |
+| Person Delete     | /person/:pid             | admin          |
+| Person Update     | /person/:pid             | all            |
+| Decision Creation | /decision/:did           | all            |
+| Decision Delete   | /decision/:did           | all            |
+| Decision Update   | /decision/:did           | all            |
+| Decision Dupl.    | /decision/:did/duplicate | all            |
+| Alt. Creation     |                          | all            |
+| Alt. Delete       |                          | all            |
+| Alt. Update       |                          | all            |
+| Blt. Creation     |                          |                |
+| Blt. Delete       |                          |                |
+| Blt. Update       |                          |                |
+| Crt. Creation     |                          |                |
+| Crt. Delete       |                          |                |
+| Crt. Update       |                          |                |
+| Vt. Delete        |                          |                |
+| Vt. Update        |                          |                |
+| Rt. Delete        |                          |                |
+| Rt. Update        |                          |                |
 
 
 # Features

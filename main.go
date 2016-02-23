@@ -78,6 +78,7 @@ func main() {
 
 	// decision homes
 	routes.POST("/decision", ginAuth.Use, AuthAsAll, HDecisionCreate)
+	routes.GET("/decision/:decision_id/duplicate", ginAuth.Use, AuthAsAll, HDecisionDuplicate)
 	routes.GET("/decisions", HDecisionsList)
 	routes.GET("/decision/:decision_id/info", HDecisionInfo)
 	routes.DELETE("/decision/:decision_id", ginAuth.Use, AuthAsAll, HDecisionDelete)

@@ -96,6 +96,65 @@ func HDecisionCriterionsList(c *gin.Context) {
 	ServeResult(c, "decision_criterions.js", result)
 }
 
+// HDecisionDuplicate duplicates a decision by cloning
+// its information, criterions, and alternatives
+func HDecisionDuplicate(c *gin.Context) {
+	did := c.Param("decision_id")
+
+	// Get the decision to duplicate
+	// and its alternatives and criterions
+	dobj, err := dbmap.Get(Decision{}, did)
+	if err != nil || dobj == nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": fmt.Sprintf("Unable to find decision %s", did)})
+		return
+	}
+	dsrc := dobj.(*Decision)
+	var cris []Criterion
+	_, _ = dbmap.Select(&cris, "select * from criterion where decision_id=$1", dsrc.DecisionID)
+	var alts []Alternative
+	_, _ = dbmap.Select(&alts, "select * from alternative where decision_id=$1", dsrc.DecisionID)
+
+	// This is auto incr we need to inset and
+	// determine its new value
+	dsrc.DecisionID = 0
+	if err := dbmap.Insert(dsrc); err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": "Unable to insert duplicated decision"})
+		return
+	}
+	// Get the new auto incr id
+	if err := dbmap.SelectOne(dsrc,
+		"select * from decision where decision_id=(select max(decision_id) from decision) and person_id=$1 and name=$2",
+		dsrc.PersonID, dsrc.Name); err != nil {
+		c.JSON(http.StatusForbidden,
+			gin.H{"error": "Unable to get duplicated decision"})
+		return
+	}
+
+	// Now change the criterions and alternatives
+	// decision ownership
+	for _, cri := range cris {
+		cri.DecisionID = dsrc.DecisionID
+		if err := cri.Save(); err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": "Unable to save criterion of duplicated decision"})
+			return
+		}
+	}
+	for _, alt := range alts {
+		alt.DecisionID = dsrc.DecisionID
+		if err := alt.Save(); err != nil {
+			c.JSON(http.StatusForbidden,
+				gin.H{"error": "Unable to save alternative of duplicated decision"})
+			return
+		}
+	}
+
+	result := gin.H{"decision": dsrc}
+	ServeResult(c, "decision_duplicate.js", result)
+}
+
 // HDecisionsList returns a list of all decision defined
 // in the database their name and url only
 func HDecisionsList(c *gin.Context) {
