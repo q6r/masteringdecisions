@@ -193,17 +193,44 @@ l2 = {"error":<str>} or {"status":<str>}
 g1 = {"person_id": <int>} or {"error": <str> }
 ```
 
-# Missing things
+# Permissions
 
-- Applying the permission middlewares to routes
+In here I list the permissions and who can do what. They are three types of
+permissions.
+
+- Admin : Only authenticated admin is allowed
+- All   : Only authenticated persons (admin or facilitator)
+- None  : Anyone
+
+This list contains the routes that have permissions on them, anything not
+listed in here is considered to have a `None` permission.
+
+| Action            | URL            | Who is allowed |
+| Person Creation   | /person        | admin          |
+| Person Delete     | /person/:pid   | admin          |
+| Person Update     | /person/:pid   | all            |
+| Decision Creation | /decision/:did | all            |
+| Decision Delete   | /decision/:did | all            |
+| Decision Update   | /decision/:did | all            |
+| Alt. Creation     |                | all            |
+| Alt. Delete       |                | all            |
+| Alt. Update       |                | all            |
+| Blt. Creation     |                |                |
+| Blt. Delete       |                |                |
+| Blt. Update       |                |                |
+| Crt. Creation     |                |                |
+| Crt. Delete       |                |                |
+| Crt. Update       |                |                |
+| Vt. Delete        |                |                |
+| Vt. Update        |                |                |
+| Rt. Delete        |                |                |
+| Rt. Update        |                |                |
+
 
 # Features
 
-- CORS
 - Cross-platform
-- Very fast
-- Almost done
 - Fully concurrent
 - SecureCookie Authentication
-- Decision Statistics
-- Replies html/json
+- Logging
+- ...
