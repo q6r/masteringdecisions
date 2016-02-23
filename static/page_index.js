@@ -843,7 +843,8 @@ function buildEditDecision(decisionID) {
   $('<div id="critStyleDiv" class="form-group">').append(
     '<label for="critStyle">Criteria Style</label>' +
     '<select id="critStyle" class="form-control">' +
-    '<option value="s">Sliders</option>' +
+    '<option value="s">Number Sliders</option>' +
+    '<option value="t">Word Sliders</option>' +
     '<option value="b">Buttons</option>' +
     '</select>').appendTo(form);
 

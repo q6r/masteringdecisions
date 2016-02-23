@@ -161,7 +161,12 @@ function main(body) {
               }
             }
           });
-          bindValues(sliders[i], spans[i]);
+          //Text Descriptions
+          if (crit_vote_style == 't') {
+            bindValuesText(sliders[i], spans[i]);
+          } else { //Number Descriptions
+            bindValuesNumbers(sliders[i], spans[i]);
+          }
         }
       }
 
@@ -221,9 +226,9 @@ function main(body) {
               $("#errordiv").show();
             }
           }
-        } else {
+        } else { //Type of slider
           for (var i = 0; i < criterion_names.length; i++) {
-            crit_votes.push($("#crit" + i + "slider-val").text());
+            crit_votes.push($("#crit" + i + "slider-val").data('val'));
             if (crit_votes[i] == undefined) {
               $("#errordiv").html("Please vote on all criterion<br>");
               $("#errordiv").show();
@@ -329,9 +334,30 @@ function main(body) {
   }
 }
 
-function bindValues(slider, span) {
+function bindValuesText(slider, span) {
+  slider.noUiSlider.on('update', function(values, handle) {
+    var test = [
+      '-', //0 not used
+      'Extremely Awful', //1
+      'Extremely Awful', //2
+      'Awful', //3
+      'Awful', //4
+      'Moderate', //5
+      'Moderate', //6
+      'Important', //7
+      'Important',//8
+      'Extremely Important', //9
+      'Extremely Important' //10
+    ];
+    span.innerHTML = test[values[handle]];
+    $('#'+span.id).data('val', values[handle]);
+  });
+}
+
+function bindValuesNumbers(slider, span) {
   slider.noUiSlider.on('update', function(values, handle) {
     span.innerHTML = values[handle];
+    $('#'+span.id).data('val', values[handle]);
   });
 }
 
