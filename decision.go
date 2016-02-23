@@ -69,7 +69,7 @@ func HDecisionBallotsList(c *gin.Context) {
 func HDecisionAlternativesList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var alts []Alternative
-	_, err := dbmap.Select(&alts, "SELECT * FROM alternative WHERE decision_id=$1 ORDER BY \"order\", \"alternative_id\" ASC", did)
+	_, err := dbmap.Select(&alts, "SELECT * FROM alternative WHERE decision_id=$1 ORDER BY \"order\", \"name\" ASC", did)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to find alternatives for decision id %s", did)})
@@ -85,7 +85,7 @@ func HDecisionAlternativesList(c *gin.Context) {
 func HDecisionCriterionsList(c *gin.Context) {
 	did := c.Param("decision_id")
 	var cris []Criterion
-	_, err := dbmap.Select(&cris, "SELECT * FROM criterion WHERE decision_id=$1 ORDER BY \"order\", \"criterion_id\" ASC", did)
+	_, err := dbmap.Select(&cris, "SELECT * FROM criterion WHERE decision_id=$1 ORDER BY \"order\", \"name\" ASC", did)
 	if err != nil {
 		c.JSON(http.StatusForbidden,
 			gin.H{"error": fmt.Sprintf("Unable to find criterion for decision %s", did)})
