@@ -15,7 +15,7 @@ function main(body) {
         $('#title').text('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
 	  }
       else if (result['decision']['stage'] == 4) {
-        $('#title').text(result['decision']['name'] + ' has been archived');
+        $('#title').text(result['decision']['name'] + ' has been locked.');
       } else { //Voting is completed, show results!
         buildResultsPage(decisionID);
         $('#title').text('Voting Results For: ' + result['decision']['name']);

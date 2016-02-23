@@ -56,7 +56,7 @@ function main(body)
 			}
 			else if (decision_stage == "4") {
 				$("body")
-				.append("<h1>This decision has been archived.</h1>");
+				.append("<h1>This decision has been locked.</h1>");
 
 				return;
 			}
