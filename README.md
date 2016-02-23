@@ -206,6 +206,7 @@ This list contains the routes that have permissions on them, anything not
 listed in here is considered to have a `None` permission.
 
 | Action            | URL            | Who is allowed |
+|-------------------|----------------|----------------|
 | Person Creation   | /person        | admin          |
 | Person Delete     | /person/:pid   | admin          |
 | Person Update     | /person/:pid   | all            |
