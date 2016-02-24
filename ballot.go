@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+var mutex sync.Mutex
 
 // Ballot represent a ballot that belong
 // in a decision
@@ -28,7 +31,7 @@ type BallotAllInfo struct {
 	URLDecision string   `json:"url"`
 	Votes       []Vote   `json:"votes"`
 	Ratings     []Rating `json:"rating"`
-  Sent        bool     `json:"sent"`
+	Sent        bool     `json:"sent"`
 }
 
 // HBallotCreate create a ballot that belongs
@@ -47,6 +50,8 @@ func HBallotCreate(c *gin.Context) {
 	}
 	b.DecisionID = did // inherited
 
+	mutex.Lock()
+	defer mutex.Unlock()
 	err = b.Save()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -126,8 +131,8 @@ func HBallotInvite(c *gin.Context) {
 		return
 	}
 
-  c.JSON(http.StatusOK, gin.H{"result": "invited"})
-  
+	c.JSON(http.StatusOK, gin.H{"result": "invited"})
+
 	// Send email to ballot, and set confirmation
 	// flag on success
 	title, body := GenerateInviteTemplate(b)
@@ -369,7 +374,7 @@ func HBallotAllInfo(c *gin.Context) {
 	var ai BallotAllInfo
 	ai.Name = ballot.Name
 	ai.Email = ballot.Email
-  ai.Sent = ballot.Sent
+	ai.Sent = ballot.Sent
 	ai.URLDecision = fmt.Sprintf("/decision/%s", did)
 
 	// Get the votes for this ballot
