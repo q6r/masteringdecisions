@@ -1537,6 +1537,7 @@ function bulkAddBallot(decisionID) {
     });
     if(breakFlag) break;
   }
+  $('#bulkEmails').val('');
 }
 
 //Adds Ballot and sends email with link
@@ -1768,7 +1769,7 @@ function deleteBallot(url, decisionID) {
           $('#error').html('<b>Error:</b> ' + result['error']);
           $('#error').show()
         } else if (result['result'] == "deleted") {
-          buildDecisionStatus(decisionID);
+          buildStatusTable(decisionID);
         } else {
           $('#error').html('<b>Error:</b> Something went wrong :(');
           $('#error').show();
@@ -1825,6 +1826,7 @@ function resetVote(decisionID, ballot) {
             $('#error').html('<b>Error:</b> ' + result['error']);
             $('#error').show()
           } else if (result['result'] == "deleted") {
+            buildStatusTable(decisionID);
             $('#success').html('Votes cleared!');
             $('#success').show();
           } else {
