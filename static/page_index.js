@@ -1,3 +1,5 @@
+var intervalID = 0; //Used to refresh pages on the fly
+
 function main(body) {
   loggedIn(function() {
     $.loadCSS('static/css/index.css');
@@ -185,6 +187,9 @@ function buildTemplate() {
 //clears the content section of the page
 function clearContent() {
   $('#content').empty();
+  if(intervalID != 0) {
+    window.clearInterval(intervalID);
+  }
 }
 
 //Updates the username in the topNav
@@ -1623,61 +1628,60 @@ function buildDecisionStatus(decisionID) {
   $('<li><a onclick="buildDecisionInvite(' + decisionID + ')">Invite</a></li>').appendTo(ul);
   $('<li class="active"><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
-  var wrapper = $('<div>').addClass('tabbedContent').attr('id', 'b_wrapper').appendTo('#content');
+  var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
   var ballotsForCurrentStage = $('<div>').attr('id', 'totalBallots').appendTo(wrapper);
 
+  $('#totalBallots').append(
+    '<ul class="list-group" id="stage_ballot">' +
+    '<li class="list-group-item active">Current Stage: <span id="stage_li"></span></li>' +
+    '<li class="list-group-item"><span class="badge" id="voted_li"></span>Voted </li>' +
+    '<li class="list-group-item"><span class="badge" id="not_voted_li"></span>Not Voted</li>' +
+    '<li class="list-group-item"><span class="badge" id="total_li"></span><b>Total ballots</b> </li>' +
+    '</ul>'
+  );
+  
   $('<div>').attr('id', 'success').addClass('alert alert-success').appendTo(wrapper);
   $('#success').hide();
   $('<div>').attr('id', 'error').addClass('alert alert-danger').appendTo(wrapper);
   $('#error').hide();
-
-  //display total counts for ballot status
-  var stageBallots = $([
-    '<ul class="list-group" id="stage_ballot">',
-    '<li class="list-group-item active" id="stage_li">',
-    '</li>',
-    '</ul>'
-  ].join("\n"));
-  stageBallots.appendTo('#totalBallots');
-
-  //display info of different ballots
-  var status_table = $([
-
-    '<table class="table table-striped" id="s_table">',
-    '<tbody id="s_body">',
-    '<tr>',
-    '<th>Name</th>',
-    '<th>Email</th>',
-    '<th id="status_header">Ballot status</th>',
-    '<th>Action</th>',
-    '<th>Reset</th>',
-    '<th></th>',
-    '<th></th>',
-    '</tr>',
-    '</tbody>',
-    '</table>',
-  ].join('\n'));
-
-
-  var tableWrapper = $('<div>').attr('id', 't_wrapper');
-  tableWrapper.append(status_table);
-  wrapper.append(tableWrapper);
-  $('#s_table').hide();
-
-  getStatus(decisionID);
-  sortTable();
+  
+  $('<div>').attr('id', 'formDiv').appendTo(wrapper);
+  
+  $('<div>').attr('id', 'statusTable').appendTo(wrapper);
+  buildStatusTable(decisionID);
+  
+  //resets table every 5 seconds :)
+  intervalID = window.setInterval(function(){
+    buildStatusTable(decisionID);
+  }, 5000);
 }
 
-function getStatus(decisionID) {
+function buildStatusTable(decisionID) {  
+  
+  var status_table = $('<table class="table table-striped" id="s_table">');
+  var s_body = $('<tbody id="s_body">');
+  
+  status_table.append(s_body);
+  s_body.append(
+    '<tr>' +
+    '<th>Name</th>' +
+    '<th>Email</th>' +
+    '<th id="status_header">Ballot status</th>' +
+    '<th>Action</th>' +
+    '<th>Reset</th>' +
+    '<th></th>' +
+    '<th></th>' +
+    '</tr>'
+  );
+  
   get_text("/decision/" + decisionID + "/ballots", function(result) {
-    console.log(result)
     var vote_status = ""
     var totalBallots = 0
     var voted = 0
     var not_voted = 0
     if (result.ballots != null) {
       $('#s_table').show()
-        //get the total ballot for current stage
+
       totalBallots = result.ballots.length
       getBallotStage(decisionID)
 
@@ -1693,35 +1697,48 @@ function getStatus(decisionID) {
         var url = result.ballots[i].url
         
         if(result.ballots[i].sent == 0) {
-          $("#s_body").append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>Not Emailed</td><td> <a onclick="resendEmail(\'' + url + '\', \'' + result.ballots[i].email + '\');">Send Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
+          s_body.append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>Not Emailed</td><td> <a onclick="resendEmail('+ decisionID + ', \'' + url + '\', \'' + result.ballots[i].email + '\');">Send Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
         } else {
-          $("#s_body").append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>' + vote_status + '</td><td> <a onclick="resendEmail(\'' + url + '\', \'' + result.ballots[i].email + '\');">Resend Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
+          s_body.append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>' + vote_status + '</td><td> <a onclick="resendEmail('+ decisionID + ', \'' + url + '\', \'' + result.ballots[i].email + '\');">Resend Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
         }
       }
     } else {
       getBallotStage(decisionID);
     }
-    $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + voted + '</span>Voted </li>');
-    $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + not_voted + '</span>Not Voted</li>');
-    $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + totalBallots + '</span><b>Total ballots</b> </li>');
+    
+    //clear old table
+    $('#statusTable').html('');
+    //set new one
+    $('#statusTable').append(status_table);
+    
+    //Update counts
+    $('#voted_li').text(voted);
+    $('#not_voted_li').text(not_voted);
+    $('#total_li').text(totalBallots);
   });
+  
+  sortTable();
 }
 
 function getBallotStage(decisionID) {
   get_text("/decision/" + decisionID + "/info", function(result) {
 
     if (result.decision.stage == 1) {
-      $("#stage_li").append('Current Stage: In Development ');
+      $("#stage_li").text('In Development ');
     } else if (result.decision.stage == 2) {
-      $("#stage_li").append('Current Stage: Voting in progress ');
+      $("#stage_li").text('Voting in progress ');
+    } else if (result.decision.stage == 3) {
+      $("#stage_li").text('Completed ');
+    } else if (result.decision.stage == 4) {
+      $("#stage_li").text('Locked ');
     } else {
-      $("#stage_li").append('Current Stage: Completed ');
+      $("#stage_li").text('Unknown ');
     }
   })
 
 }
 
-function resendEmail(url, email) {
+function resendEmail(decisionID, url, email) {
   $('#success').hide();
   $('#error').hide();
 
@@ -1730,6 +1747,7 @@ function resendEmail(url, email) {
       $('#error').html('<b>Error:</b> ' + result['error']);
       $('#error').show()
     } else if (result['result'] == "invited") {
+      buildDecisionStatus(decisionID);
       $('#success').html('Invite sent to ' + email);
       $('#success').show();
     } else {
@@ -1777,7 +1795,10 @@ function editBallot(decisionID, url) {
       $('#error').html('<b>Error:</b> ' + result['error']);
       $('#error').show()
     } else if (result['ballot']) {
-      buildDecisionStatus(decisionID);
+      //Just clear the div
+      $('#formDiv').html('');
+      //refresh table
+      buildStatusTable(decisionID);
     } else {
       $('#error').html('<b>Error:</b> Something went wrong :(');
       $('#error').show();
@@ -1786,7 +1807,8 @@ function editBallot(decisionID, url) {
 }
 
 function cancelEdit(decisionID) {
-  buildDecisionStatus(decisionID)
+  //Just clear the div
+  $('#formDiv').html('');
 }
 
 function resetVote(decisionID, ballot) {
@@ -1837,7 +1859,8 @@ function resetVote(decisionID, ballot) {
 
 function buildEditBallotForm(decisionID, ballot) {
   //edit ballot form
-  $('#s_table').empty()
+  $('#formDiv').html('');
+  $('#formDiv').append('<hr/>');
   var form = $([
     '<form class ="form-signin" onsubmit = "return false" id="editBallotForm">',
 
@@ -1853,10 +1876,11 @@ function buildEditBallotForm(decisionID, ballot) {
     '<br />',
     '</form>'
   ].join('\n'));
-  form.appendTo('#b_wrapper');
+  form.appendTo('#formDiv');
   $('<button>').addClass('btn btn-primary').attr('onclick', 'editBallot(' + decisionID + ',\'' + ballot.url + '\');').attr('style', 'float: right').append('<span>  Update </span>').appendTo(form);
   $('<button>').addClass('btn btn-primary').attr('onclick', 'cancelEdit(' + decisionID + ')').append('<span> Cancel </span>').appendTo(form);
-
+  $('#formDiv').append('<hr/>');
+  
   get_text("/decision/" + decisionID + "/info", function(result) {
     $('#bName').val(result.decision.name);
   })
