@@ -1526,7 +1526,6 @@ function bulkAddBallot(decisionID) {
         $('#bulk_error').html('<b>Error:</b> ' + result['error']);
         $('#bulk_error').show()
         breakFlag = true;
-        return;
       } else if (result['ballot']) {
         $('#bulk_sent').append(result['ballot']['email'] + ' | ');
         $('#bulk_sent').show()
@@ -1534,7 +1533,6 @@ function bulkAddBallot(decisionID) {
         $('#bulk_error').html('<b>Error:</b> Something went wrong :(');
         $('#bulk_error').show();
         breakFlag = true;
-        return;
       }
     });
     if(breakFlag) break;
