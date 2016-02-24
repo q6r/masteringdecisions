@@ -11,6 +11,10 @@ a:hover {cursor: pointer; cursor: hand;}
   padding:10px 5px 5px 20px;
 }
 
+#userList {
+  max-width:800px;
+}
+
 .form-signin{
   max-width:500px;
 }
