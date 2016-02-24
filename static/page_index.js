@@ -384,8 +384,6 @@ function buildManageUsers() {
   clearContent();
 
   $('<strong><i class="glyphicon glyphicon-user"></i> Manage Users</strong><hr/>').appendTo('#content');
-  $('<hr/>').appendTo('#content');
-
 
   $('<div id="userList">').appendTo('#content');
   $('<hr/>').appendTo('#content');
