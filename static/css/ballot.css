@@ -39,6 +39,11 @@
   text-align:center;
 }
 
+#criterrordiv {
+  max-width:500px;
+  margin:auto;
+}
+
 /*Box colors for rating Alternatives*/
 .vote-red {background-color:red;}
 .vote-orange {background-color:orange;}

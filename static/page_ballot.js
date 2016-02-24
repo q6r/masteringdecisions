@@ -93,7 +93,7 @@ function main(body) {
       $("body").append("<h1>This decision has been locked.</h1>");
       return;
     } else {
-      var page = "<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">" + "<div class=\"container\">" + "<a class=\"navbar-brand\">" + decision_name + "</a>" + "</div>" + "</div>" + "<div id=\"ballotbody\" class=\"container\">" + "<div class=\"row\">" + "<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">" + "<img id=\"decision_image\" src=\"" + dec_img + "\"></img>" + "<h3>Welcome, " + voter_name + "! </h3>" + "<p class=\"lead\">" + decision_desc + "</p>" + "<div id='crit_inst' class='partone'>" + crit_instructions + "</div>" + "</div>" + "</div>" + "<form class=\"form-horizontal partone\" role=\"form\">";
+      var page = "<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">" + "<div class=\"container\">" + "<a class=\"navbar-brand\">" + decision_name + "</a>" + "</div>" + "</div>" + "<div id=\"ballotbody\" class=\"container\">" + "<div class=\"row\">" + "<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">" + "<img id=\"decision_image\" src=\"" + dec_img + "\"></img>" + "<h3>Welcome, " + voter_name + "! </h3>" + "<p class=\"lead\">" + decision_desc + "</p>" + "<div id='crit_inst' class='partone'>" + crit_instructions + "</div>" + "</div>" + "</div>" + "<form class=\"form-horizontal center partone\" role=\"form\">";
 
       //check to see if they want sliders or buttons
       if (crit_vote_style == "b") {
@@ -178,16 +178,16 @@ function main(body) {
       $('#contbtn').click(function(event) {
         var crit_votes = [];
 
-        $("#errordiv").hide();
-        $("#errordiv").empty();
+        $("#criterrordiv").hide();
+        $("#criterrordiv").empty();
 
         if (crit_vote_style == 'b') {
           for (var i = 0; i < criterion_names.length; i++) {
             crit_votes.push($("input[name=crit" + i + "]:checked").val());
 
             if (crit_votes[i] == undefined) {
-              $("#errordiv").html("Please vote on all criterion<br>");
-              $("#errordiv").show();
+              $("#criterrordiv").html("Please vote on all criterion<br>");
+              $("#criterrordiv").show();
             }
           }
         } else {
@@ -195,13 +195,13 @@ function main(body) {
             crit_votes.push($("#crit" + i + "slider-val").text());
 
             if (crit_votes[i] == undefined) {
-              $("#errordiv").html("Please vote on all criterion<br>");
-              $("#errordiv").show();
+              $("#criterrordiv").html("Please vote on all criterion<br>");
+              $("#criterrordiv").show();
             }
           }
         }
 
-        if ($("#errordiv").is(":empty")) {
+        if ($("#criterrordiv").is(":empty")) {
           $(".partone").hide();
           $(".parttwo").show();
         }
