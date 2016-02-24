@@ -337,17 +337,17 @@ function main(body) {
 function bindValuesText(slider, span) {
   slider.noUiSlider.on('update', function(values, handle) {
     var test = [
-      '-', //0 not used
-      'Extremely Awful', //1
-      'Extremely Awful', //2
-      'Awful', //3
-      'Awful', //4
-      'Moderate', //5
-      'Moderate', //6
-      'Important', //7
-      'Important',//8
-      'Extremely Important', //9
-      'Extremely Important' //10
+      '0 -', //0 not used
+      '1 - Not at all important',
+      '2 - Slightly important',
+      '3 - Slightly important',
+      '4 - Moderately important',
+      '5 - Moderately important',
+      '6 - Important',
+      '7 - Important',
+      '8 - Very important',
+      '9 - Very important',
+      '10 - Extremely important'
     ];
     span.innerHTML = test[values[handle]];
     $('#'+span.id).data('val', values[handle]);
