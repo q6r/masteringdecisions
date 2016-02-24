@@ -96,6 +96,8 @@ func HBallotCreateSilent(c *gin.Context) {
 	}
 	b.DecisionID = did // inherited
 
+	mutex.Lock()
+	defer mutex.Unlock()
 	err = b.Save()
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
