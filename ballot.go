@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +18,7 @@ type Ballot struct {
 	Secret     string `db:"secret" json:"secret"`
 	Name       string `db:"name" json:"name" binding:"required"`
 	Email      string `db:"email" json:"email" binding:"required"`
+	Sent       bool   `db:"sent" json:"sent"`
 }
 
 // BallotAllInfo is a struct to hold
@@ -60,9 +62,24 @@ func HBallotCreate(c *gin.Context) {
 	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here</a>",
 		b.Name, b.DecisionID, b.BallotID, b.Secret)
 
-	// Non-blocking can improve error handling
-	// but must block
-	go Send(body, title, b.Email)
+	// Send email to ballot, and set confirmation
+	// flag on success
+	go func(b *Ballot) {
+		if b == nil {
+			return
+		}
+		err := Send(body, title, b.Email)
+		if err != nil {
+			b.Sent = false
+			log.Printf("Unable to send email %#v\n", b)
+			return
+		}
+		b.Sent = true
+		_, err = dbmap.Update(b)
+		if err != nil {
+			log.Printf("Unable to update b after email is sent successfuly %#v err : %#v\n", b, err)
+		}
+	}(&b)
 }
 
 // HBallotInvite invites a specific ballot via email
