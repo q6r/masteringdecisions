@@ -28,7 +28,9 @@
 }
 
 #decision_image {
-  max-width:600px;
+  max-width:100%;
+  height:auto;
+  width: auto\9;
 }	
 
 #bottomRow {
