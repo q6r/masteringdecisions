@@ -60,6 +60,13 @@ function main(body) {
       return;
     }
 
+    var votes = get_votes(decision_id, ballot_id);
+
+    if (votes == null || votes["error"] != null || votes["error"] != undefined) {
+      alert("Unable to retrieve votes");
+      return;
+    }
+
     decision_name = decision.name;
     decision_desc = decision.description;
     decision_stage = decision.stage;
@@ -92,6 +99,8 @@ function main(body) {
     } else if (decision_stage == "4") {
       $("body").append("<h1>This decision has been locked.</h1>");
       return;
+    } else if (votes.length != 0) {
+      $("body").append("<h1>You have already voted in this decision, contact the facilitator if you wish to change your vote.</h1>");		    
     } else {
       var page = "<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">" + "<div class=\"container\">" + "<a class=\"navbar-brand\">" + decision_name + "</a>" + "</div>" + "</div>" + "<div id=\"ballotbody\" class=\"container\">" + "<div class=\"row\">" + "<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">" + "<img id=\"decision_image\" src=\"" + dec_img + "\"></img>" + "<h3>Welcome, " + voter_name + "! </h3>" + "<p class=\"lead\">" + decision_desc + "</p>" + "<div id='crit_inst' class='partone'>" + crit_instructions + "</div>" + "</div>" + "</div>" + "<form class=\"form-horizontal center partone\" role=\"form\">";
 
@@ -411,6 +420,25 @@ function get_ballot(decision_id, ballot_id) {
     async: false,
     success: function(r) {
       result = r["ballot"];
+    },
+    error: function(r) {
+      errmsg = JSON.parse(r.responseText);
+      result = errmsg;
+    }
+  });
+  return result;
+}
+
+//get votes from a ballot
+function get_votes(decision_id, ballot_id) {
+  var result = null;
+  $.ajax({
+    type: "GET",
+    url: base_url + "/decision/" +decision_id + "/ballot/" +ballot_id+ "/votes",
+    contentType: 'application/json; charset=utf-8',
+    async: false,
+    success: function(r) {
+      result = r["votes"];
     },
     error: function(r) {
       errmsg = JSON.parse(r.responseText);
