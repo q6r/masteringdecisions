@@ -74,6 +74,33 @@ func HBallotCreate(c *gin.Context) {
 	}(&b)
 }
 
+// HBallotCreateSilent create a ballot without sending
+// it an invitation
+func HBallotCreateSilent(c *gin.Context) {
+	did, err := strconv.Atoi(c.Param("decision_id"))
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid decision_id"})
+		return
+	}
+
+	var b Ballot
+	if err := c.Bind(&b); err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid ballot object"})
+		return
+	}
+	b.DecisionID = did // inherited
+
+	err = b.Save()
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := gin.H{"ballot": b}
+	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.BallotID))
+	ServeResult(c, "ballot_create.js", result)
+}
+
 // GenerateInviteTemplate generate the template for email
 // invitations
 func GenerateInviteTemplate(b Ballot) (title string, body string) {
