@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,29 +56,31 @@ func HBallotCreate(c *gin.Context) {
 	c.Writer.Header().Set("Location", fmt.Sprintf("/ballot/%d", b.BallotID))
 	ServeResult(c, "ballot_create.js", result)
 
-	// Send invitation
-	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here</a>",
-		b.Name, b.DecisionID, b.BallotID, b.Secret)
-
 	// Send email to ballot, and set confirmation
 	// flag on success
+	title, body := GenerateInviteTemplate(b)
 	go func(b *Ballot) {
 		if b == nil {
 			return
 		}
-		err := Send(body, title, b.Email)
-		if err != nil {
+		if err := Send(body, title, b.Email); err != nil {
 			b.Sent = false
-			log.Printf("Unable to send email %#v\n", b)
 			return
 		}
 		b.Sent = true
-		_, err = dbmap.Update(b)
-		if err != nil {
-			log.Printf("Unable to update b after email is sent successfuly %#v err : %#v\n", b, err)
+		if _, err := dbmap.Update(b); err != nil {
+			return
 		}
 	}(&b)
+}
+
+// GenerateInviteTemplate generate the template for email
+// invitations
+func GenerateInviteTemplate(b Ballot) (title string, body string) {
+	title = fmt.Sprintf("%s's ballot", b.Name)
+	body = fmt.Sprintf("Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here</a>",
+		b.Name, b.DecisionID, b.BallotID, b.Secret)
+	return title, body
 }
 
 // HBallotInvite invites a specific ballot via email
@@ -97,16 +98,22 @@ func HBallotInvite(c *gin.Context) {
 		return
 	}
 
-	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
-		b.Name, b.DecisionID, b.BallotID, b.Secret)
-
-	err = Send(body, title, b.Email)
-	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"error": err})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "invited"})
-	}
+	// Send email to ballot, and set confirmation
+	// flag on success
+	title, body := GenerateInviteTemplate(b)
+	go func(b *Ballot) {
+		if b == nil {
+			return
+		}
+		if err := Send(body, title, b.Email); err != nil {
+			b.Sent = false
+			return
+		}
+		b.Sent = true
+		if _, err := dbmap.Update(b); err != nil {
+			return
+		}
+	}(&b)
 }
 
 // HBallotUpdate updates a ballot
