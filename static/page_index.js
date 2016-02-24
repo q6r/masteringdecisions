@@ -1429,7 +1429,6 @@ function updateAltList(decisionID) {
 
 /**** Decision Invite ****/
 function buildDecisionInvite(decisionID) {
-
   $('title').html('Invite People');
   clearContent();
 
@@ -1444,22 +1443,19 @@ function buildDecisionInvite(decisionID) {
   $('<li><a onclick="buildDecisionStatus(' + decisionID + ')">Voting Status</a></li>').appendTo(ul);
 
   var wrapper = $('<div>').addClass('tabbedContent').appendTo('#content');
-
+  
+  $('<h2>').text('Invite Individuals').appendTo(wrapper);
   var form = $([
     '<form class ="form-signin" onsubmit = "return false" id="inviteForm">',
-
     '<div id= "invitation_sent" class = "alert alert-success"></div>',
     '<div id="invitation_error" class="alert alert-danger" style="display: none;"></div>',
     '<label for="bal_dec_id" >Decision Name: </label>',
     '<input type="text" class= "form-control" required="required" placeholder="Decision ID" id="dName"></input>',
-    '<br />',
-
     '<label for="bal_name">Name</label>',
     '<input type="text" id="i_name" class= "form-control" required="required" placeholder="Name"></input>',
-    '<br />',
     '<label for="bal_email">Email</label>',
     '<input type="email" id="i_email" class= "form-control" required="required" placeholder="Email"></input>',
-    '<br />',
+    '<br/>',
     '</form>'
   ].join('\n'));
 
@@ -1467,15 +1463,77 @@ function buildDecisionInvite(decisionID) {
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right;').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite and Email</span>').appendTo(form);
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'addBallot(' + decisionID + ');').attr('style', 'float: right; margin-right:10px;').append('<span> <i class="glyphicon glyphicon-user"></i>  Invite </span>').appendTo(form);
 
-
   get_text("/decision/" + decisionID + "/info", function(result) {
     $('#dName').val(result.decision.name)
   })
-
-  $(wrapper).append(form)
-
+  
+  $(wrapper).append(form);
   $("#invitation_sent").hide()
   $("#invitation_error").hide()
+  
+  $('<hr/>').appendTo(wrapper);
+  $('<h2>').text('Invite Bulk').appendTo(wrapper);
+
+  $('<div>').attr('id', 'bulk_sent').addClass('alert alert-success').appendTo(wrapper);
+  $('#bulk_sent').hide();
+  $('<div>').attr('id', 'bulk_error').addClass('alert alert-danger').appendTo(wrapper);
+  $('#bulk_error').hide();
+  
+  $('<div class="form-group">').append(
+    $('<label for="bulkEmails">Email List</label>'),
+    $('<textarea>').addClass('form-control')
+    .attr('rows', '3')
+    .attr('name', 'bulkEmails')
+    .attr('placeholder', 'one@email.com, two@email.com, three@email.com, etc')
+    .attr('id', 'bulkEmails'))
+  .appendTo(wrapper);
+  
+  $('<button>').addClass('btn btn-primary').attr('onclick', 'bulkAddBallot(' + decisionID + ');').text('Bulk Add').appendTo(wrapper);
+  $('<div>').addClass('clearfix').appendTo(wrapper);
+}
+
+function bulkAddBallot(decisionID) {
+  $("#bulk_sent").hide()
+  $("#bulk_error").hide()
+  
+  var emails = $('#bulkEmails').val().split(',');
+  
+  for(var i in emails) {
+    if (!isEmail($.trim(emails[i]))) {
+      $('#bulk_error').html('<b>Error:</b> Invalid email:' + $.trim(emails[i]));
+      $('#bulk_error').show();
+      break;
+    }
+    
+    //Default name is just email
+    new_invite = {
+      "name": $.trim(emails[i].substr(0,emails[i].indexOf('@'))),
+      "email": $.trim(emails[i])
+    };
+    
+    //If one breaks, just stop trying
+    var breakFlag = false;
+    
+    $('#bulk_sent').html('Added ballots: ');
+    
+    post_text("/decision/" + decisionID + "/ballot_silent", JSON.stringify(new_invite), function(result) {
+      if (result['error']) {
+        $('#bulk_error').html('<b>Error:</b> ' + result['error']);
+        $('#bulk_error').show()
+        breakFlag = true;
+        return;
+      } else if (result['ballot']) {
+        $('#bulk_sent').append(result['ballot']['email'] + ' | ');
+        $('#bulk_sent').show()
+      } else {
+        $('#bulk_error').html('<b>Error:</b> Something went wrong :(');
+        $('#bulk_error').show();
+        breakFlag = true;
+        return;
+      }
+    });
+    if(breakFlag) break;
+  }
 }
 
 //Adds Ballot and sends email with link
