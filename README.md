@@ -115,6 +115,7 @@ ballots, and gather statistics.
 | Get a decision statistics     | /decision/:decision_id/stats                                                                              | GET    | nothing | s1          |
 | Delete a decision             | /decision/:decision_id                                                                                    | DELETE | nothing | r1          |
 | Create a ballot for decision  | /decision/:decision_id/ballot                                                                             | POST   | b1      | b2          |
+| Create a ballot without inv.  | /decision/:decision_id/ballot_silent                                                                      | POST   | b1      | b2          |
 | List ballots in a decision    | /decision/:decision_id/ballots                                                                            | GET    | nothing | array of b2 |
 | Show a ballot info            | /decision/:decision_id/ballot/:ballot_id/info                                                             | GET    | nothing | b2          |
 | Delete a ballot               | /decision/:decision_id/ballot/:ballot_id                                                                  | DELETE | nothing | r1          |
@@ -147,8 +148,8 @@ a1 = {"name": <str>, "description":<optional-str>, "cost":<optiona-int> }
 d1 = {"person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 d2 = {"decision_id":<int>, "person_id":<int>, "name":<str>, "description":<str>, "stage":<int>, "criterion_vote_style":<str>, "alternative_vote_style":<str>, "client_settings":<str>}
 s1 = "undecided yet"
-b1 = {"name":<str>, "email":<str>}
-b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<str>, "name":<str>, "email":<str>}
+b1 = {"name":<str>, "email":<str>, "sent":<bool-opt>}
+b2 = {"ballot_id":<int>, "decision_id":<int>, "secret":<str>, "name":<str>, "email":<str>, "sent":<bool-opt>}
 b3 = {"ballot": b1, "ratings": array of v2}
 c1 = {"name":<str>, "description":<optional-str>}
 c2 = {"criterion_id":<int>, "description":<optional-str>, "decision_id":<int>, "name":<str>}
