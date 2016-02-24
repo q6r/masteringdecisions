@@ -28,6 +28,7 @@ type BallotAllInfo struct {
 	URLDecision string   `json:"url"`
 	Votes       []Vote   `json:"votes"`
 	Ratings     []Rating `json:"rating"`
+  Sent        bool     `json:"sent"`
 }
 
 // HBallotCreate create a ballot that belongs
@@ -105,7 +106,7 @@ func HBallotCreateSilent(c *gin.Context) {
 // invitations
 func GenerateInviteTemplate(b Ballot) (title string, body string) {
 	title = fmt.Sprintf("%s's ballot", b.Name)
-	body = fmt.Sprintf("<html><body>Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here</a></body></html>",
+	body = fmt.Sprintf("<html><body>Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here to vote</a>.</body></html>",
 		b.Name, b.DecisionID, b.BallotID, b.Secret)
 	return title, body
 }
@@ -125,6 +126,8 @@ func HBallotInvite(c *gin.Context) {
 		return
 	}
 
+  c.JSON(http.StatusOK, gin.H{"result": "invited"})
+  
 	// Send email to ballot, and set confirmation
 	// flag on success
 	title, body := GenerateInviteTemplate(b)
@@ -366,6 +369,7 @@ func HBallotAllInfo(c *gin.Context) {
 	var ai BallotAllInfo
 	ai.Name = ballot.Name
 	ai.Email = ballot.Email
+  ai.Sent = ballot.Sent
 	ai.URLDecision = fmt.Sprintf("/decision/%s", did)
 
 	// Get the votes for this ballot

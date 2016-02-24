@@ -42,6 +42,7 @@ func HDecisionBallotsList(c *gin.Context) {
 		var ai BallotAllInfo
 		ai.Name = b.Name
 		ai.Email = b.Email
+    ai.Sent = b.Sent
 		ai.URLDecision = fmt.Sprintf("/decision/%s/ballot/%d", did, b.BallotID)
 		// Get the votes for this ballot
 		_, err = dbmap.Select(&ai.Votes, "SELECT * FROM vote where ballot_id=$1", b.BallotID)

@@ -1464,7 +1464,8 @@ function buildDecisionInvite(decisionID) {
   ].join('\n'));
 
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'buildDecisionHome(' + decisionID + ');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
-  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite </span>').appendTo(form);
+  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right;').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite and Email</span>').appendTo(form);
+  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'addBallot(' + decisionID + ');').attr('style', 'float: right; margin-right:10px;').append('<span> <i class="glyphicon glyphicon-user"></i>  Invite </span>').appendTo(form);
 
 
   get_text("/decision/" + decisionID + "/info", function(result) {
@@ -1477,6 +1478,7 @@ function buildDecisionInvite(decisionID) {
   $("#invitation_error").hide()
 }
 
+//Adds Ballot and sends email with link
 function sendInvite(decisionID) {
   $("#invitation_sent").hide()
   $("#invitation_error").hide()
@@ -1503,6 +1505,42 @@ function sendInvite(decisionID) {
       } else if (result['ballot']) {
         buildDecisionInvite(id);
         $('#invitation_sent').html('Invitation sent Successfully!');
+        $('#invitation_sent').show()
+      } else {
+        $('#invitation_error').html('<b>Error:</b> Something went wrong :(');
+        $('#invitation_error').show();
+      }
+    });
+  }
+}
+
+//Adds Ballot without emailing
+function addBallot(decisionID) {
+  $("#invitation_sent").hide()
+  $("#invitation_error").hide()
+  id = decisionID
+
+  if ($('#i_name').val() == '') {
+    $('#invitation_error').html('<b>Error:</b> No name set!');
+    $('#invitation_error').show();
+  } else if ($('#i_email').val() == '') {
+    $('#invitation_error').html('<b>Error:</b> No email set!');
+    $('#invitation_error').show();
+  } else if (!isEmail($('#i_email').val())) {
+    $('#invitation_error').html('<b>Error:</b> Invalid email!');
+    $('#invitation_error').show()
+  } else {
+    new_invite = {
+      "name": $('#i_name').val(),
+      "email": $('#i_email').val()
+    };
+    post_text("/decision/" + id + "/ballot_silent", JSON.stringify(new_invite), function(result) {
+      if (result['error']) {
+        $('#invitation_error').html('<b>Error:</b> ' + result['error']);
+        $('#invitation_error').show()
+      } else if (result['ballot']) {
+        buildDecisionInvite(id);
+        $('#invitation_sent').html('Added ballot Successfully!');
         $('#invitation_sent').show()
       } else {
         $('#invitation_error').html('<b>Error:</b> Something went wrong :(');
@@ -1563,13 +1601,13 @@ function buildDecisionStatus(decisionID) {
   ].join('\n'));
 
 
-  var tableWrapper = $('<div>').attr('id', 't_wrapper')
-  tableWrapper.append(status_table)
-  wrapper.append(tableWrapper)
-  $('#s_table').hide()
+  var tableWrapper = $('<div>').attr('id', 't_wrapper');
+  tableWrapper.append(status_table);
+  wrapper.append(tableWrapper);
+  $('#s_table').hide();
 
-  getStatus(decisionID)
-  sortTable()
+  getStatus(decisionID);
+  sortTable();
 }
 
 function getStatus(decisionID) {
@@ -1587,26 +1625,28 @@ function getStatus(decisionID) {
 
       for (var i = 0; i < result.ballots.length; i++) {
         if (result.ballots[i].rating != null && result.ballots[i].rating.length > 0 && result.ballots[i].rating.length != "undefined") {
-          vote_status = "Voted"
-          voted = voted + 1
+          vote_status = "Voted";
+          voted = voted + 1;
         } else {
-          vote_status = "Not Voted"
-          not_voted = not_voted + 1
+          vote_status = "Not Voted";
+          not_voted = not_voted + 1;
         }
 
         var url = result.ballots[i].url
-
-        //$("#s_table").append('<tbody><tr><td>' +result.ballots[i].name + '</td><td>' + result.ballots[i].email +'</td><td>' + vote_status + '</td><td> <a onclick=resendEmail(\''+url+'\')>Resend email</a>'+'</td> </tbody>');       
-        $("#s_body").append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>' + vote_status + '</td><td> <a onclick="resendEmail(\'' + url + '\', \'' + result.ballots[i].email + '\');">Resend Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
-
+        
+        if(result.ballots[i].sent == 0) {
+          $("#s_body").append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>Not Emailed</td><td> <a onclick="resendEmail(\'' + url + '\', \'' + result.ballots[i].email + '\');">Send Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
+        } else {
+          $("#s_body").append('<tr><td>' + result.ballots[i].name + '</td><td>' + result.ballots[i].email + '</td><td>' + vote_status + '</td><td> <a onclick="resendEmail(\'' + url + '\', \'' + result.ballots[i].email + '\');">Resend Email</a>' + '</td><td align="center"><a onclick=\'resetVote(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-repeat"></span></a></td><td><a onclick=\'buildEditBallotForm(' + decisionID + ',' + JSON.stringify(result.ballots[i]) + ')\'><span class="glyphicon glyphicon-pencil text-Primary"></span></a></td><td><a onclick=deleteBallot(\'' + url + '\',' + decisionID + ')><span class="glyphicon glyphicon-trash text-Danger" style="margin-left: 10px; display: inline-block;"></span></a></td>');
+        }
       }
     } else {
-      getBallotStage(decisionID)
+      getBallotStage(decisionID);
     }
     $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + voted + '</span>Voted </li>');
     $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + not_voted + '</span>Not Voted</li>');
     $("#stage_ballot").append('<li class="list-group-item"><span class="badge">' + totalBallots + '</span><b>Total ballots</b> </li>');
-  })
+  });
 }
 
 function getBallotStage(decisionID) {
@@ -1632,7 +1672,7 @@ function resendEmail(url, email) {
       $('#error').html('<b>Error:</b> ' + result['error']);
       $('#error').show()
     } else if (result['result'] == "invited") {
-      $('#success').html('Invite resent to ' + email);
+      $('#success').html('Invite sent to ' + email);
       $('#success').show();
     } else {
       $('#error').html('<b>Error:</b> Something went wrong :(');
