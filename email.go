@@ -20,8 +20,8 @@ func Send(body, title, to string) error {
 
 	from := conf.String("smtp::email")
 
-	msg := fmt.Sprintf("From: %s\nTo: %s\nSubject: %s\n\n%s",
-		from, to, title+mime, body)
+	msg := fmt.Sprintf("From: %s\nTo: %s\nSubject: %s\n%s%s",
+		from, to, title, mime, body)
 
 	port, err := conf.Int("smtp::port")
 	if err != nil {
