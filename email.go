@@ -16,10 +16,12 @@ func Send(body, title, to string) error {
 		log.Fatalln(err)
 	}
 
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+
 	from := conf.String("smtp::email")
 
 	msg := fmt.Sprintf("From: %s\nTo: %s\nSubject: %s\n\n%s",
-		from, to, title, body)
+		from, to, title+mime, body)
 
 	port, err := conf.Int("smtp::port")
 	if err != nil {

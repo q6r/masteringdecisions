@@ -57,7 +57,7 @@ func HBallotCreate(c *gin.Context) {
 
 	// Send invitation
 	title := fmt.Sprintf("%s's ballot", b.Name)
-	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision at the following url : http://localhost:9999/decision/%d/ballot/%d/login/%s",
+	body := fmt.Sprintf("Hello %s, you have been invited to participate in a decision <a href=\"http://localhost:9999/decision/%d/ballot/%d/login/%s\">click here</a>",
 		b.Name, b.DecisionID, b.BallotID, b.Secret)
 
 	// Non-blocking can improve error handling
