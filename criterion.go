@@ -10,11 +10,11 @@ import (
 
 // Criterion represent a criterion for a decision
 type Criterion struct {
-	CriterionID int    `db:"criterion_id" json:"criterion_id"`
-	DecisionID  int    `db:"decision_id" json:"decision_id"` // inherited
-	Name        string `db:"name" json:"name" binding:"required"`
-	Description string `db:"description" json:"description"`
-	Order       int    `db:"order" json:"order"`
+	CriterionID int       `db:"criterion_id" json:"criterion_id"`
+	DecisionID  int       `db:"decision_id" json:"decision_id"` // inherited
+	Name        string    `db:"name" json:"name" binding:"required"`
+	Description string    `db:"description" json:"description"`
+	Order       float32   `db:"order" json:"order"`
 }
 
 // HCriterionInfo get the information of a specific
