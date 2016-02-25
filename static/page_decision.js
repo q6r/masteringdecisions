@@ -136,6 +136,29 @@ function buildResultsPage(decisionID) {
             }
           }
         }
+        //Footer
+        //Build the template <tr>
+        var tr = $('<tfoot>').addClass('resultFooter').appendTo(table);
+        tr.append($('<td>').addClass('footerCell').text(' '));
+        for (j = 0; j < critIds.length; j++) {
+          tr.append($('<td>').addClass('footerCell').text(' '));
+        }
+        for (j = 0; j < critIds.length; j++) {
+          for (k = 0; k < altIds.length; k++) {
+            tr.append($('<td>').addClass('footerCell').text(' '));
+          }
+        }
+        for (var j in altIds) {
+          var sumWeights = 0;
+          var sumBallots = 0;
+          for (var i in results["ballots"]) {
+            if($('#weights' + i + '-' + altIds[j]).text() != '-') {
+              sumWeights += parseFloat($('#weights' + i + '-' + altIds[j]).text());
+              sumBallots++;
+            }
+          }
+          tr.append($('<td>').addClass('footerTotal').attr('id', 'totals' + i + '-' + altIds[j]).text((sumWeights / sumBallots).toFixed(2)));
+        }
       });
     });
   });

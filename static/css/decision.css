@@ -63,32 +63,48 @@ th,td {
   text-align:center;
 }
 
+.footerCell {
+  background:#333;
+  border:1px solid #333 !important;
+}
+
+.footerTotal {
+  font-weight:bold;
+  font-size: 16px;
+}
+
 /* Colors of criterion headers */
-.crit0 {background:#0000ff;}
-.crit1 {background:#8080ff;}
-.crit2 {background:#40ff00;}
-.crit3 {background:#00bfff;}
-.crit4 {background:#ff0080;}
-.crit5 {background:#bfff00;}
-.crit6 {background:#ff4000;}
-.crit7 {background:#ff00ff;}
-.crit8 {background:#ff0080;}
-.crit9 {background:#8000ff;}
-.crit10{background:#ff0000;}
-.crit11{background:#80ff00;}
-.crit12{background:#00ff40;}
-.crit13{background:#00ffbf;}
-.crit14{background:#00ffff;}
-.crit15{background:#ff0040;}
-.crit16{background:#00ff00;}
-.crit17{background:#00ff80;}
-.crit18{background:#ffbf00;}
-.crit19{background:#bf00ff;}
-.crit20{background:#ffff00;}
-.crit21{background:#ff8000;}
-.crit22{background:#ff0000;}
-.crit23{background:#0040ff;}
-.crit24{background:#ff00bf;}
+.crit0 {background: #3366cc;}
+.crit1 {background: #dc3912;}
+.crit2 {background: #ff9900;}
+.crit3 {background: #109618;}
+.crit4 {background: #990099;}
+.crit5 {background: #0099c6;}
+.crit6 {background: #dd4477;}
+.crit7 {background: #66aa00;}
+.crit8 {background: #b82e2e;}
+.crit9 {background: #316395;}
+.crit10{background: #994499;}
+.crit11{background: #22aa99;}
+.crit12{background: #aaaa11;}
+.crit13{background: #6633cc;}
+.crit14{background: #e67300;}
+.crit15{background: #8b0707;}
+.crit16{background: #651067;}
+.crit17{background: #329262;}
+.crit18{background: #5574a6;}
+.crit19{background: #3b3eac;}
+.crit20{background: #b77322;}
+.crit21{background: #16d620;}
+.crit22{background: #b91383;}
+.crit23{background: #f4359e;}
+.crit24{background: #9c5935;}
+.crit25{background: #a9c413;}
+.crit26{background: #2a778d;}
+.crit27{background: #668d1c;}
+.crit28{background: #bea413;}
+.crit29{background: #0c5922;}
+.crit31{background: #743411;}
 
 /* Colors of the ratings */
 .alt-R{color:red;}
