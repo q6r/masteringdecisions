@@ -58,8 +58,7 @@ function buildResultsPage(decisionID) {
         $('<tr>').append(
           $('<th>').text(' '), //space to fix copy/paste bug
           $('<th>').text('Step 1').attr('colspan', critNames.length).addClass('step1'),
-          $('<th>').text('Step 2').attr('colspan', critNames.length * altNames.length).addClass('step2'),
-          $('<th>').text('Outcome').attr('colspan', altNames.length).addClass('step4')
+          $('<th>').text('Step 2').attr('colspan', critNames.length * altNames.length).addClass('step2')
         )
       );
 
@@ -72,9 +71,6 @@ function buildResultsPage(decisionID) {
       for (j = 0; j < critNames.length; j++) {
         row2.append($('<td>').text(critNames[j]).attr('colspan', altNames.length).addClass('critHeaders crit' + j));
       }
-      for (j = 0; j < altNames.length; j++) {
-        row2.append($('<td>'));
-      }
 
       //Row 3 and all values
       var row3 = $('<tr>').addClass('row3').appendTo(table);
@@ -82,12 +78,13 @@ function buildResultsPage(decisionID) {
       for (j = 0; j < critNames.length; j++) {
         row3.append($('<td>').text(critNames[j]));
       }
-      for (j = 0; j < critNames.length + 1; j++) { //+1 to show the totals at the end!
+      for (j = 0; j < critNames.length; j++) {
         for (k = 0; k < altNames.length; k++) {
           row3.append($('<td>').text(altNames[k]));
         }
       }
 
+      //Fill the table
       get_text("/decision/" + decisionID + "/ballots", function(results) {
         for (var i in results["ballots"]) {
           //Build the template <tr>
@@ -102,72 +99,22 @@ function buildResultsPage(decisionID) {
             }
           }
 
+          //Fill in the Name
           var b = results["ballots"][i];
           $('#name' + i).text(b["name"]);
-
-          //set crit values in template
-          var critTotal = 0;
           
+          //Fill in the Ratings
           for (var j in b["rating"]) {
             var r = b["rating"][j];
             $('#crit' + i + '-' + parseInt(r["criterion_id"])).text(r["rating"]);
-            critTotal += parseInt(r["rating"]);
           }
 
-          var weights = [];
-          var weightTotals = [];
-
-          for (var j in altIds) {
-            tr.append($('<td>').attr('id', 'weights' + i + '-' + altIds[j]).text('-'));
-
-            weights.push(altIds[j]);
-            weights[altIds[j]] = 0;
-            
-            weightTotals.push(altIds[j]);
-            weightTotals[altIds[j]] = 0;
-          }
-
+          //Fill in the Votes
           var colors = ['-', 'R', 'O', 'Y', 'GY', 'G'];
           for (var j in b["votes"]) {
             var v = b["votes"][j];
             $('#alt' + i + '-' + parseInt(v["criterion_id"]) + '-' + parseInt(v["alternative_id"])).text(colors[parseInt(v["weight"])]).addClass('alt-' + colors[parseInt(v["weight"])]);
-            
-            weights[parseInt(v["alternative_id"])] += parseInt(v["weight"]) * parseInt($('#crit' + i + '-' + parseInt(v["criterion_id"])).text()) / critTotal;
-            weightTotals[altIds[j]]++;
           }
-
-          for (var j in altIds) {
-            if (weights[altIds[j]]) {
-              //Stores the raw number so our avgs are better at the end
-              $('#weights' + i + '-' + altIds[j]).data('val', weights[altIds[j]] / weightTotals[altIds[j]]);
-              
-              $('#weights' + i + '-' + altIds[j]).text((weights[altIds[j]] / weightTotals[altIds[j]]).toFixed(2));
-            }
-          }
-        }
-        //Footer
-        //Build the template <tr>
-        //Has to be <tr> to copy correctly
-        var tr = $('<tr>').addClass('resultFooter').appendTo(table);
-        tr.append($('<td>').addClass('footerCell').text(' '));
-        for (j = 0; j < critIds.length; j++) {
-          tr.append($('<td>').addClass('footerCell').text(' '));
-        }
-        for (j = 0; j < critIds.length; j++) {
-          for (k = 0; k < altIds.length; k++) {
-            tr.append($('<td>').addClass('footerCell').text(' '));
-          }
-        }
-        for (var j in altIds) {
-          var sumWeights = 0;
-          var sumBallots = 0;
-          for (var i in results["ballots"]) {
-            if($('#weights' + i + '-' + altIds[j]).text() != '-') {
-              sumWeights += parseFloat($('#weights' + i + '-' + altIds[j]).data('val'));
-              sumBallots++;
-            }
-          }
-          tr.append($('<td>').addClass('footerTotal').attr('id', 'totals' + i + '-' + altIds[j]).text((sumWeights / sumBallots).toFixed(2)));
         }
       });
     });
