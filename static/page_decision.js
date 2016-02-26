@@ -59,7 +59,7 @@ function buildResultsPage(decisionID) {
           $('<th>').text(' '), //space to fix copy/paste bug
           $('<th>').text('Step 1').attr('colspan', critNames.length).addClass('step1'),
           $('<th>').text('Step 2').attr('colspan', critNames.length * altNames.length).addClass('step2'),
-          $('<th>').text('Step 4').attr('colspan', altNames.length).addClass('step4')
+          $('<th>').text('Outcome').attr('colspan', altNames.length).addClass('step4')
         )
       );
 
@@ -106,39 +106,49 @@ function buildResultsPage(decisionID) {
           $('#name' + i).text(b["name"]);
 
           //set crit values in template
+          var critTotal = 0;
+          
           for (var j in b["rating"]) {
             var r = b["rating"][j];
             $('#crit' + i + '-' + parseInt(r["criterion_id"])).text(r["rating"]);
+            critTotal += parseInt(r["rating"]);
           }
 
           var weights = [];
-          var weightTotal = 0;
+          var weightTotals = [];
 
           for (var j in altIds) {
             tr.append($('<td>').attr('id', 'weights' + i + '-' + altIds[j]).text('-'));
 
             weights.push(altIds[j]);
             weights[altIds[j]] = 0;
+            
+            weightTotals.push(altIds[j]);
+            weightTotals[altIds[j]] = 0;
           }
 
           var colors = ['-', 'R', 'O', 'Y', 'GY', 'G'];
           for (var j in b["votes"]) {
             var v = b["votes"][j];
             $('#alt' + i + '-' + parseInt(v["criterion_id"]) + '-' + parseInt(v["alternative_id"])).text(colors[parseInt(v["weight"])]).addClass('alt-' + colors[parseInt(v["weight"])]);
-
-            weights[parseInt(v["alternative_id"])] += parseInt(v["weight"]);
-            weightTotal += parseInt(v["weight"]);
+            
+            weights[parseInt(v["alternative_id"])] += parseInt(v["weight"]) * parseInt($('#crit' + i + '-' + parseInt(v["criterion_id"])).text()) / critTotal;
+            weightTotals[altIds[j]]++;
           }
 
           for (var j in altIds) {
             if (weights[altIds[j]]) {
-              $('#weights' + i + '-' + altIds[j]).text((weights[altIds[j]] * 100 / weightTotal).toFixed(2));
+              //Stores the raw number so our avgs are better at the end
+              $('#weights' + i + '-' + altIds[j]).data('val', weights[altIds[j]] / weightTotals[altIds[j]]);
+              
+              $('#weights' + i + '-' + altIds[j]).text((weights[altIds[j]] / weightTotals[altIds[j]]).toFixed(2));
             }
           }
         }
         //Footer
         //Build the template <tr>
-        var tr = $('<tfoot>').addClass('resultFooter').appendTo(table);
+        //Has to be <tr> to copy correctly
+        var tr = $('<tr>').addClass('resultFooter').appendTo(table);
         tr.append($('<td>').addClass('footerCell').text(' '));
         for (j = 0; j < critIds.length; j++) {
           tr.append($('<td>').addClass('footerCell').text(' '));
@@ -153,7 +163,7 @@ function buildResultsPage(decisionID) {
           var sumBallots = 0;
           for (var i in results["ballots"]) {
             if($('#weights' + i + '-' + altIds[j]).text() != '-') {
-              sumWeights += parseFloat($('#weights' + i + '-' + altIds[j]).text());
+              sumWeights += parseFloat($('#weights' + i + '-' + altIds[j]).data('val'));
               sumBallots++;
             }
           }

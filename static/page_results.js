@@ -7,89 +7,89 @@ var ballots;
 
 
 function main(body) {
+  getScript('https://www.gstatic.com/charts/loader.js', function() {
+    google.charts.load('current', {packages: ['corechart', 'table']});
+    google.charts.setOnLoadCallback(function() {
+      var decision_id = window.location.pathname.substr('/results/'.length);
+      var decision_stage;
 
-	var decision_id = window.location.pathname.substr('/results/'.length);
-	var decision_stage;
+      $('title').html('Results');
+      $('head').prepend(custom_header());
 
-	$('title').html('Results');
-	$('head').prepend(custom_header());
+      var decision = get_decision(decision_id);
 
-	var decision = get_decision(decision_id);
+      if(decision == null || decision["error"] != null || decision["error"] != undefined) {
+        alert("Unable to get decision information");
+        return;
+      }
+        
+      ballots = get_ballots(decision_id);
 
-	if(decision == null || decision["error"] != null || decision["error"] != undefined) {
-		alert("Unable to get decision information");
-		return;
-	}
-		
-	ballots = get_ballots(decision_id);
+      if(ballots == null || ballots["error"] != null || ballots["error"] != undefined) {
+        alert("Unable to get ballot information");
+        return;
+      }
 
-	if(ballots == null || ballots["error"] != null || ballots["error"] != undefined) {
-		alert("Unable to get ballot information");
-		return;
-	}
+      var criterion = get_criterion(decision);
 
-	var criterion = get_criterion(decision);
+      if(criterion == null || criterion["error"] != null || criterion["error"] != undefined) {
+        alert("Unable to get criterion information");
+        return;
+      }
 
-	if(criterion == null || criterion["error"] != null || criterion["error"] != undefined) {
-		alert("Unable to get criterion information");
-		return;
-	}
+      var alternatives = get_alternatives(decision);
+        
+      if(alternatives == null || alternatives["error"] != null || alternatives["error"] != undefined) {
+        alert("Unable to get alternative information");
+        return;
+      }
 
-	var alternatives = get_alternatives(decision);
-		
-	if(alternatives == null || alternatives["error"] != null || alternatives["error"] != undefined) {
-		alert("Unable to get alternative information");
-		return;
-	}
+      decision_stage = decision.stage;
 
-	decision_stage = decision.stage;
+      if(decision_stage != "3") {
 
-	if(decision_stage != "3") {
+        $("body").append("<h1>Decision stage must be complete in order to view results</h1>");
+        return;
 
-		$("body").append("<h1>Decision stage must be complete in order to view results</h1>");
-		return;
+      } else {
+        
+        decision_name = decision.name;
 
-	} else {
-		
-		decision_name = decision.name;
+        //criterion info
+        for(var i=0; i<criterion.length; i++) {
+          criterion_names[i] = criterion[i].name;
+          criterion_ids[i] = criterion[i].criterion_id;		
 
-		//criterion info
-		for(var i=0; i<criterion.length; i++) {
-			criterion_names[i] = criterion[i].name;
-			criterion_ids[i] = criterion[i].criterion_id;		
+        }
 
-		}
+        //alternative info
+        for(var i=0; i<alternatives.length; i++) {
+      
+          alternative_names[i] = alternatives[i].name;
+          alternative_ids[i] = alternatives[i].alternative_id;
+      
+        }
 
-		//alternative info
-		for(var i=0; i<alternatives.length; i++) {
-	
-			alternative_names[i] = alternatives[i].name;
-			alternative_ids[i] = alternatives[i].alternative_id;
-	
-		}
+        var page = '<table align="center">'
+        +'<tr align="top">'
+        +'<td colSpan=2>'
+        +'<div id="chart_div"></div>'
+        +'</td>'
+        +'</tr>'
+        +'<tr>'
+        +'<td>'
+        +'<div id="table_div"></div>'
+        +'</td>'
+        +'</tr>'
+        +'</table>';
 
-		google.charts.load('current', {'packages':['corechart', 'table'], 'callback':wait()});
+        $('body').append(page);
+      
+        drawTable();
 
-		var page = '<table align="center">'
-		+'<tr align="top">'
-		+'<td colSpan=2>'
-		+'<div id="chart_div"></div>'
-		+'</td>'
-		+'</tr>'
-		+'<tr>'
-		+'<td>'
-		+'<div id="table_div"></div>'
-		+'</td>'
-		+'</tr>'
-		+'</table>';
-
-		$('body').append(page);
-	
-
-	}
-
-
-
+      }
+    });
+  });
 }
 
 
@@ -115,11 +115,6 @@ function get_decision(decision_id) {
 		}
 	});
 	return result;
-}
-function wait() {
-
-	setTimeout(function() {drawTable();}, 3000);
-
 }
 
 function drawTable() {
