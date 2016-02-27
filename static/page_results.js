@@ -140,31 +140,31 @@ function drawTable() {
 	var tally = [];
 	var final_tally = [];
 
-
 	for(var i=0; i<ballots.length; i++) {
 
 		temp_sum = 0;
 		temp_weights = [];
 
-		for(var j=0; j<ballots[i].rating.length; j++) {
+		if(ballots[i].rating.length != 0) {
 
-			temp_weights.push(ballots[i].rating[j].rating);
-			temp_sum += ballots[i].rating[j].rating;
-
-
-		}
+			for(var j=0; j<ballots[i].rating.length; j++) {
+				temp_weights.push(ballots[i].rating[j].rating);
+				temp_sum += ballots[i].rating[j].rating;
+	
+	
+			}
+			
+			weights[i] = new Array();
+	
+			for(var j=0; j<temp_weights.length; j++) {
+	
+				weights[i].push(temp_weights[j]/temp_sum);
+	
+			}
 		
-		weights[i] = new Array();
-
-		for(var j=0; j<temp_weights.length; j++) {
-
-			weights[i].push(temp_weights[j]/temp_sum);
-
 		}
-		
 
 	}
-
 
 	for(var i=0; i<weights[0].length; i++) {
 
@@ -191,22 +191,25 @@ function drawTable() {
 		temp_votes = [];	
 
 
-		for(var j=0; j<ballots[i].votes.length; j++) {
+		if(ballots[i].votes.length !=0) {
 
-			temp_votes.push(ballots[i].votes[j].weight);
-			temp_sum += ballots[i].votes[j].weight;
-
-		}
-
-
-		votes[i] = new Array();
+			for(var j=0; j<ballots[i].votes.length; j++) {
 	
-		for(var j=0; j<temp_votes.length; j++) {
-			
-			votes[i].push(temp_votes[j]);	
+				temp_votes.push(ballots[i].votes[j].weight);
+				temp_sum += ballots[i].votes[j].weight;
+	
+			}
+	
+	
+			votes[i] = new Array();
+		
+			for(var j=0; j<temp_votes.length; j++) {
+				
+				votes[i].push(temp_votes[j]);	
+	
+			}
 
 		}
-
 	}
 
 
