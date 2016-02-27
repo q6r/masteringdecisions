@@ -1678,7 +1678,7 @@ function buildDecisionStatus(decisionID) {
   $('<div>').attr('id', 'bulk_invite_sent').addClass('alert alert-success').appendTo(wrapper);
   $('#bulk_invite_sent').hide();
 
-  $('<div>').css('padding','10px').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Invite All')).appendTo(wrapper);
+  $('<div>').css('margin-bottom','20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Invite All')).appendTo(wrapper);
 
 
 
