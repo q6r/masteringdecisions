@@ -154,7 +154,7 @@ function buildTemplate() {
     '<li class="nav-header"> <a  data-toggle="collapse" data-target="#Menu2" aria-expanded="false" class="collapsed">Settings <i id="arrow_change" class="glyphicon glyphicon-chevron-right"></i></a>',
     '<ul class="nav nav-stacked collapse" id="Menu2" aria-expanded="fasle">',
     '<li class="active"> <a onclick="buildHome()"><i class="glyphicon glyphicon-home"></i> Home</a></li>',
-    '<li><a onclick="buildManageUsers()"><i class="glyphicon glyphicon-user"></i> Manage Users</a></li>',
+    '<li id="manageUsers"><a onclick="buildManageUsers()"><i class="glyphicon glyphicon-user"></i> Manage Users</a></li>',
     //'<li><a ><i class="glyphicon glyphicon-list-alt"></i> Report</a></li>',
     '<li><a href="/logout.html"><i class="glyphicon glyphicon-off"></i> Logout</a></li>',
     '</ul>',
@@ -175,7 +175,8 @@ function buildTemplate() {
   div_dashboard.append(div_row)
 
   updateUserText();
-
+  $('#manageUsers').hide();
+  
   //Toggles the arrows to be correct
   $("a").attr("aria-expanded", "true");
   $("a").click(function() {
@@ -194,6 +195,7 @@ function clearContent() {
 //Updates the username in the topNav
 function updateUserText() {
   get_text("/whoami", function(result) {
+    if(result['person_id'] == 0) {$('#manageUsers').show();}
     get_text("/person/" + result['person_id'] + "/info", function(result) {
       $('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
     });

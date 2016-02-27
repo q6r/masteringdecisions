@@ -74,6 +74,19 @@ jQuery.loadCSS = function(url) {
     $('head').append('<link rel="stylesheet" type="text/css" href="' + url + '">');
 }
 
+function getScript(src, callback) {
+  var s = document.createElement('script');
+  s.src = src;
+  s.async = true;
+  s.onreadystatechange = s.onload = function() {
+    if (!callback.done && (!s.readyState || /loaded|complete/.test(s.readyState))) {
+      callback.done = true;
+      callback();
+    }
+  };
+  document.querySelector('head').appendChild(s);
+}
+
 function confirmYesNo(title, msg, yesFn, noFn) {
   var $confirm = $("#modalConfirmYesNo");
   $confirm.modal('show');

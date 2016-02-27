@@ -1,0 +1,19 @@
+th {
+
+	text-align:center !important;
+
+}
+
+#chart_div {
+
+	align:center;
+	width:700px;
+	height:300px;
+	margin-bottom:100px;
+}
+
+#table_div {
+
+	align:center;
+
+}
