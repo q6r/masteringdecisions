@@ -19,28 +19,28 @@ function main(body) {
       var decision = get_decision(decision_id);
 
       if(decision == null || decision["error"] != null || decision["error"] != undefined) {
-        alert("Unable to get decision information");
+        errorPage("Unable to get decision information");
         return;
       }
         
       ballots = get_ballots(decision_id);
 
       if(ballots == null || ballots["error"] != null || ballots["error"] != undefined) {
-        alert("Unable to get ballot information");
+        errorPage("Unable to get ballot information");
         return;
       }
 
       var criterion = get_criterion(decision);
 
       if(criterion == null || criterion["error"] != null || criterion["error"] != undefined) {
-        alert("Unable to get criterion information");
+        errorPage("Unable to get criterion information");
         return;
       }
 
       var alternatives = get_alternatives(decision);
         
       if(alternatives == null || alternatives["error"] != null || alternatives["error"] != undefined) {
-        alert("Unable to get alternative information");
+        errorPage("Unable to get alternative information");
         return;
       }
 
@@ -48,7 +48,7 @@ function main(body) {
 
       if(decision_stage != "3") {
 
-        $("body").append("<h1>Decision stage must be complete in order to view results</h1>");
+        errorPage("Decision stage must be complete in order to view results");
         return;
 
       } else {

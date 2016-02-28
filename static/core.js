@@ -126,3 +126,8 @@ function getParameterByName(name, url) {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+function errorPage(error){
+  $("body").attr("STYLE","BACKGROUND:#A4A4A4 !IMPORTANT").append('<H2><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP"</CENTER><H2 STYLE="margin-top:50px;">'+error+'</H2>'
+);
+}

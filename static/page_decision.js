@@ -7,29 +7,29 @@ function main(body) {
 
   //Build page
   $('title').html('Decision Voting Table');
-  $('<h2 id="title"></h2>').appendTo('body');
 
   get_text("/decision/" + decisionID + "/info", function(result) {
     if (result['decision']) {
       if (result['decision']['stage'] == 1 || result['decision']['stage'] ==2 ) {
-        $('#title').text('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
+        errorPage('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
       }
       else if (result['decision']['stage'] == 4) {
-        $('#title').text(result['decision']['name'] + ' has been locked.');
+        errorPage(result['decision']['name'] + ' has been locked.');
       } else { //Voting is completed, show results!
         buildResultsPage(decisionID);
-        $('#title').text('Voting Results For: ' + result['decision']['name']);
+        $('<h2 id="title"></h2>').appendTo('body');
+        $("#title").text('Voting Results For: ' + result['decision']['name']);
       }
     } else if (result['error']) {
-      $('#title').text(result['error']);
+      errorPage(result['error']);
     } else {
-      $('#title').text('Could not find it :()');
+      errorPage('Could not find it :()');
     }
   });
 }
 
 function buildResultsPage(decisionID) {
-  get_text("/decision/" + decisionID + "/criterions", function(results) {
+  get_text("/decision/"+decisionID+"/criterions", function(results){
     var critNames = []; //Array of crit names
     var critIds = [];
     for (var i in results["criterions"]) {
