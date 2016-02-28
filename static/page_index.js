@@ -1539,6 +1539,38 @@ function bulkAddBallot(decisionID) {
   $('#bulkEmails').val('');
 }
 
+function bulkInvite(decisionID) {
+  $('#bulk_invite_sent').hide()
+  $('#error').hide()
+
+  get_text('/decision/' + decisionID + '/ballots', function(result) {
+	ballots = result["ballots"];
+
+	$('#bulk_invite_sent').html('Invited ballots: ');
+
+	for(var i in ballots) {
+	  ballot = ballots[i];
+	  if(ballot["sent"]) {
+
+
+		  get_text(ballot["url"] + "/invite", function(result) {
+			if (result['error']) {
+			  $('#error').html('<b>Error:</b> ' + result['error']);
+			  $('#error').show()
+			} else if (result['result'] == "invited") {
+			  $('#bulk_invite_sent').append(ballot["email"] + ' | ');
+			  $('#bulk_invite_sent').show();
+			} else {
+			  $('#error').html('<b>Error:</b> Something went wrong :(');
+			  $('#error').show();
+			}
+		  });
+
+	  }
+	}
+  });
+}
+
 //Adds Ballot and sends email with link
 function sendInvite(decisionID) {
   $("#invitation_sent").hide()
@@ -1643,9 +1675,16 @@ function buildDecisionStatus(decisionID) {
   $('<div>').attr('id', 'error').addClass('alert alert-danger').appendTo(wrapper);
   $('#error').hide();
 
+  $('<div>').attr('id', 'bulk_invite_sent').addClass('alert alert-success').appendTo(wrapper);
+  $('#bulk_invite_sent').hide();
+
+  $('<div>').css('margin-bottom','20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Invite All')).appendTo(wrapper);
+
+
+
   $('<div>').attr('id', 'formDiv').appendTo(wrapper);
 
-  $('<div>').attr('id', 'statusTable').appendTo(wrapper);
+  $('<div>').attr('id', 'statusTable').appendTo(wrapper).css('margin-top','10px');
   buildStatusTable(decisionID);
 
   //resets table every 5 seconds :)
