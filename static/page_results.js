@@ -75,7 +75,15 @@ function main(body) {
         +'<td colSpan=2>'
         +'<div id="chart_div"></div>'
         +'</td>'
+	+'<td style=>'
+	+'<div id="pie_div"></div>'
+	+'</td>'
         +'</tr>'
+	+'<tr>'
+	+'<p>What if instructions: enter a value and click the chart element you want to change</p>'
+	+'<label for="new_value">New Value</label>'
+	+'<input type="text" id="new_value" name="x">'
+	+'</tr>'
         +'<tr>'
         +'<td>'
         +'<div id="table_div"></div>'
@@ -301,6 +309,7 @@ function drawTable() {
 
         var table = new google.visualization.Table(document.getElementById('table_div'));
 
+
         table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
 
 
@@ -334,12 +343,73 @@ function drawTable() {
 		data_c.addRow(row);	
 	}	
 
-	new google.visualization.ColumnChart(document.getElementById('chart_div')).
-		draw(data_c,
-		{title:"Voting Results - "+decision_name,
-		width:600, height:400,
-		vAxis: {title: "Votes"}, isStacked: true}
-	);
+	var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+
+	var view = new google.visualization.DataView(data_c);
+	
+
+	function colSelectHandler() {
+
+		var selectedItem = col_chart.getSelection()[0];
+
+		var column = view.getTableColumnIndex(col_chart.getSelection()[0]['column']);
+
+		if(selectedItem) {
+
+			var item = data_c.getValue(selectedItem.row, column);
+			var new_val = document.getElementById("new_value").value;
+
+			data_c.setCell(selectedItem.row, column, new_val);
+			col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
+
+		}
+
+
+	}
+
+	google.visualization.events.addListener(col_chart, 'select', colSelectHandler);
+
+	col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
+
+	var data_p = new google.visualization.DataTable();
+	var pie_row;
+	data_p.addColumn('string', 'criterion');
+	data_p.addColumn('number', 'weight');
+
+
+	for(var i=0; i<criterion_names.length; i++) {
+
+		pie_row = [];
+		pie_row.push(criterion_names[i]);
+		pie_row.push(final_weights[i]);
+		data_p.addRow(pie_row);
+
+	}
+
+	var pie = new google.visualization.PieChart(document.getElementById('pie_div'));
+
+	function pieSelectHandler() {
+
+		var selectedItem = pie.getSelection()[0];
+
+		if(selectedItem) {
+
+			var item = data_p.getValue(selectedItem.row, 1);
+			var new_val = document.getElementById("new_value").value;
+
+			data_p.setCell(selectedItem.row, 1, new_val);
+			pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
+
+		}
+
+
+	}
+
+	google.visualization.events.addListener(pie, 'select', pieSelectHandler);
+
+	pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
+
+
 
 }
 
