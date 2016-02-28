@@ -868,12 +868,14 @@ function buildEditDecision(decisionID) {
     '<option value="4">Locked</option>' +
     '</select>').appendTo(form);
 
-  $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision(' + decisionID + ');').text('Submit').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'updateDecision(' + decisionID + ');').text('Save').appendTo(form);
   $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('id', 'deleteDecisionBtn').attr('onclick', 'deleteDecision(' + decisionID + ');').text('Delete Decision').appendTo(form);
-  $('<hr/>').appendTo(form);
   $('<button>').addClass('btn btn-lg btn-success btn-block').attr('id', 'duplicateDecisionBtn').attr('onclick', 'duplicateDecision(' + decisionID + ');').text('Duplicate Decision').appendTo(form);
-  $('<button>').addClass('btn btn-lg btn-info btn-block').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/decision/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Decision Results').appendTo(form);
+  $('<hr/>').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionVotesBtn').attr('onclick', '$("<a>").attr("href","/decision/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Votes').css('float','left').css('width', '48%').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/results/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Results').css('float','right').css('width', '48%').appendTo(form);
   $('#decisionResultsBtn').hide();
+  $('#decisionVotesBtn').hide();
 
   get_text("/decision/" + decisionID + "/info", function(result) {
     $('#name').val(result['decision']['name']);
@@ -888,6 +890,7 @@ function buildEditDecision(decisionID) {
 
     if (result['decision']['stage'] == 3) { //if decision is completed show results Btn
       $('#decisionResultsBtn').show();
+      $('#decisionVotesBtn').show();
     }
   });
 }
@@ -950,6 +953,7 @@ function updateDecision(decisionID) {
   $('#error').hide();
   $('#success').hide();
   $('#decisionResultsBtn').hide();
+  $('#decisionVotesBtn').hide();
 
   if ($('#name').val() == '') {
     $('#error').html('<b>Error:</b> No name set!');
@@ -984,6 +988,7 @@ function updateDecision(decisionID) {
 
           if (new_decision['stage'] == 3) {
             $('#decisionResultsBtn').show();
+            $('#decisionVotesBtn').show();
           }
         } else {
           $('#error').html('<b>Error:</b> Something went wrong :(');
@@ -1463,9 +1468,10 @@ function buildDecisionInvite(decisionID) {
     '</form>'
   ].join('\n'));
 
-  $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'buildDecisionHome(' + decisionID + ');').append('<span> <i class="glyphicon glyphicon-arrow-left"></i>  Back to Decision </span>').appendTo(form);
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right;').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite and Email</span>').appendTo(form);
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'addBallot(' + decisionID + ');').attr('style', 'float: right; margin-right:10px;').append('<span> <i class="glyphicon glyphicon-user"></i>  Invite </span>').appendTo(form);
+  
+  $('<div>').addClass('clearFix').appendTo(form);
 
   get_text("/decision/" + decisionID + "/info", function(result) {
     $('#dName').val(result.decision.name)
