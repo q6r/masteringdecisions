@@ -14,7 +14,6 @@ function main(body) {
       var decision_stage;
 
       $('title').html('Results');
-      $('head').prepend(custom_header());
 
       var decision = get_decision(decision_id);
 
@@ -90,7 +89,7 @@ function main(body) {
         $('body').append(page);
       
 
-	var data_table = $('<table>').addClass('table').attr('id', 'dataTable').append('<tbody>').appendTo('body');
+	var data_table = $('<table>').addClass('table table-striped').attr('id', 'dataTable').append('<tbody>').appendTo('body');
 	var temp_row = $('<tr>');
 
 
