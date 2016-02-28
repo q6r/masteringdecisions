@@ -79,11 +79,6 @@ function main(body) {
 	+'<div id="pie_div"></div>'
 	+'</td>'
         +'</tr>'
-	//+'<tr>'
-	//+'<p>What if instructions: enter a value and click the chart element you want to change</p>'
-	//+'<label for="new_value">New Value</label>'
-	//+'<input type="text" id="new_value" name="x">'
-	//+'</tr>'
         +'<tr>'
         +'<td>'
         +'<div id="table_div"></div>'
@@ -121,7 +116,7 @@ function main(body) {
 
 	}
 	
-	$(temp_row).append($('<td>').attr('id', 'weight_total').text('x'));
+	$(temp_row).append($('<td>').attr('id', 'weight_total').text('100'));
 	
 	$(temp_row).appendTo(data_table);
 
@@ -142,9 +137,6 @@ function main(body) {
 
 	}
 
-	//var button = $('<button>').addClass('btn btn-success').attr('id', 'update_graph_btn').text('Update Graph').attr('onClick','draw_graphs()').appendTo('body');
-
-	
         calculate_table();
 	draw_graphs();
 
@@ -441,155 +433,29 @@ function calculate_table() {
 
 	}
 
-        //data.addColumn('string', '');
-	
-	//for(var i=0; i<criterion_names.length; i++) {
-
-	//	data.addColumn('number', criterion_names[i]);
-
-	//}
-
-        //data.addColumn('number', 'Final Tally');
-
-	//weight_row = ['weights'];
-
 	for(var i=0; i<criterion_names.length; i++) {
 
-		//weight_row.push(final_weights[i] * 100);
 		$('#weight_'+i).val((final_weights[i] * 100).toFixed(3));	
 	}
 	
-	//weight_row.push(weight_total * 100);
-	$('#weight_total').text(weight_total * 100);
+	//$('#weight_total').text(weight_total * 100);
 	
 
-	//data.addRow(weight_row);
 
 	counter = 0;
 	var chart_rows = [];
 
 	for(var i=0; i<alternative_names.length; i++) {
 		
-		//var row = [alternative_names[i]];
-		//chart_rows[i] = new Array();
-
 		for(var j=0; j<criterion_names.length; j++) {
 		
-			//row.push(final_votes[counter]);
 			$('#value_'+i+'_'+j).val(final_votes[counter].toFixed(3));
 			counter++;
 		}
 
-		//row.push(final_tally[i]);
 		$('#totals_'+i).text(final_tally[i].toFixed(3));
-		//data.addRow(row);
 
 	}
-
-        //var table = new google.visualization.Table(document.getElementById('table_div'));
-
-
-        //table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
-
-
-
-        var data_c = new google.visualization.DataTable();
-
-	data_c.addColumn('string', 'criterion');
-
-	for(var i=0; i<criterion_names.length; i++) {
-
-		data_c.addColumn('number', criterion_names[i]);
-
-	}
-
-	counter = 0;
-
-	chart_rows = [];
-
-	for(var i=0; i<alternative_names.length; i++) {
-
-		var row = [alternative_names[i]];
-		chart_rows[i] = new Array();
-
-		for(var j=0; j<criterion_names.length; j++) {
-
-			row.push(chart_junk[counter]);
-			counter++;
-
-		}
-				
-		data_c.addRow(row);	
-	}	
-
-//	var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-
-//	var view = new google.visualization.DataView(data_c);
-	
-
-	//function colSelectHandler() {
-
-	//	var selectedItem = col_chart.getSelection()[0];
-
-	//	var column = view.getTableColumnIndex(col_chart.getSelection()[0]['column']);
-
-	//	if(selectedItem) {
-
-	//		var item = data_c.getValue(selectedItem.row, column);
-	//		var new_val = document.getElementById("new_value").value;
-
-	//		data_c.setCell(selectedItem.row, column, new_val);
-	//		col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
-
-	//	}
-
-
-	//}
-
-	//google.visualization.events.addListener(col_chart, 'select', colSelectHandler);
-/*
-	col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
-
-	var data_p = new google.visualization.DataTable();
-	var pie_row;
-	data_p.addColumn('string', 'criterion');
-	data_p.addColumn('number', 'weight');
-
-
-	for(var i=0; i<criterion_names.length; i++) {
-
-		pie_row = [];
-		pie_row.push(criterion_names[i]);
-		pie_row.push(final_weights[i]);
-		data_p.addRow(pie_row);
-
-	}
-
-	var pie = new google.visualization.PieChart(document.getElementById('pie_div'));
-
-	//function pieSelectHandler() {
-
-	//	var selectedItem = pie.getSelection()[0];
-
-	//	if(selectedItem) {
-
-	//		var item = data_p.getValue(selectedItem.row, 1);
-	//		var new_val = document.getElementById("new_value").value;
-
-	//		data_p.setCell(selectedItem.row, 1, new_val);
-	//		pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
-
-	//	}
-
-
-	//}
-
-	//google.visualization.events.addListener(pie, 'select', pieSelectHandler);
-
-	pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
-
-
-*/
 }
 
 
