@@ -79,25 +79,203 @@ function main(body) {
 	+'<div id="pie_div"></div>'
 	+'</td>'
         +'</tr>'
-	+'<tr>'
-	+'<p>What if instructions: enter a value and click the chart element you want to change</p>'
-	+'<label for="new_value">New Value</label>'
-	+'<input type="text" id="new_value" name="x">'
-	+'</tr>'
+	//+'<tr>'
+	//+'<p>What if instructions: enter a value and click the chart element you want to change</p>'
+	//+'<label for="new_value">New Value</label>'
+	//+'<input type="text" id="new_value" name="x">'
+	//+'</tr>'
         +'<tr>'
         +'<td>'
         +'<div id="table_div"></div>'
         +'</td>'
         +'</tr>'
         +'</table>';
+	
 
         $('body').append(page);
       
-        drawTable();
+
+	var data_table = $('<table>').addClass('table').attr('id', 'dataTable').append('<tbody>').appendTo('body');
+	var temp_row = $('<tr>');
+
+
+	$(temp_row).append($('<th>').text(' '));
+
+	
+	for(var i=0; i<criterion_names.length; i++){
+
+		$(temp_row).append($('<th>').text(criterion_names[i]));
+
+	}
+
+	$(temp_row).append($('<th>').text('Final Tally'));
+	$(temp_row).appendTo(data_table);
+
+	temp_row = $('<tr>');
+
+	$(temp_row).append($('<td>').text('Weights'));
+
+	for(var i=0; i<criterion_names.length; i++) {
+
+		$(temp_row).append($('<td>').append($('<input type="text">').attr('id', 'weight_'+i).val('-').attr('onChange','rebalance_weights('+i+')')));
+
+	}
+	
+	$(temp_row).append($('<td>').attr('id', 'weight_total').text('x'));
+	
+	$(temp_row).appendTo(data_table);
+
+
+	for(var i=0; i<alternative_names.length; i++) {
+
+		temp_row = $('<tr>');
+		$(temp_row).append($('<td>').attr('id', 'alt_names_'+i).text(alternative_names[i]));
+
+		for(var j=0; j<criterion_names.length; j++) {
+
+			$(temp_row).append($('<td>').append($('<input type="text">').attr('id', 'value_'+i+'_'+j).val('y').attr('onChange','recalculate_tally()')));
+
+		}		
+	
+		$(temp_row).append($('<td>').attr('id', 'totals_'+i).text('z'));
+		$(temp_row).appendTo(data_table);
+
+	}
+
+	//var button = $('<button>').addClass('btn btn-success').attr('id', 'update_graph_btn').text('Update Graph').attr('onClick','draw_graphs()').appendTo('body');
+
+	
+        calculate_table();
+	draw_graphs();
 
       }
     });
   });
+}
+
+function recalculate_tally() {
+
+	var new_tally;
+
+	for(var i=0; i<alternative_names.length; i++) {
+
+		new_tally = 0;
+		for(var j=0; j<criterion_names.length; j++) {
+
+			new_tally += parseFloat($('#value_'+i+'_'+j).val() * $('#weight_'+j).val()/100); 
+
+		}
+
+		$('#totals_'+i).text(new_tally.toFixed(3));
+
+	}		
+	
+	draw_graphs();
+}
+
+
+function draw_graphs() {
+
+
+        var data_c = new google.visualization.DataTable();
+
+	data_c.addColumn('string', 'criterion');
+
+	for(var i=0; i<criterion_names.length; i++) {
+
+		data_c.addColumn('number', criterion_names[i]);
+
+	}
+
+	chart_rows = [];
+
+	for(var i=0; i<alternative_names.length; i++) {
+
+		var row = [alternative_names[i]];
+		chart_rows[i] = new Array();
+
+		for(var j=0; j<criterion_names.length; j++) {
+			row.push(parseFloat($('#value_'+i+'_'+j).val()) * $('#weight_'+j).val()/100);
+
+		}
+				
+		data_c.addRow(row);	
+	}	
+
+	var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+	
+	col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
+
+	var data_p = new google.visualization.DataTable();
+
+	var pie_row;
+	data_p.addColumn('string', 'criterion');
+	data_p.addColumn('number', 'weight');
+
+
+	for(var i=0; i<criterion_names.length; i++) {
+
+		pie_row = [];
+		pie_row.push(criterion_names[i]);
+		pie_row.push(parseFloat($('#weight_'+i).val()));
+		data_p.addRow(pie_row);
+
+	}
+
+	var pie = new google.visualization.PieChart(document.getElementById('pie_div'));
+
+	pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
+
+
+
+}
+
+function rebalance_weights(x) {
+
+		var total_weight=0;
+
+
+		for(var i=0; i<criterion_names.length; i++) {
+
+			total_weight += parseFloat($('#weight_'+i).val());
+
+		}
+
+		for(var i=0; i<criterion_names.length; i++) {
+
+			if( i != x) {
+
+				var old_value = parseFloat($('#weight_'+i).val());
+				var changed_value = parseFloat($('#weight_'+x).val());
+				var sub_total = parseFloat(total_weight - changed_value);
+
+				var new_value = (old_value - (old_value/sub_total * (total_weight - 100))).toFixed(3); 
+				var new_tally;			
+
+				$('#weight_'+i).val(new_value);
+
+
+			}
+
+
+		}
+
+		for(var i=0; i<alternative_names.length; i++) {
+
+			new_tally = 0;
+			for(var j=0; j<criterion_names.length; j++) {
+
+				new_tally += parseFloat($('#value_'+i+'_'+j).val() * $('#weight_'+j).val()/100); 
+
+			}
+
+			$('#totals_'+i).text(new_tally.toFixed(3));
+
+		}		
+				
+		draw_graphs();
+
+
 }
 
 
@@ -125,10 +303,7 @@ function get_decision(decision_id) {
 	return result;
 }
 
-function drawTable() {
-
-        var data = new google.visualization.DataTable();
-	
+function calculate_table() {
 
 	var weight_row = [];
 	var temp_sum = 0.0;
@@ -266,51 +441,55 @@ function drawTable() {
 
 	}
 
-        data.addColumn('string', '');
+        //data.addColumn('string', '');
 	
+	//for(var i=0; i<criterion_names.length; i++) {
+
+	//	data.addColumn('number', criterion_names[i]);
+
+	//}
+
+        //data.addColumn('number', 'Final Tally');
+
+	//weight_row = ['weights'];
+
 	for(var i=0; i<criterion_names.length; i++) {
 
-		data.addColumn('number', criterion_names[i]);
-
-	}
-
-        data.addColumn('number', 'Final Tally');
-
-	weight_row = ['weights'];
-
-	for(var i=0; i<criterion_names.length; i++) {
-
-		weight_row.push(final_weights[i] * 100);
-
+		//weight_row.push(final_weights[i] * 100);
+		$('#weight_'+i).val((final_weights[i] * 100).toFixed(3));	
 	}
 	
-	weight_row.push(weight_total * 100);
+	//weight_row.push(weight_total * 100);
+	$('#weight_total').text(weight_total * 100);
+	
 
-	data.addRow(weight_row);
+	//data.addRow(weight_row);
 
 	counter = 0;
 	var chart_rows = [];
 
 	for(var i=0; i<alternative_names.length; i++) {
 		
-		var row = [alternative_names[i]];
-		chart_rows[i] = new Array();
+		//var row = [alternative_names[i]];
+		//chart_rows[i] = new Array();
 
 		for(var j=0; j<criterion_names.length; j++) {
 		
-			row.push(final_votes[counter]);
+			//row.push(final_votes[counter]);
+			$('#value_'+i+'_'+j).val(final_votes[counter].toFixed(3));
 			counter++;
 		}
 
-		row.push(final_tally[i]);
-		data.addRow(row);
+		//row.push(final_tally[i]);
+		$('#totals_'+i).text(final_tally[i].toFixed(3));
+		//data.addRow(row);
 
 	}
 
-        var table = new google.visualization.Table(document.getElementById('table_div'));
+        //var table = new google.visualization.Table(document.getElementById('table_div'));
 
 
-        table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
+        //table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
 
 
 
@@ -343,32 +522,32 @@ function drawTable() {
 		data_c.addRow(row);	
 	}	
 
-	var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+//	var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
 
-	var view = new google.visualization.DataView(data_c);
+//	var view = new google.visualization.DataView(data_c);
 	
 
-	function colSelectHandler() {
+	//function colSelectHandler() {
 
-		var selectedItem = col_chart.getSelection()[0];
+	//	var selectedItem = col_chart.getSelection()[0];
 
-		var column = view.getTableColumnIndex(col_chart.getSelection()[0]['column']);
+	//	var column = view.getTableColumnIndex(col_chart.getSelection()[0]['column']);
 
-		if(selectedItem) {
+	//	if(selectedItem) {
 
-			var item = data_c.getValue(selectedItem.row, column);
-			var new_val = document.getElementById("new_value").value;
+	//		var item = data_c.getValue(selectedItem.row, column);
+	//		var new_val = document.getElementById("new_value").value;
 
-			data_c.setCell(selectedItem.row, column, new_val);
-			col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
+	//		data_c.setCell(selectedItem.row, column, new_val);
+	//		col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
 
-		}
+	//	}
 
 
-	}
+	//}
 
-	google.visualization.events.addListener(col_chart, 'select', colSelectHandler);
-
+	//google.visualization.events.addListener(col_chart, 'select', colSelectHandler);
+/*
 	col_chart.draw(data_c, {title:"Voting Results - "+decision_name, width:600, height:400, vAxis: {title: "Votes"}, isStacked: true});
 
 	var data_p = new google.visualization.DataTable();
@@ -388,29 +567,29 @@ function drawTable() {
 
 	var pie = new google.visualization.PieChart(document.getElementById('pie_div'));
 
-	function pieSelectHandler() {
+	//function pieSelectHandler() {
 
-		var selectedItem = pie.getSelection()[0];
+	//	var selectedItem = pie.getSelection()[0];
 
-		if(selectedItem) {
+	//	if(selectedItem) {
 
-			var item = data_p.getValue(selectedItem.row, 1);
-			var new_val = document.getElementById("new_value").value;
+	//		var item = data_p.getValue(selectedItem.row, 1);
+	//		var new_val = document.getElementById("new_value").value;
 
-			data_p.setCell(selectedItem.row, 1, new_val);
-			pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
+	//		data_p.setCell(selectedItem.row, 1, new_val);
+	//		pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
 
-		}
+	//	}
 
 
-	}
+	//}
 
-	google.visualization.events.addListener(pie, 'select', pieSelectHandler);
+	//google.visualization.events.addListener(pie, 'select', pieSelectHandler);
 
 	pie.draw(data_p, {title:"Criterion weights", width:600, height:400});
 
 
-
+*/
 }
 
 
