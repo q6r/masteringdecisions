@@ -1553,16 +1553,16 @@ function bulkInvite(decisionID) {
 	ballots = result["ballots"];
 
 	$('#bulk_invite_sent').html('Invited ballots: ');
-
+  
 	for(var i in ballots) {
 	  ballot = ballots[i];
 	  if(!ballot["sent"]) {
+      $('#bulk_invite_sent').append(ballot["email"] + ' | ');
 		  get_text(ballot["url"] + "/invite", function(result) {
-			if (result['error']) {
+      if (result['error']) {
 			  $('#error').html('<b>Error:</b> ' + result['error']);
 			  $('#error').show()
 			} else if (result['result'] == "invited") {
-			  $('#bulk_invite_sent').append(ballot["email"] + ' | ');
 			  $('#bulk_invite_sent').show();
 			} else {
 			  $('#error').html('<b>Error:</b> Something went wrong :(');
