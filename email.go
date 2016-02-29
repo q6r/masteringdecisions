@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/smtp"
 
 	"github.com/astaxie/beego/config"
@@ -13,7 +12,7 @@ func Send(body, title, to string) error {
 
 	conf, err := config.NewConfig("ini", "smtp.conf")
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
