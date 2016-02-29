@@ -1556,9 +1556,7 @@ function bulkInvite(decisionID) {
 
 	for(var i in ballots) {
 	  ballot = ballots[i];
-	  if(ballot["sent"]) {
-
-
+	  if(!ballot["sent"]) {
 		  get_text(ballot["url"] + "/invite", function(result) {
 			if (result['error']) {
 			  $('#error').html('<b>Error:</b> ' + result['error']);
@@ -1684,7 +1682,7 @@ function buildDecisionStatus(decisionID) {
   $('<div>').attr('id', 'bulk_invite_sent').addClass('alert alert-success').appendTo(wrapper);
   $('#bulk_invite_sent').hide();
 
-  $('<div>').css('margin-bottom','20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Invite All')).appendTo(wrapper);
+  $('<div>').css('margin-bottom','20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Send All')).appendTo(wrapper);
 
 
 
