@@ -14,6 +14,7 @@ function main(body) {
       var decision_stage;
 
       $('title').html('Results');
+      $.loadCSS('/static/css/results.css');
 
       var decision = get_decision(decision_id);
       if (decision == null || decision["error"] != null || decision["error"] != undefined) {
@@ -68,7 +69,7 @@ function main(body) {
         $(temp_row).append($('<th>').text(' '));
 
         for (var i = 0; i < criterion_names.length; i++) {
-          $(temp_row).append($('<th>').text(criterion_names[i]));
+          $(temp_row).append($('<th>').text(criterion_names[i]).addClass("crit"+i));
         }
 
         $(temp_row).append($('<th>').text('Final Tally'));
