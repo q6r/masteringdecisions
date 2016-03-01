@@ -115,7 +115,7 @@ function main(body) {
 
 	}
 	
-	$(temp_row).append($('<td>').attr('id', 'weight_total').text('100'));
+	$(temp_row).append($('<td>').attr('id', 'weight_total').text('-'));
 	
 	$(temp_row).appendTo(data_table);
 
@@ -127,11 +127,11 @@ function main(body) {
 
 		for(var j=0; j<criterion_names.length; j++) {
 
-			$(temp_row).append($('<td>').append($('<input type="text">').attr('id', 'value_'+i+'_'+j).val('y').attr('onChange','recalculate_tally()')));
+			$(temp_row).append($('<td>').append($('<input type="text">').attr('id', 'value_'+i+'_'+j).val('-').attr('onChange','recalculate_tally()')));
 
 		}		
 	
-		$(temp_row).append($('<td>').attr('id', 'totals_'+i).text('z'));
+		$(temp_row).append($('<td>').attr('id', 'totals_'+i).text('-'));
 		$(temp_row).appendTo(data_table);
 
 	}
@@ -328,20 +328,21 @@ function calculate_table() {
 	
 			}
 			
-			weights[i] = new Array();
+			weights[weights.length] = new Array();
 	
 			for(var j=0; j<temp_weights.length; j++) {
 	
-				weights[i].push(temp_weights[j]/temp_sum);
+				weights[weights.length-1].push(temp_weights[j]/temp_sum);
 	
 			}
 		
 		}
 
 	}
-
-	for(var i=0; i<weights[0].length; i++) {
-
+  
+  if(weights.length == 0) { return; } //Shitty no vote checking, fix me later
+  
+  for(var i=0; i<weights[0].length; i++) {
 		temp_sum = 0;
 		temp_weights = [];
 
@@ -375,11 +376,11 @@ function calculate_table() {
 			}
 	
 	
-			votes[i] = new Array();
+			votes[votes.length] = new Array();
 		
 			for(var j=0; j<temp_votes.length; j++) {
 				
-				votes[i].push(temp_votes[j]);	
+				votes[votes.length-1].push(temp_votes[j]);	
 	
 			}
 
@@ -438,6 +439,7 @@ function calculate_table() {
 	}
 	
 	//$('#weight_total').text(weight_total * 100);
+  $('#weight_total').text('100');
 	
 
 
