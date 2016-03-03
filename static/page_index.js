@@ -1066,7 +1066,7 @@ function showAddCriteria(decisionID) {
         .attr('id', 'critDesc'))
       .appendTo('#critForm');
 
-    $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria(' + decisionID + ');').text('Add Criteria').appendTo('#critForm');
+    $('<button>').addClass('btn btn-lg btn-primary btn-block').attr('onclick', 'addCriteria(' + decisionID + ');').text('Add Criterion').appendTo('#critForm');
   });
   $('#critForm').show();
 }
@@ -1101,7 +1101,7 @@ function showEditCriteria(decisionID, criterionID) {
     .appendTo('#critForm');
 
   $('<button>').addClass('btn btn-primary').attr('onclick', 'showAddCriteria(' + decisionID + ');').text('Back to Add New Criteria').attr('style', 'float: left').appendTo('#critForm');
-  $('<button>').addClass('btn btn-primary').attr('onclick', 'editCriteria(' + decisionID + ', ' + criterionID + ');').text('Update Criteria').attr('style', 'float: right').appendTo('#critForm');
+  $('<button>').addClass('btn btn-primary').attr('onclick', 'editCriteria(' + decisionID + ', ' + criterionID + ');').text('Update Criterion').attr('style', 'float: right').appendTo('#critForm');
   $('<div>').addClass('clearfix').appendTo('#critForm'); //added to fix display issue
   get_text("/decision/" + decisionID + "/criterion/" + criterionID + "/info", function(result) {
     $('#critOrder').val(result['criterion']['order']);
@@ -1498,7 +1498,7 @@ function buildDecisionInvite(decisionID) {
       .attr('id', 'bulkEmails'))
     .appendTo(wrapper);
 
-  $('<button>').addClass('btn btn-primary').attr('onclick', 'bulkAddBallot(' + decisionID + ');').text('Bulk Add').appendTo(wrapper);
+  $('<button>').addClass('btn btn-primary').attr('onclick', 'bulkAddBallot(' + decisionID + ');').text('Bulk Invite').appendTo(wrapper);
   $('<div>').addClass('clearfix').appendTo(wrapper);
 }
 
