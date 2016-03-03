@@ -190,7 +190,7 @@ func HBallotUpdate(c *gin.Context) {
 		Secret:     secret,
 		Name:       json.Name,
 		Email:      json.Email,
-		Sent:       b.Sent,
+    Sent:       b.Sent,
 	}
 	_, err = dbmap.Update(&newBallot)
 	if err != nil {
