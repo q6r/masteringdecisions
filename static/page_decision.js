@@ -110,7 +110,7 @@ function buildResultsPage(decisionID) {
           }
 
           //Fill in the Votes
-          var colors = ['-', 'R', 'O', 'Y', 'GY', 'G'];
+          var colors = ['-', '1', '2', '3', '4', '5'];
           for (var j in b["votes"]) {
             var v = b["votes"][j];
             $('#alt' + i + '-' + parseInt(v["criterion_id"]) + '-' + parseInt(v["alternative_id"])).text(colors[parseInt(v["weight"])]).addClass('alt-' + colors[parseInt(v["weight"])]);
