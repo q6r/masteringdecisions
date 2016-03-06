@@ -94,11 +94,11 @@
   background-color:gray;
 }
 
-.dropup button {
+.dropdown button {
   float:left;
 }
 
-.dropup li {
+.dropdown li {
   margin:10px;
   border:1px solid gray;
   text-align:center;

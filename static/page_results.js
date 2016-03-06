@@ -59,7 +59,7 @@ function main(body) {
           alternative_ids[i] = alternatives[i].alternative_id;
         }
 
-        var page = '<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="chart_div"></div>' + '</td>' + '<td style=>' + '<div id="pie_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>';
+        var page = '<h1 id="chart_title">Voting Results - '+decision_name+'<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="pie_div"></div>' + '</td>' + '<td style=>' + '<div id="chart_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing'+'</form>';
 
         $('body').append(page);
 
@@ -138,7 +138,6 @@ function draw_graphs() {
   var col_chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
 
   col_chart.draw(data_c, {
-    title: "Voting Results - " + decision_name,
     width: 600,
     height: 400,
     vAxis: {title: "Votes"},
@@ -167,6 +166,9 @@ function draw_graphs() {
 }
 
 function rebalance_weights(x) {
+
+
+  if( $("#paused").prop("checked") == false) {
   //Check overflow
   if(parseFloat($('#weight_' + x).val()) > 100) {$('#weight_' + x).val('100')}
   if(parseFloat($('#weight_' + x).val()) < 0) {$('#weight_' + x).val('0')}
@@ -175,6 +177,7 @@ function rebalance_weights(x) {
   for (var i = 0; i < criterion_names.length; i++) {
     total_weight += parseFloat($('#weight_' + i).val());
   }
+
 
   for (var i = 0; i < criterion_names.length; i++) {
     if (i != x) {
@@ -196,7 +199,20 @@ function rebalance_weights(x) {
     }
     $('#totals_' + i).text(new_tally.toFixed(3));
   }
+  }
+
+  var new_total = 0;
+  for(var i=0; i<criterion_names.length; i++) {
+
+	new_total += parseFloat($('#weight_'+i).val());
+
+  }
+
+  $("#weight_total").text(Math.round(new_total));
+	
+
   draw_graphs();
+  
 }
 
 function calculate_table() {
@@ -299,8 +315,7 @@ function calculate_table() {
     $('#weight_' + i).val((final_weights[i] * 100).toFixed(3));
   }
 
-  //$('#weight_total').text(weight_total * 100);
-  $('#weight_total').text('100');
+  $('#weight_total').text(Math.round(weight_total * 100));
 
   counter = 0;
   var chart_rows = [];

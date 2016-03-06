@@ -132,11 +132,11 @@ function main(body) {
 
         if (alt_vote_style == "5") {
           for (var j = 0; j < criterion_names.length; j++) {
-            page += "<td>" + "<div class=\"dropup\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Green</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-greenyellow\">Green Yellow</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Yellow</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-orange\">Orange</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Red</li>" + "</ul>" + "</div>" + "</td>";
+            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-greenyellow\">Well Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-orange\">Poorly Aligned</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
           }
         } else { //3
           for (var j = 0; j < criterion_names.length; j++) {
-            page += "<td>" + "<div class=\"dropup\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Green</li>" +  "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Yellow</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Red</li>" + "</ul>" + "</div>" + "</td>";
+            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" +  "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
           }
         }
         page += "</tr>";
@@ -272,7 +272,7 @@ function main(body) {
         }
 
         if (alt_missing == true) {
-          $("#errordiv").append("Please vote on all alternatives");
+          $("#errordiv").append("Please assign a rating to all boxes");
           $("#errordiv").show();
         }
 
