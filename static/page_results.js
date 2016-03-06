@@ -191,7 +191,7 @@ function rebalance_weights(x) {
       $('#weight_' + i).val(new_value);
     }
   }
-
+  }
   for (var i = 0; i < alternative_names.length; i++) {
     new_tally = 0;
     for (var j = 0; j < criterion_names.length; j++) {
@@ -199,7 +199,7 @@ function rebalance_weights(x) {
     }
     $('#totals_' + i).text(new_tally.toFixed(3));
   }
-  }
+  
 
   var new_total = 0;
   for(var i=0; i<criterion_names.length; i++) {
