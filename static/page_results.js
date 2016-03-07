@@ -47,8 +47,6 @@ function main(body) {
         errorPage("Decision stage must be complete in order to view results");
         return;
       } else {
-        $("body").html('<div id="header" class="navbar-inverse"><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP" /></CENTER></div>');
-
         decision_name = decision.name;
 
         //criterion info
@@ -63,9 +61,10 @@ function main(body) {
           alternative_ids[i] = alternatives[i].alternative_id;
         }
 
-        var page = '<h1 id="chart_title">Voting Results - ' + decision_name + '<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="pie_div"></div>' + '</td>' + '<td style=>' + '<div id="chart_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing' + '</form>';
+        var page = '<h1 id="chart_title">Voting Results - ' + decision_name + '</h1>' + '<div id="pie_div"></div>' + '<div id="chart_div"></div>' + '<div id="table_div"></div>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing' + '</form>';
 
         $('<div id="content">').appendTo('body');
+        $('#content').append('<div id="header" class="navbar-inverse"><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP" /></CENTER></div>');
         $('#content').append(page);
 
         var data_table = $('<table>').addClass('table table-striped').attr('id', 'dataTable').append('<tbody>').appendTo('#content');
@@ -124,17 +123,22 @@ function recalculate_tally() {
 
 function draw_graphs() {
   var data_c = new google.visualization.DataTable();
+  var colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"]
+  var chartColors = new Array();
   data_c.addColumn('string', 'criterion');
 
-  for (var i = 0; i < criterion_names.length; i++) {
+  for (var i = criterion_names.length-1; i >= 0; i--) {
+  //for (var i = 0; i< criterion_names.length; i++) {
     data_c.addColumn('number', criterion_names[i]);
+    chartColors.push(colors[i]);
   }
 
   chart_rows = [];
-  for (var i = 0; i < alternative_names.length; i++) {
+  for (var i = alternative_names.length-1; i >= 0; i--) {
     var row = [alternative_names[i]];
     chart_rows[i] = new Array();
-    for (var j = 0; j < criterion_names.length; j++) {
+    for (var j = criterion_names.length-1; j >= 0; j--) {
+    //for (var j = 0; j < criterion_names.length; j++) {
       row.push(parseFloat($('#value_' + i + '_' + j).val()) * $('#weight_' + j).val() / 100);
     }
     data_c.addRow(row);
@@ -148,7 +152,8 @@ function draw_graphs() {
     vAxis: {
       title: "Votes"
     },
-    isStacked: true
+    isStacked: true,
+    colors: chartColors //reverse of Googles colors
   });
 
   var data_p = new google.visualization.DataTable();

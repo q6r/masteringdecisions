@@ -51,3 +51,15 @@ form {
   padding:0px 20px 20px 20px;
   margin:auto auto;
 }
+
+#chart_div {
+  float:left;
+}
+
+#pie_div {
+  float:left;
+}
+
+#table_div {
+  clear:both;
+}
