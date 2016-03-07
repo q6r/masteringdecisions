@@ -8,7 +8,9 @@ var ballots;
 
 function main(body) {
   getScript('https://www.gstatic.com/charts/loader.js', function() {
-    google.charts.load('current', {packages: ['corechart', 'table']});
+    google.charts.load('current', {
+      packages: ['corechart', 'table']
+    });
     google.charts.setOnLoadCallback(function() {
       var decision_id = window.location.pathname.substr('/results/'.length);
       var decision_stage;
@@ -46,9 +48,9 @@ function main(body) {
         return;
       } else {
         $("body").html('<div id="header" class="navbar-inverse"><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP" /></CENTER></div>');
-        
+
         decision_name = decision.name;
-        
+
         //criterion info
         for (var i = 0; i < criterion.length; i++) {
           criterion_names[i] = criterion[i].name;
@@ -61,7 +63,7 @@ function main(body) {
           alternative_ids[i] = alternatives[i].alternative_id;
         }
 
-        var page = '<h1 id="chart_title">Voting Results - '+decision_name+'<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="pie_div"></div>' + '</td>' + '<td style=>' + '<div id="chart_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing'+'</form>';
+        var page = '<h1 id="chart_title">Voting Results - ' + decision_name + '<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="pie_div"></div>' + '</td>' + '<td style=>' + '<div id="chart_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing' + '</form>';
 
         $('<div id="content">').appendTo('body');
         $('#content').append(page);
@@ -72,7 +74,7 @@ function main(body) {
         $(temp_row).append($('<th>').text(' '));
 
         for (var i = 0; i < criterion_names.length; i++) {
-          $(temp_row).append($('<th>').text(criterion_names[i]).addClass("crit"+i));
+          $(temp_row).append($('<th>').text(criterion_names[i]).addClass("crit" + i));
         }
 
         $(temp_row).append($('<th>').text('Final Tally'));
@@ -143,7 +145,9 @@ function draw_graphs() {
   col_chart.draw(data_c, {
     width: 600,
     height: 400,
-    vAxis: {title: "Votes"},
+    vAxis: {
+      title: "Votes"
+    },
     isStacked: true
   });
 
@@ -171,29 +175,33 @@ function draw_graphs() {
 function rebalance_weights(x) {
 
 
-  if( $("#paused").prop("checked") == false) {
-  //Check overflow
-  if(parseFloat($('#weight_' + x).val()) > 100) {$('#weight_' + x).val('100')}
-  if(parseFloat($('#weight_' + x).val()) < 0) {$('#weight_' + x).val('0')}
-
-  var total_weight = 0;
-  for (var i = 0; i < criterion_names.length; i++) {
-    total_weight += parseFloat($('#weight_' + i).val());
-  }
-
-
-  for (var i = 0; i < criterion_names.length; i++) {
-    if (i != x) {
-      var old_value = parseFloat($('#weight_' + i).val());
-      var changed_value = parseFloat($('#weight_' + x).val());
-      var sub_total = parseFloat(total_weight - changed_value);
-
-      var new_value = (old_value - (old_value / sub_total * (total_weight - 100))).toFixed(3);
-      var new_tally;
-
-      $('#weight_' + i).val(new_value);
+  if ($("#paused").prop("checked") == false) {
+    //Check overflow
+    if (parseFloat($('#weight_' + x).val()) > 100) {
+      $('#weight_' + x).val('100')
     }
-  }
+    if (parseFloat($('#weight_' + x).val()) < 0) {
+      $('#weight_' + x).val('0')
+    }
+
+    var total_weight = 0;
+    for (var i = 0; i < criterion_names.length; i++) {
+      total_weight += parseFloat($('#weight_' + i).val());
+    }
+
+
+    for (var i = 0; i < criterion_names.length; i++) {
+      if (i != x) {
+        var old_value = parseFloat($('#weight_' + i).val());
+        var changed_value = parseFloat($('#weight_' + x).val());
+        var sub_total = parseFloat(total_weight - changed_value);
+
+        var new_value = (old_value - (old_value / sub_total * (total_weight - 100))).toFixed(3);
+        var new_tally;
+
+        $('#weight_' + i).val(new_value);
+      }
+    }
   }
   for (var i = 0; i < alternative_names.length; i++) {
     new_tally = 0;
@@ -202,20 +210,20 @@ function rebalance_weights(x) {
     }
     $('#totals_' + i).text(new_tally.toFixed(3));
   }
-  
+
 
   var new_total = 0;
-  for(var i=0; i<criterion_names.length; i++) {
+  for (var i = 0; i < criterion_names.length; i++) {
 
-	new_total += parseFloat($('#weight_'+i).val());
+    new_total += parseFloat($('#weight_' + i).val());
 
   }
 
   $("#weight_total").text(Math.round(new_total));
-	
+
 
   draw_graphs();
-  
+
 }
 
 function calculate_table() {
@@ -240,7 +248,7 @@ function calculate_table() {
   for (var i = 0; i < ballots.length; i++) {
     temp_sum = 0;
     temp_weights = [];
-    
+
     if (ballots[i].rating.length != 0) {
       for (var j = 0; j < ballots[i].rating.length; j++) {
         temp_weights.push(ballots[i].rating[j].rating);
@@ -254,7 +262,9 @@ function calculate_table() {
     }
   }
 
-  if (weights.length == 0) { return;} //No vote checking, might expand later
+  if (weights.length == 0) {
+    return;
+  } //No vote checking, might expand later
 
   for (var i = 0; i < weights[0].length; i++) {
     temp_sum = 0;
@@ -272,7 +282,7 @@ function calculate_table() {
   for (var i = 0; i < ballots.length; i++) {
     temp_sum = 0;
     temp_votes = [];
-    
+
     if (ballots[i].votes.length != 0) {
       for (var j = 0; j < ballots[i].votes.length; j++) {
         temp_votes.push(ballots[i].votes[j].weight);

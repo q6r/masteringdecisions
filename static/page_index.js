@@ -176,7 +176,7 @@ function buildTemplate() {
 
   updateUserText();
   $('#manageUsers').hide();
-  
+
   //Toggles the arrows to be correct
   $("a").attr("aria-expanded", "true");
   $("a").click(function() {
@@ -195,7 +195,9 @@ function clearContent() {
 //Updates the username in the topNav
 function updateUserText() {
   get_text("/whoami", function(result) {
-    if(result['person_id'] == 0) {$('#manageUsers').show();}
+    if (result['person_id'] == 0) {
+      $('#manageUsers').show();
+    }
     get_text("/person/" + result['person_id'] + "/info", function(result) {
       $('#userName').text(' ' + result['person']['name_first'] + ' ' + result['person']['name_last']);
     });
@@ -872,8 +874,8 @@ function buildEditDecision(decisionID) {
   $('<button>').addClass('btn btn-lg btn-danger btn-block').attr('id', 'deleteDecisionBtn').attr('onclick', 'deleteDecision(' + decisionID + ');').text('Delete Decision').appendTo(form);
   $('<button>').addClass('btn btn-lg btn-success btn-block').attr('id', 'duplicateDecisionBtn').attr('onclick', 'duplicateDecision(' + decisionID + ');').text('Duplicate Decision').appendTo(form);
   $('<hr/>').appendTo(form);
-  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionVotesBtn').attr('onclick', '$("<a>").attr("href","/decision/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Votes').css('float','left').css('width', '48%').appendTo(form);
-  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/results/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Results').css('float','right').css('width', '48%').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionVotesBtn').attr('onclick', '$("<a>").attr("href","/decision/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Votes').css('float', 'left').css('width', '48%').appendTo(form);
+  $('<button>').addClass('btn btn-lg btn-info').attr('id', 'decisionResultsBtn').attr('onclick', '$("<a>").attr("href","/results/' + decisionID + '").attr("target", "_blank")[0].click();').text('View Results').css('float', 'right').css('width', '48%').appendTo(form);
   $('#decisionResultsBtn').hide();
   $('#decisionVotesBtn').hide();
 
@@ -1470,7 +1472,7 @@ function buildDecisionInvite(decisionID) {
 
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'sendInvite(' + decisionID + ');').attr('style', 'float: right;').append('<span> <i class="glyphicon glyphicon-envelope"></i>  Invite and Email</span>').appendTo(form);
   $('<button>').addClass('btn btn-primary').attr('id', 'invite_submit').attr('onclick', 'addBallot(' + decisionID + ');').attr('style', 'float: right; margin-right:10px;').append('<span> <i class="glyphicon glyphicon-user"></i>  Invite </span>').appendTo(form);
-  
+
   $('<div>').addClass('clearFix').appendTo(form);
 
   get_text("/decision/" + decisionID + "/info", function(result) {
@@ -1550,28 +1552,28 @@ function bulkInvite(decisionID) {
   $('#error').hide()
 
   get_text('/decision/' + decisionID + '/ballots', function(result) {
-	ballots = result["ballots"];
+    ballots = result["ballots"];
 
-	$('#bulk_invite_sent').html('Invited ballots: ');
-  
-	for(var i in ballots) {
-	  ballot = ballots[i];
-	  if(!ballot["sent"]) {
-      $('#bulk_invite_sent').append(ballot["email"] + ' | ');
-		  get_text(ballot["url"] + "/invite", function(result) {
-      if (result['error']) {
-			  $('#error').html('<b>Error:</b> ' + result['error']);
-			  $('#error').show()
-			} else if (result['result'] == "invited") {
-			  $('#bulk_invite_sent').show();
-			} else {
-			  $('#error').html('<b>Error:</b> Something went wrong :(');
-			  $('#error').show();
-			}
-		  });
+    $('#bulk_invite_sent').html('Invited ballots: ');
 
-	  }
-	}
+    for (var i in ballots) {
+      ballot = ballots[i];
+      if (!ballot["sent"]) {
+        $('#bulk_invite_sent').append(ballot["email"] + ' | ');
+        get_text(ballot["url"] + "/invite", function(result) {
+          if (result['error']) {
+            $('#error').html('<b>Error:</b> ' + result['error']);
+            $('#error').show()
+          } else if (result['result'] == "invited") {
+            $('#bulk_invite_sent').show();
+          } else {
+            $('#error').html('<b>Error:</b> Something went wrong :(');
+            $('#error').show();
+          }
+        });
+
+      }
+    }
   });
 }
 
@@ -1682,13 +1684,13 @@ function buildDecisionStatus(decisionID) {
   $('<div>').attr('id', 'bulk_invite_sent').addClass('alert alert-success').appendTo(wrapper);
   $('#bulk_invite_sent').hide();
 
-  $('<div>').css('margin-bottom','20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Send All')).appendTo(wrapper);
+  $('<div>').css('margin-bottom', '20px').addClass('clearFix').append($('<button>').addClass('btn btn-primary').attr('style', 'float: right;').attr('onclick', 'bulkInvite(' + decisionID + ');').text('Send All')).appendTo(wrapper);
 
 
 
   $('<div>').attr('id', 'formDiv').appendTo(wrapper);
 
-  $('<div>').attr('id', 'statusTable').appendTo(wrapper).css('margin-top','10px');
+  $('<div>').attr('id', 'statusTable').appendTo(wrapper).css('margin-top', '10px');
   buildStatusTable(decisionID);
 
   //resets table every 5 seconds :)

@@ -100,7 +100,7 @@ function main(body) {
       errorPage("This decision has been locked.");
       return;
     } else if (votes.length != 0) {
-      errorPage("You have already voted in this decision, contact the facilitator if you wish to change your vote.");		    
+      errorPage("You have already voted in this decision, contact the facilitator if you wish to change your vote.");
     } else {
       var page = "<div id=\"topbar\" class=\"navbar navbar-default navbar-fixed-top\">" + "<div class=\"container\">" + "<a class=\"navbar-brand\">" + decision_name + "</a>" + "</div>" + "</div>" + "<div id=\"ballotbody\" class=\"container\">" + "<div class=\"row\">" + "<div class=\"col-md-6 col-md-offset-3\" id=\"topRow\">" + "<img id=\"decision_image\" src=\"" + dec_img + "\"></img>" + "<h3>Welcome, " + voter_name + "! </h3>" + "<p class=\"lead\">" + decision_desc + "</p>" + "<div id='crit_inst' class='partone'>" + crit_instructions + "</div>" + "</div>" + "</div>" + "<form class=\"form-horizontal center partone\" role=\"form\">";
 
@@ -132,11 +132,11 @@ function main(body) {
 
         if (alt_vote_style == "5") {
           for (var j = 0; j < criterion_names.length; j++) {
-            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-greenyellow\">Well Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-orange\">Poorly Aligned</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
+            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-greenyellow\">Well Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-orange\">Poorly Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
           }
         } else { //3
           for (var j = 0; j < criterion_names.length; j++) {
-            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" +  "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" +  "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
+            page += "<td>" + "<div class=\"dropdown\">" + "<button class=\"btn btn-default dropdown-toggle center\" type=\"button\" id=\"dropdownMenu" + i + j + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + "<div id=\"alt" + i + "crit" + j + "_color\" class=\"color_pick\"></div>" + "</button>" + "<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu" + i + j + "\">" + "<li id=\"alt" + i + "crit" + j + "g\" class=\"vote-green\">Very Well-Aligned</li>" + "<li id=\"alt" + i + "crit" + j + "y\" class=\"vote-yellow\">Neutral</li>" + "<li id=\"alt" + i + "crit" + j + "r\" class=\"vote-red\">Very Poorly-Aligned</li>" + "</ul>" + "</div>" + "</td>";
           }
         }
         page += "</tr>";
@@ -359,14 +359,14 @@ function bindValuesText(slider, span) {
       '10 - Extremely important'
     ];
     span.innerHTML = test[values[handle]];
-    $('#'+span.id).data('val', values[handle]);
+    $('#' + span.id).data('val', values[handle]);
   });
 }
 
 function bindValuesNumbers(slider, span) {
   slider.noUiSlider.on('update', function(values, handle) {
     span.innerHTML = values[handle];
-    $('#'+span.id).data('val', values[handle]);
+    $('#' + span.id).data('val', values[handle]);
   });
 }
 
@@ -434,7 +434,7 @@ function get_votes(decision_id, ballot_id) {
   var result = null;
   $.ajax({
     type: "GET",
-    url: base_url + "/decision/" +decision_id + "/ballot/" +ballot_id+ "/votes",
+    url: base_url + "/decision/" + decision_id + "/ballot/" + ballot_id + "/votes",
     contentType: 'application/json; charset=utf-8',
     async: false,
     success: function(r) {

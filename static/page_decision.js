@@ -10,10 +10,9 @@ function main(body) {
 
   get_text("/decision/" + decisionID + "/info", function(result) {
     if (result['decision']) {
-      if (result['decision']['stage'] == 1 || result['decision']['stage'] ==2 ) {
+      if (result['decision']['stage'] == 1 || result['decision']['stage'] == 2) {
         errorPage('Voting Results For ' + result['decision']['name'] + ' are not yet avalible');
-      }
-      else if (result['decision']['stage'] == 4) {
+      } else if (result['decision']['stage'] == 4) {
         errorPage(result['decision']['name'] + ' has been locked.');
       } else { //Voting is completed, show results!
         buildResultsPage(decisionID);
@@ -29,7 +28,7 @@ function main(body) {
 }
 
 function buildResultsPage(decisionID) {
-  get_text("/decision/"+decisionID+"/criterions", function(results){
+  get_text("/decision/" + decisionID + "/criterions", function(results) {
     var critNames = []; //Array of crit names
     var critIds = [];
     for (var i in results["criterions"]) {
@@ -41,17 +40,17 @@ function buildResultsPage(decisionID) {
     get_text("/decision/" + decisionID + "/alternatives", function(results) {
       var altNames = []; //Array of alt names
       var altIds = [];
-      
+
       var key = $('<table>').attr('id', 'keyTable').appendTo('body');
       key.append($('<tr>').append($('<th>').text('Alternatives Key').attr('colspan', '2')));
-      
+
       for (i in results["alternatives"]) {
         var a = results["alternatives"][i];
         altNames.push(String.fromCharCode(65 + parseInt(i)));
         altIds.push(a["alternative_id"]);
         key.append('<tr><td>' + String.fromCharCode(65 + parseInt(i)) + '</td><td>' + a['name'] + '</td></tr>');
       }
-      
+
       //Table and row 1
       var table = $('<table>').addClass('table table-striped').attr('id', 'votesTable').append('<tbody>').appendTo('body');
       table.append(
@@ -102,7 +101,7 @@ function buildResultsPage(decisionID) {
           //Fill in the Name
           var b = results["ballots"][i];
           $('#name' + i).text(b["name"]);
-          
+
           //Fill in the Ratings
           for (var j in b["rating"]) {
             var r = b["rating"][j];
