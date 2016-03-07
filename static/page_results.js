@@ -45,6 +45,8 @@ function main(body) {
         errorPage("Decision stage must be complete in order to view results");
         return;
       } else {
+        $("body").html('<div id="header" class="navbar-inverse"><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP" /></CENTER></div>');
+        
         decision_name = decision.name;
         
         //criterion info
@@ -61,9 +63,10 @@ function main(body) {
 
         var page = '<h1 id="chart_title">Voting Results - '+decision_name+'<table align="center">' + '<tr align="top">' + '<td colSpan=2>' + '<div id="pie_div"></div>' + '</td>' + '<td style=>' + '<div id="chart_div"></div>' + '</td>' + '</tr>' + '<tr>' + '<td>' + '<div id="table_div"></div>' + '</td>' + '</tr>' + '</table>' + '<input class="btn btn-warning" id="clearbtn" type="button" value="Refresh" onClick="window.location.reload()">' + '<form>' + '<input type="checkbox" name="pause" id="paused"> Pause automatic weight balancing'+'</form>';
 
-        $('body').append(page);
+        $('<div id="content">').appendTo('body');
+        $('#content').append(page);
 
-        var data_table = $('<table>').addClass('table table-striped').attr('id', 'dataTable').append('<tbody>').appendTo('body');
+        var data_table = $('<table>').addClass('table table-striped').attr('id', 'dataTable').append('<tbody>').appendTo('#content');
         var temp_row = $('<tr>');
 
         $(temp_row).append($('<th>').text(' '));

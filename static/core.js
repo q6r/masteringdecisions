@@ -128,6 +128,5 @@ function getParameterByName(name, url) {
 }
 
 function errorPage(error){
-  $("body").attr("STYLE","BACKGROUND:#A4A4A4 !IMPORTANT").append('<H2><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP"</CENTER><H2 STYLE="margin-top:50px;">'+error+'</H2>'
-);
+  $("body").attr("STYLE","BACKGROUND:#A4A4A4 !IMPORTANT").html('<H2><CENTER><IMG SRC="/static/images/logo.png" ALIGN="TOP" /><H2 STYLE="margin-top:50px;">'+error+'</H2>');
 }

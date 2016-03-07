@@ -687,7 +687,7 @@ function createNewDecision() {
   } else {
     get_text("/whoami", function(result) {
       if (result['person_id'] == 0) {
-        $('#error').html('<b>Error:</b> The admin account cannot have decisons!');
+        $('#error').html('<b>Error:</b> The admin account cannot create decisons!');
         $('#error').show();
         return;
       }
@@ -700,8 +700,8 @@ function createNewDecision() {
         "alternative_vote_style": "3", //3-color
         "client_settings": "",
         "display_name": $("#name").val(),
-        "criteria_instruction": "",
-        "alternative_instruction": "",
+        "criteria_instruction": "<h4><strong>Instructions:</strong></h4>\r\n<p style=\"margin-bottom: 50px;\">Using the sliders below, rate the importance of each evaluation factor.</p>",
+        "alternative_instruction": "<h4><strong>Instructions:</strong></h4>\r\n<p>Using the boxes below, rate how well each alternative satisfies each evaluation factor.</p>\r\n<p>It is best to work on one factor at a time.</p>",
         "image": ""
       }
       post_text("/decision", JSON.stringify(new_decision), function(result) {

@@ -32,11 +32,22 @@
 .crit30{color: #743411;}
 
 #clearbtn { 
-	
-	margin-bottom:20px;
-
+  margin-bottom:20px;
 }
 form {
-	font-size:15px;
-		
+  font-size:15px;
+}
+
+#header {
+  width:100%;
+  margin: 0px;
+}
+
+#header img {
+  margin:auto auto;
+}
+
+#content {
+  padding:0px 20px 20px 20px;
+  margin:auto auto;
 }
