@@ -128,7 +128,6 @@ function draw_graphs() {
   data_c.addColumn('string', 'criterion');
 
   for (var i = criterion_names.length-1; i >= 0; i--) {
-  //for (var i = 0; i< criterion_names.length; i++) {
     data_c.addColumn('number', criterion_names[i]);
     chartColors.push(colors[i]);
   }
@@ -138,7 +137,6 @@ function draw_graphs() {
     var row = [alternative_names[i]];
     chart_rows[i] = new Array();
     for (var j = criterion_names.length-1; j >= 0; j--) {
-    //for (var j = 0; j < criterion_names.length; j++) {
       row.push(parseFloat($('#value_' + i + '_' + j).val()) * $('#weight_' + j).val() / 100);
     }
     data_c.addRow(row);
