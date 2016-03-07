@@ -151,7 +151,8 @@ function draw_graphs() {
       title: "Votes"
     },
     isStacked: true,
-    colors: chartColors //reverse of Googles colors
+    colors: chartColors, //reverse of Googles colors
+    chartArea: {  width: "50%" }
   });
 
   var data_p = new google.visualization.DataTable();
