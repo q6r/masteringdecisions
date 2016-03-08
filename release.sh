@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install dependencies before running
-***REMOVED***##############
+#######################################
 # uglify-js "npm install uglify-js -g"
 # cleancc   "npm install clean-css -g"
 
