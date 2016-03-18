@@ -1,3 +1,10 @@
+# Intro
+
+This is a opensource website (backend/frontend) written by a bunch of people
+for our capstone class at the university for a company called www.masteringdecisions.com.
+The tool is used to help in making decisions. I wrote the backend portion of this project,
+API and all code is documented.
+
 # Backend
 
 This is the backend written in [Golang](http://golang.org). This verison is
